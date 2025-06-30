@@ -25,7 +25,10 @@ class BackendDataverseService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = 'http://localhost:3001/api/dataverse';
+    // Azure Functions API base URL (will be localhost during development, Azure URL when deployed)
+    this.baseUrl = process.env.NODE_ENV === 'production' 
+      ? '/api/dataverse'  // Azure Static Web Apps automatically routes /api to Azure Functions
+      : 'http://localhost:7071/api/dataverse';  // Local Azure Functions development server
   }
 
   // Contact (Trainer) operations

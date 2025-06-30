@@ -53,8 +53,6 @@ backend/.env.*
 backend/local.settings.json
 
 # Azure Functions
-api/
-func/
-.funcignore
-host.json
 local.settings.json
+api/local.settings.json
+.funcignore
