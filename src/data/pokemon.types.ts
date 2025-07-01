@@ -44,19 +44,16 @@ export interface EvolutionRequirement {
 
 export interface PokemonDataverseEntity {
   pokemon_pokemonid?: string;
-  pokemon_id: number;
+  pokemon_number: number;
   pokemon_name: string;
-  pokemon_height?: number;
-  pokemon_weight?: number;
+  pokemon_height: number;
+  pokemon_weight: number;
   pokemon_sprite_url?: string;
   pokemon_artwork_url?: string;
-  pokemon_types?: string; // JSON string of types array
-  pokemon_stats?: string; // JSON string of stats array
-  pokemon_abilities?: string; // JSON string of abilities array
-  pokemon_evolution?: string; // JSON string of evolution data
-  pokemon_type?: string;
-  pokemon_description?: string;
-  pokemon_imageurl?: string;
+  pokemon_types: string; // JSON string of types array
+  pokemon_stats: string; // JSON string of stats array
+  pokemon_abilities: string; // JSON string of abilities array
+  pokemon_evolution: string; // JSON string of evolution data
 }
 
 export type PokemonList = Pokemon[];

@@ -4,7 +4,7 @@
 # Azure Functions localsettings file
 local.settings.json
 
-# Temporary server files with secrets
+# Temporary server files
 temp-server.js
 
 # User-specific files
