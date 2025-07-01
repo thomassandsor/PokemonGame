@@ -3,11 +3,11 @@ import { Container, Row, Col, Card, Button, Alert, Modal, Form } from 'react-boo
 import { useNavigate } from 'react-router-dom';
 import { useMsal, useAccount } from '@azure/msal-react';
 import QrScanner from 'qr-scanner';
-import { createPokemon, getContactByEmail, type Pokemon } from '../../services/backendDataverseService';
+import { catchPokemonByName, getContactByEmail } from '../../services/azureFunctionsDataverseService';
 
 const QRScannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
   const account = useAccount(accounts[0] || {});
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrScannerRef = useRef<QrScanner | null>(null);
@@ -16,13 +16,8 @@ const QRScannerPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [scannedData, setScannedData] = useState<any>(null);
   const [pokemonData, setPokemonData] = useState({
-    name: '',
-    species: '',
-    type: '',
-    level: 1,
-    imageUrl: ''
+    name: ''
   });
 
   useEffect(() => {
@@ -79,13 +74,8 @@ const QRScannerPage: React.FC = () => {
         pokemonInfo = { name: data };
       }
       
-      setScannedData(pokemonInfo);
       setPokemonData({
-        name: pokemonInfo.name || 'Unknown Pokemon',
-        species: pokemonInfo.species || '',
-        type: pokemonInfo.type || '',
-        level: pokemonInfo.level || 1,
-        imageUrl: pokemonInfo.imageUrl || pokemonInfo.image || ''
+        name: pokemonInfo.name || 'Unknown Pokemon'
       });
       
       setShowModal(true);
@@ -112,18 +102,8 @@ const QRScannerPage: React.FC = () => {
         return;
       }
 
-      // Create new Pokemon
-      const newPokemon: Omit<Pokemon, 'new_pokemonid' | 'createdon'> = {
-        new_name: pokemonData.name,
-        new_species: pokemonData.species || undefined,
-        new_type: pokemonData.type || undefined,
-        new_imageurl: pokemonData.imageUrl || undefined,
-        new_level: pokemonData.level || 1,
-        new_caughtdate: new Date().toISOString(),
-        new_contactid: contact.contactid,
-      };
-
-      await createPokemon(newPokemon);
+      // Catch the Pokemon using the simplified schema
+      await catchPokemonByName(contact.contactid, pokemonData.name);
       
       setSuccess(`${pokemonData.name} has been added to your collection!`);
       setShowModal(false);
@@ -233,64 +213,12 @@ const QRScannerPage: React.FC = () => {
                 value={pokemonData.name}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter Pokemon name"
               />
+              <Form.Text className="text-muted">
+                This will be saved to your Pokedex collection.
+              </Form.Text>
             </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Species</Form.Label>
-              <Form.Control
-                type="text"
-                name="species"
-                value={pokemonData.species}
-                onChange={handleInputChange}
-                placeholder="e.g., Electric Mouse Pokemon"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Type</Form.Label>
-              <Form.Control
-                type="text"
-                name="type"
-                value={pokemonData.type}
-                onChange={handleInputChange}
-                placeholder="e.g., Electric"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Level</Form.Label>
-              <Form.Control
-                type="number"
-                name="level"
-                value={pokemonData.level}
-                onChange={handleInputChange}
-                min="1"
-                max="100"
-              />
-            </Form.Group>
-            
-            <Form.Group className="mb-3">
-              <Form.Label>Image URL</Form.Label>
-              <Form.Control
-                type="url"
-                name="imageUrl"
-                value={pokemonData.imageUrl}
-                onChange={handleInputChange}
-                placeholder="https://example.com/pokemon-image.jpg"
-              />
-            </Form.Group>
-            
-            {pokemonData.imageUrl && (
-              <div className="text-center mb-3">
-                <img 
-                  src={pokemonData.imageUrl} 
-                  alt={pokemonData.name}
-                  style={{ maxWidth: '200px', maxHeight: '200px' }}
-                  className="img-fluid rounded"
-                />
-              </div>
-            )}
           </Form>
         </Modal.Body>
         <Modal.Footer>

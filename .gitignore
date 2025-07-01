@@ -47,11 +47,6 @@ logs
 *.tar.gz
 *.dmg
 
-# Backend environment files
-backend/.env
-backend/.env.*
-backend/local.settings.json
-
 # Azure Functions
 local.settings.json
 api/local.settings.json

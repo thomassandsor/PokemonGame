@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "DATAVERSE_URL": "https://pokemongame.crm4.dynamics.com/api/data/v9.2",
+    "DATAVERSE_TENANT_ID": "your-tenant-id-here",
+    "DATAVERSE_CLIENT_ID": "your-client-id-here",
+    "DATAVERSE_CLIENT_SECRET": "your-client-secret-here",
+    "DATAVERSE_SCOPE": "https://pokemongame.crm4.dynamics.com/.default"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}

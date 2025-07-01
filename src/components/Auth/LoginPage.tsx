@@ -1,12 +1,9 @@
 import React from 'react';
 import { Card, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest } from '../../config/authConfig';
-import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
   const { instance } = useMsal();
-  const navigate = useNavigate();
   const [error, setError] = React.useState<string>('');
 
   const handleFreshRegistration = async () => {

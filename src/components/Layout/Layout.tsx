@@ -31,7 +31,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {isAuthenticated && (
                 <>
                   <Nav.Link onClick={() => navigate('/my-page')}>My Pokemon</Nav.Link>
+                  <Nav.Link onClick={() => navigate('/pokemon-browser')}>Browse Pokemon</Nav.Link>
+                  <Nav.Link onClick={() => navigate('/battle-arena')}>Battle Arena</Nav.Link>
+                  <Nav.Link onClick={() => navigate('/evolution-lab')}>Evolution Lab</Nav.Link>
                   <Nav.Link onClick={() => navigate('/scan-pokemon')}>Scan Pokemon</Nav.Link>
+                  <Nav.Link onClick={() => navigate('/admin')}>Admin</Nav.Link>
                 </>
               )}
             </Nav>

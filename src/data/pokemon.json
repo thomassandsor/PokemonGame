@@ -1,0 +1,8657 @@
+[
+  {
+    "id": 1,
+    "name": "bulbasaur",
+    "height": 7,
+    "weight": 69,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 49
+      },
+      {
+        "name": "defense",
+        "base_stat": 49
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "overgrow",
+      "chlorophyll"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 2,
+          "name": "ivysaur",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 2,
+    "name": "ivysaur",
+    "height": 10,
+    "weight": 130,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 62
+      },
+      {
+        "name": "defense",
+        "base_stat": 63
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 80
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "overgrow",
+      "chlorophyll"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 1,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 3,
+          "name": "venusaur",
+          "requirement": {
+            "level": 32,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur",
+    "height": 20,
+    "weight": 1000,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 82
+      },
+      {
+        "name": "defense",
+        "base_stat": 83
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "overgrow",
+      "chlorophyll"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 2,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 4,
+    "name": "charmander",
+    "height": 6,
+    "weight": 85,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 39
+      },
+      {
+        "name": "attack",
+        "base_stat": 52
+      },
+      {
+        "name": "defense",
+        "base_stat": 43
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "blaze",
+      "solar-power"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 5,
+          "name": "charmeleon",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 5,
+    "name": "charmeleon",
+    "height": 11,
+    "weight": 190,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 58
+      },
+      {
+        "name": "attack",
+        "base_stat": 64
+      },
+      {
+        "name": "defense",
+        "base_stat": 58
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 80
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "blaze",
+      "solar-power"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 4,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 6,
+          "name": "charizard",
+          "requirement": {
+            "level": 36,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 6,
+    "name": "charizard",
+    "height": 17,
+    "weight": 905,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
+    },
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 78
+      },
+      {
+        "name": "attack",
+        "base_stat": 84
+      },
+      {
+        "name": "defense",
+        "base_stat": 78
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 109
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "blaze",
+      "solar-power"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 5,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 7,
+    "name": "squirtle",
+    "height": 5,
+    "weight": 90,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 44
+      },
+      {
+        "name": "attack",
+        "base_stat": 48
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 64
+      },
+      {
+        "name": "speed",
+        "base_stat": 43
+      }
+    ],
+    "abilities": [
+      "torrent",
+      "rain-dish"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 8,
+          "name": "wartortle",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 8,
+    "name": "wartortle",
+    "height": 10,
+    "weight": 225,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/8.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/8.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 59
+      },
+      {
+        "name": "attack",
+        "base_stat": 63
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 58
+      }
+    ],
+    "abilities": [
+      "torrent",
+      "rain-dish"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 7,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 9,
+          "name": "blastoise",
+          "requirement": {
+            "level": 36,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 9,
+    "name": "blastoise",
+    "height": 16,
+    "weight": 855,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/9.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 79
+      },
+      {
+        "name": "attack",
+        "base_stat": 83
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 105
+      },
+      {
+        "name": "speed",
+        "base_stat": 78
+      }
+    ],
+    "abilities": [
+      "torrent",
+      "rain-dish"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 8,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 10,
+    "name": "caterpie",
+    "height": 3,
+    "weight": 29,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/10.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10.png"
+    },
+    "types": [
+      "bug"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 30
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 20
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 20
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "shield-dust",
+      "run-away"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 11,
+          "name": "metapod",
+          "requirement": {
+            "level": 7,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 11,
+    "name": "metapod",
+    "height": 7,
+    "weight": 99,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/11.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/11.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/11.png"
+    },
+    "types": [
+      "bug"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 20
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 25
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "shed-skin"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 10,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 12,
+          "name": "butterfree",
+          "requirement": {
+            "level": 10,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 12,
+    "name": "butterfree",
+    "height": 11,
+    "weight": 320,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/12.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/12.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png"
+    },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 90
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "compound-eyes",
+      "tinted-lens"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 11,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 13,
+    "name": "weedle",
+    "height": 3,
+    "weight": 32,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/13.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/13.png"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 35
+      },
+      {
+        "name": "defense",
+        "base_stat": 30
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 20
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 20
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "shield-dust",
+      "run-away"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 14,
+          "name": "kakuna",
+          "requirement": {
+            "level": 7,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 14,
+    "name": "kakuna",
+    "height": 6,
+    "weight": 100,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/14.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/14.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/14.png"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 25
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 25
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "shed-skin"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 13,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 15,
+          "name": "beedrill",
+          "requirement": {
+            "level": 10,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 15,
+    "name": "beedrill",
+    "height": 10,
+    "weight": 295,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/15.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/15.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/15.png"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 75
+      }
+    ],
+    "abilities": [
+      "swarm",
+      "sniper"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 14,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 16,
+    "name": "pidgey",
+    "height": 3,
+    "weight": 18,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/16.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/16.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 35
+      },
+      {
+        "name": "speed",
+        "base_stat": 56
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "tangled-feet",
+      "big-pecks"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 17,
+          "name": "pidgeotto",
+          "requirement": {
+            "level": 18,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 17,
+    "name": "pidgeotto",
+    "height": 11,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/17.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/17.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 63
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 71
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "tangled-feet",
+      "big-pecks"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 16,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 18,
+          "name": "pidgeot",
+          "requirement": {
+            "level": 36,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 18,
+    "name": "pidgeot",
+    "height": 15,
+    "weight": 395,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/18.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/18.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 83
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 75
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 101
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "tangled-feet",
+      "big-pecks"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 17,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 19,
+    "name": "rattata",
+    "height": 3,
+    "weight": 35,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/19.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/19.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 56
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 25
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 35
+      },
+      {
+        "name": "speed",
+        "base_stat": 72
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "guts",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 20,
+          "name": "raticate",
+          "requirement": {
+            "level": 20,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 20,
+    "name": "raticate",
+    "height": 7,
+    "weight": 185,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/20.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/20.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/20.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 81
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 97
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "guts",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 19,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 21,
+    "name": "spearow",
+    "height": 3,
+    "weight": 20,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/21.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/21.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/21.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 30
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 31
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 31
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "sniper"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 22,
+          "name": "fearow",
+          "requirement": {
+            "level": 20,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 22,
+    "name": "fearow",
+    "height": 12,
+    "weight": 380,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/22.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/22.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 61
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 61
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "sniper"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 21,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 23,
+    "name": "ekans",
+    "height": 20,
+    "weight": 69,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/23.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/23.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 44
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 54
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "shed-skin",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 24,
+          "name": "arbok",
+          "requirement": {
+            "level": 22,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 24,
+    "name": "arbok",
+    "height": 35,
+    "weight": 650,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/24.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/24.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 69
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 79
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "shed-skin",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 23,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 25,
+    "name": "pikachu",
+    "height": 4,
+    "weight": 60,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "static",
+      "lightning-rod"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 172,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 26,
+          "name": "raichu",
+          "requirement": {
+            "item": "thunder-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 26,
+    "name": "raichu",
+    "height": 8,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/26.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 90
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 110
+      }
+    ],
+    "abilities": [
+      "static",
+      "lightning-rod"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 25,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 27,
+    "name": "sandshrew",
+    "height": 6,
+    "weight": 120,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/27.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/27.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/27.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 75
+      },
+      {
+        "name": "defense",
+        "base_stat": 85
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 20
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 30
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "sand-veil",
+      "sand-rush"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 28,
+          "name": "sandslash",
+          "requirement": {
+            "level": 22,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 28,
+    "name": "sandslash",
+    "height": 10,
+    "weight": 295,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/28.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/28.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/28.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 75
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 110
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "sand-veil",
+      "sand-rush"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 27,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 29,
+    "name": "nidoran-f",
+    "height": 4,
+    "weight": 70,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/29.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/29.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 47
+      },
+      {
+        "name": "defense",
+        "base_stat": 52
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 41
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 30,
+          "name": "nidorina",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 30,
+    "name": "nidorina",
+    "height": 8,
+    "weight": 200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/30.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/30.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/30.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 62
+      },
+      {
+        "name": "defense",
+        "base_stat": 67
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 56
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 29,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 31,
+          "name": "nidoqueen",
+          "requirement": {
+            "item": "moon-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 31,
+    "name": "nidoqueen",
+    "height": 13,
+    "weight": 600,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/31.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/31.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/31.png"
+    },
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 92
+      },
+      {
+        "name": "defense",
+        "base_stat": 87
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 75
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 76
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "sheer-force"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 30,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 32,
+    "name": "nidoran-m",
+    "height": 5,
+    "weight": 90,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/32.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/32.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/32.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 46
+      },
+      {
+        "name": "attack",
+        "base_stat": 57
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 33,
+          "name": "nidorino",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 33,
+    "name": "nidorino",
+    "height": 9,
+    "weight": 195,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/33.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/33.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/33.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 61
+      },
+      {
+        "name": "attack",
+        "base_stat": 72
+      },
+      {
+        "name": "defense",
+        "base_stat": 57
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "hustle"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 32,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 34,
+          "name": "nidoking",
+          "requirement": {
+            "item": "moon-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 34,
+    "name": "nidoking",
+    "height": 14,
+    "weight": 620,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/34.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/34.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/34.png"
+    },
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 81
+      },
+      {
+        "name": "attack",
+        "base_stat": 102
+      },
+      {
+        "name": "defense",
+        "base_stat": 77
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "rivalry",
+      "sheer-force"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 33,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 35,
+    "name": "clefairy",
+    "height": 6,
+    "weight": 75,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/35.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/35.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/35.png"
+    },
+    "types": [
+      "fairy"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 48
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "cute-charm",
+      "magic-guard",
+      "friend-guard"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 173,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 36,
+          "name": "clefable",
+          "requirement": {
+            "item": "moon-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 36,
+    "name": "clefable",
+    "height": 13,
+    "weight": 400,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/36.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/36.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/36.png"
+    },
+    "types": [
+      "fairy"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 95
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 73
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "cute-charm",
+      "magic-guard",
+      "unaware"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 35,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 37,
+    "name": "vulpix",
+    "height": 6,
+    "weight": 99,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/37.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/37.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/37.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 38
+      },
+      {
+        "name": "attack",
+        "base_stat": 41
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "flash-fire",
+      "drought"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 38,
+          "name": "ninetales",
+          "requirement": {
+            "item": "fire-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 38,
+    "name": "ninetales",
+    "height": 11,
+    "weight": 199,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/38.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/38.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/38.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 73
+      },
+      {
+        "name": "attack",
+        "base_stat": 76
+      },
+      {
+        "name": "defense",
+        "base_stat": 75
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 81
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "flash-fire",
+      "drought"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 37,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 39,
+    "name": "jigglypuff",
+    "height": 5,
+    "weight": 55,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/39.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 115
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 20
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 20
+      }
+    ],
+    "abilities": [
+      "cute-charm",
+      "competitive",
+      "friend-guard"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 174,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 40,
+          "name": "wigglytuff",
+          "requirement": {
+            "item": "moon-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "height": 10,
+    "weight": 120,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/40.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/40.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/40.png"
+    },
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 140
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "cute-charm",
+      "competitive",
+      "frisk"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 39,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 41,
+    "name": "zubat",
+    "height": 8,
+    "weight": 75,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/41.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/41.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/41.png"
+    },
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 30
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "inner-focus",
+      "infiltrator"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 42,
+          "name": "golbat",
+          "requirement": {
+            "level": 22,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 42,
+    "name": "golbat",
+    "height": 16,
+    "weight": 550,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/42.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/42.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/42.png"
+    },
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 75
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "inner-focus",
+      "infiltrator"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 41,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 169,
+          "name": "crobat",
+          "requirement": {
+            "trigger": "level-up",
+            "min_happiness": 160
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 43,
+    "name": "oddish",
+    "height": 5,
+    "weight": 54,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/43.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/43.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 75
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "run-away"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 44,
+          "name": "gloom",
+          "requirement": {
+            "level": 21,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 44,
+    "name": "gloom",
+    "height": 8,
+    "weight": 86,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/44.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/44.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/44.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "stench"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 43,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 45,
+          "name": "vileplume",
+          "requirement": {
+            "item": "leaf-stone",
+            "trigger": "use-item"
+          }
+        },
+        {
+          "id": 182,
+          "name": "bellossom",
+          "requirement": {
+            "item": "sun-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 45,
+    "name": "vileplume",
+    "height": 12,
+    "weight": 186,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/45.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/45.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 75
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 85
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 110
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "effect-spore"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 44,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 46,
+    "name": "paras",
+    "height": 3,
+    "weight": 54,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/46.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/46.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/46.png"
+    },
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 25
+      }
+    ],
+    "abilities": [
+      "effect-spore",
+      "dry-skin",
+      "damp"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 47,
+          "name": "parasect",
+          "requirement": {
+            "level": 24,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 47,
+    "name": "parasect",
+    "height": 10,
+    "weight": 295,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/47.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/47.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/47.png"
+    },
+    "types": [
+      "bug",
+      "grass"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "effect-spore",
+      "dry-skin",
+      "damp"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 46,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 48,
+    "name": "venonat",
+    "height": 10,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/48.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/48.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/48.png"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "compound-eyes",
+      "tinted-lens",
+      "run-away"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 49,
+          "name": "venomoth",
+          "requirement": {
+            "level": 31,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 49,
+    "name": "venomoth",
+    "height": 15,
+    "weight": 125,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/49.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/49.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/49.png"
+    },
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 90
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "shield-dust",
+      "tinted-lens",
+      "wonder-skin"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 48,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 50,
+    "name": "diglett",
+    "height": 2,
+    "weight": 8,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/50.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/50.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/50.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 10
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 25
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 95
+      }
+    ],
+    "abilities": [
+      "sand-veil",
+      "arena-trap",
+      "sand-force"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 51,
+          "name": "dugtrio",
+          "requirement": {
+            "level": 26,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 51,
+    "name": "dugtrio",
+    "height": 7,
+    "weight": 333,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/51.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/51.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 120
+      }
+    ],
+    "abilities": [
+      "sand-veil",
+      "arena-trap",
+      "sand-force"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 50,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth",
+    "height": 4,
+    "weight": 42,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/52.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/52.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "pickup",
+      "technician",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 53,
+          "name": "persian",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        },
+        {
+          "id": 863,
+          "name": "perrserker",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian",
+    "height": 10,
+    "weight": 320,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/53.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/53.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 115
+      }
+    ],
+    "abilities": [
+      "limber",
+      "technician",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 52,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 54,
+    "name": "psyduck",
+    "height": 8,
+    "weight": 196,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/54.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 52
+      },
+      {
+        "name": "defense",
+        "base_stat": 48
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "damp",
+      "cloud-nine",
+      "swift-swim"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 55,
+          "name": "golduck",
+          "requirement": {
+            "level": 33,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 55,
+    "name": "golduck",
+    "height": 17,
+    "weight": 766,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/55.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/55.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 82
+      },
+      {
+        "name": "defense",
+        "base_stat": 78
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "damp",
+      "cloud-nine",
+      "swift-swim"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 54,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 56,
+    "name": "mankey",
+    "height": 5,
+    "weight": 280,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/56.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/56.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/56.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "vital-spirit",
+      "anger-point",
+      "defiant"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 57,
+          "name": "primeape",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 57,
+    "name": "primeape",
+    "height": 10,
+    "weight": 320,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/57.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/57.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 95
+      }
+    ],
+    "abilities": [
+      "vital-spirit",
+      "anger-point",
+      "defiant"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 56,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 979,
+          "name": "annihilape",
+          "requirement": {
+            "trigger": "other"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 58,
+    "name": "growlithe",
+    "height": 7,
+    "weight": 190,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/58.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/58.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "flash-fire",
+      "justified"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 59,
+          "name": "arcanine",
+          "requirement": {
+            "item": "fire-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 59,
+    "name": "arcanine",
+    "height": 19,
+    "weight": 1550,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/59.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 110
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 95
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "flash-fire",
+      "justified"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 58,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 60,
+    "name": "poliwag",
+    "height": 6,
+    "weight": 124,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/60.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/60.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 40
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "water-absorb",
+      "damp",
+      "swift-swim"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 61,
+          "name": "poliwhirl",
+          "requirement": {
+            "level": 25,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 61,
+    "name": "poliwhirl",
+    "height": 10,
+    "weight": 200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/61.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/61.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "water-absorb",
+      "damp",
+      "swift-swim"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 60,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 62,
+          "name": "poliwrath",
+          "requirement": {
+            "item": "water-stone",
+            "trigger": "use-item"
+          }
+        },
+        {
+          "id": 186,
+          "name": "politoed",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 62,
+    "name": "poliwrath",
+    "height": 13,
+    "weight": 540,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/62.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/62.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/62.png"
+    },
+    "types": [
+      "water",
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "water-absorb",
+      "damp",
+      "swift-swim"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 61,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 63,
+    "name": "abra",
+    "height": 9,
+    "weight": 195,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/63.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/63.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 25
+      },
+      {
+        "name": "attack",
+        "base_stat": 20
+      },
+      {
+        "name": "defense",
+        "base_stat": 15
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 105
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "synchronize",
+      "inner-focus",
+      "magic-guard"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 64,
+          "name": "kadabra",
+          "requirement": {
+            "level": 16,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 64,
+    "name": "kadabra",
+    "height": 13,
+    "weight": 565,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/64.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/64.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/64.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 35
+      },
+      {
+        "name": "defense",
+        "base_stat": 30
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 120
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 105
+      }
+    ],
+    "abilities": [
+      "synchronize",
+      "inner-focus",
+      "magic-guard"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 63,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 65,
+          "name": "alakazam",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 65,
+    "name": "alakazam",
+    "height": 15,
+    "weight": 480,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/65.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 135
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 120
+      }
+    ],
+    "abilities": [
+      "synchronize",
+      "inner-focus",
+      "magic-guard"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 64,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 66,
+    "name": "machop",
+    "height": 8,
+    "weight": 195,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/66.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/66.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/66.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 35
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "guts",
+      "no-guard",
+      "steadfast"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 67,
+          "name": "machoke",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 67,
+    "name": "machoke",
+    "height": 15,
+    "weight": 705,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/67.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/67.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 60
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "guts",
+      "no-guard",
+      "steadfast"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 66,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 68,
+          "name": "machamp",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 68,
+    "name": "machamp",
+    "height": 16,
+    "weight": 1300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/68.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/68.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 130
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "guts",
+      "no-guard",
+      "steadfast"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 67,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 69,
+    "name": "bellsprout",
+    "height": 7,
+    "weight": 40,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/69.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/69.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 75
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 30
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "gluttony"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 70,
+          "name": "weepinbell",
+          "requirement": {
+            "level": 21,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 70,
+    "name": "weepinbell",
+    "height": 10,
+    "weight": 64,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/70.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/70.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/70.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "gluttony"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 69,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 71,
+          "name": "victreebel",
+          "requirement": {
+            "item": "leaf-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 71,
+    "name": "victreebel",
+    "height": 17,
+    "weight": 155,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/71.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/71.png"
+    },
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "gluttony"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 70,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 72,
+    "name": "tentacool",
+    "height": 9,
+    "weight": 455,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/72.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/72.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/72.png"
+    },
+    "types": [
+      "water",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 40
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "clear-body",
+      "liquid-ooze",
+      "rain-dish"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 73,
+          "name": "tentacruel",
+          "requirement": {
+            "level": 30,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 73,
+    "name": "tentacruel",
+    "height": 16,
+    "weight": 550,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/73.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/73.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/73.png"
+    },
+    "types": [
+      "water",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 80
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 120
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "clear-body",
+      "liquid-ooze",
+      "rain-dish"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 72,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 74,
+    "name": "geodude",
+    "height": 4,
+    "weight": 200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/74.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/74.png"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 30
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 30
+      },
+      {
+        "name": "speed",
+        "base_stat": 20
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "sturdy",
+      "sand-veil"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 75,
+          "name": "graveler",
+          "requirement": {
+            "level": 25,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 75,
+    "name": "graveler",
+    "height": 10,
+    "weight": 1050,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/75.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/75.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/75.png"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 115
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "sturdy",
+      "sand-veil"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 74,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 76,
+          "name": "golem",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 76,
+    "name": "golem",
+    "height": 14,
+    "weight": 3000,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/76.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/76.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/76.png"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 120
+      },
+      {
+        "name": "defense",
+        "base_stat": 130
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "sturdy",
+      "sand-veil"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 75,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 77,
+    "name": "ponyta",
+    "height": 10,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/77.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/77.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/77.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 85
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "flash-fire",
+      "flame-body"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 78,
+          "name": "rapidash",
+          "requirement": {
+            "level": 40,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 78,
+    "name": "rapidash",
+    "height": 17,
+    "weight": 950,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/78.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/78.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 80
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 105
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "flash-fire",
+      "flame-body"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 77,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 79,
+    "name": "slowpoke",
+    "height": 12,
+    "weight": 360,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/79.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/79.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/79.png"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 15
+      }
+    ],
+    "abilities": [
+      "oblivious",
+      "own-tempo",
+      "regenerator"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 80,
+          "name": "slowbro",
+          "requirement": {
+            "level": 37,
+            "trigger": "level-up"
+          }
+        },
+        {
+          "id": 199,
+          "name": "slowking",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 80,
+    "name": "slowbro",
+    "height": 16,
+    "weight": 785,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/80.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/80.png"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 95
+      },
+      {
+        "name": "attack",
+        "base_stat": 75
+      },
+      {
+        "name": "defense",
+        "base_stat": 110
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "oblivious",
+      "own-tempo",
+      "regenerator"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 79,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 81,
+    "name": "magnemite",
+    "height": 3,
+    "weight": 60,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/81.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/81.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/81.png"
+    },
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 25
+      },
+      {
+        "name": "attack",
+        "base_stat": 35
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "magnet-pull",
+      "sturdy",
+      "analytic"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 82,
+          "name": "magneton",
+          "requirement": {
+            "level": 30,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 82,
+    "name": "magneton",
+    "height": 10,
+    "weight": 600,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/82.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/82.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/82.png"
+    },
+    "types": [
+      "electric",
+      "steel"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 120
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "magnet-pull",
+      "sturdy",
+      "analytic"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 81,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 462,
+          "name": "magnezone",
+          "requirement": {
+            "trigger": "level-up",
+            "location": "mt-coronet"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 83,
+    "name": "farfetchd",
+    "height": 8,
+    "weight": 150,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/83.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/83.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/83.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 52
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 58
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 62
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "inner-focus",
+      "defiant"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 865,
+          "name": "sirfetchd",
+          "requirement": {
+            "trigger": "three-critical-hits"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 84,
+    "name": "doduo",
+    "height": 14,
+    "weight": 392,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/84.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/84.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/84.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 85
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 35
+      },
+      {
+        "name": "speed",
+        "base_stat": 75
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "early-bird",
+      "tangled-feet"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 85,
+          "name": "dodrio",
+          "requirement": {
+            "level": 31,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 85,
+    "name": "dodrio",
+    "height": 18,
+    "weight": 852,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/85.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/85.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/85.png"
+    },
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 110
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 60
+      },
+      {
+        "name": "speed",
+        "base_stat": 110
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "early-bird",
+      "tangled-feet"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 84,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 86,
+    "name": "seel",
+    "height": 11,
+    "weight": 900,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/86.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/86.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/86.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "thick-fat",
+      "hydration",
+      "ice-body"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 87,
+          "name": "dewgong",
+          "requirement": {
+            "level": 34,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 87,
+    "name": "dewgong",
+    "height": 17,
+    "weight": 1200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/87.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/87.png"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 70
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "thick-fat",
+      "hydration",
+      "ice-body"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 86,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 88,
+    "name": "grimer",
+    "height": 9,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/88.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/88.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/88.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 25
+      }
+    ],
+    "abilities": [
+      "stench",
+      "sticky-hold",
+      "poison-touch"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 89,
+          "name": "muk",
+          "requirement": {
+            "level": 38,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 89,
+    "name": "muk",
+    "height": 12,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/89.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/89.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/89.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 105
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 75
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "stench",
+      "sticky-hold",
+      "poison-touch"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 88,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 90,
+    "name": "shellder",
+    "height": 3,
+    "weight": 40,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/90.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/90.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/90.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "shell-armor",
+      "skill-link",
+      "overcoat"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 91,
+          "name": "cloyster",
+          "requirement": {
+            "item": "water-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 91,
+    "name": "cloyster",
+    "height": 15,
+    "weight": 1325,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/91.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/91.png"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 180
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "shell-armor",
+      "skill-link",
+      "overcoat"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 90,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 92,
+    "name": "gastly",
+    "height": 13,
+    "weight": 1,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/92.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/92.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/92.png"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 35
+      },
+      {
+        "name": "defense",
+        "base_stat": 30
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 35
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "levitate"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 93,
+          "name": "haunter",
+          "requirement": {
+            "level": 25,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 93,
+    "name": "haunter",
+    "height": 16,
+    "weight": 1,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/93.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 115
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 95
+      }
+    ],
+    "abilities": [
+      "levitate"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 92,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 94,
+          "name": "gengar",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 94,
+    "name": "gengar",
+    "height": 15,
+    "weight": 405,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/94.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png"
+    },
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 130
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 110
+      }
+    ],
+    "abilities": [
+      "cursed-body"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 93,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 95,
+    "name": "onix",
+    "height": 88,
+    "weight": 2100,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/95.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/95.png"
+    },
+    "types": [
+      "rock",
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 160
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 30
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "sturdy",
+      "weak-armor"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 208,
+          "name": "steelix",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 96,
+    "name": "drowzee",
+    "height": 10,
+    "weight": 324,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/96.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/96.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/96.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 48
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 43
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 42
+      }
+    ],
+    "abilities": [
+      "insomnia",
+      "forewarn",
+      "inner-focus"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 97,
+          "name": "hypno",
+          "requirement": {
+            "level": 26,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 97,
+    "name": "hypno",
+    "height": 16,
+    "weight": 756,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/97.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/97.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/97.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 85
+      },
+      {
+        "name": "attack",
+        "base_stat": 73
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 73
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 115
+      },
+      {
+        "name": "speed",
+        "base_stat": 67
+      }
+    ],
+    "abilities": [
+      "insomnia",
+      "forewarn",
+      "inner-focus"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 96,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 98,
+    "name": "krabby",
+    "height": 4,
+    "weight": 65,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/98.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/98.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/98.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 90
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 25
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "hyper-cutter",
+      "shell-armor",
+      "sheer-force"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 99,
+          "name": "kingler",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 99,
+    "name": "kingler",
+    "height": 13,
+    "weight": 600,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/99.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/99.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/99.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 130
+      },
+      {
+        "name": "defense",
+        "base_stat": 115
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 75
+      }
+    ],
+    "abilities": [
+      "hyper-cutter",
+      "shell-armor",
+      "sheer-force"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 98,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 100,
+    "name": "voltorb",
+    "height": 5,
+    "weight": 104,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/100.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/100.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/100.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 30
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "soundproof",
+      "static",
+      "aftermath"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 101,
+          "name": "electrode",
+          "requirement": {
+            "level": 30,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 101,
+    "name": "electrode",
+    "height": 12,
+    "weight": 666,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/101.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/101.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/101.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 80
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 150
+      }
+    ],
+    "abilities": [
+      "soundproof",
+      "static",
+      "aftermath"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 100,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 102,
+    "name": "exeggcute",
+    "height": 4,
+    "weight": 25,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/102.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/102.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/102.png"
+    },
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 40
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "harvest"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 103,
+          "name": "exeggutor",
+          "requirement": {
+            "item": "leaf-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 103,
+    "name": "exeggutor",
+    "height": 20,
+    "weight": 1200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/103.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/103.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/103.png"
+    },
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 95
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 85
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 125
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "harvest"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 102,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 104,
+    "name": "cubone",
+    "height": 4,
+    "weight": 65,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/104.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/104.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/104.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "lightning-rod",
+      "battle-armor"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 105,
+          "name": "marowak",
+          "requirement": {
+            "level": 28,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 105,
+    "name": "marowak",
+    "height": 10,
+    "weight": 450,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/105.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/105.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/105.png"
+    },
+    "types": [
+      "ground"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 110
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 45
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "lightning-rod",
+      "battle-armor"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 104,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 106,
+    "name": "hitmonlee",
+    "height": 15,
+    "weight": 498,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/106.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/106.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/106.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 120
+      },
+      {
+        "name": "defense",
+        "base_stat": 53
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 110
+      },
+      {
+        "name": "speed",
+        "base_stat": 87
+      }
+    ],
+    "abilities": [
+      "limber",
+      "reckless",
+      "unburden"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 236,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 107,
+    "name": "hitmonchan",
+    "height": 14,
+    "weight": 502,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/107.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/107.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/107.png"
+    },
+    "types": [
+      "fighting"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 50
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 79
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 110
+      },
+      {
+        "name": "speed",
+        "base_stat": 76
+      }
+    ],
+    "abilities": [
+      "keen-eye",
+      "iron-fist",
+      "inner-focus"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 236,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 108,
+    "name": "lickitung",
+    "height": 12,
+    "weight": 655,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/108.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/108.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/108.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 75
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "own-tempo",
+      "oblivious",
+      "cloud-nine"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 463,
+          "name": "lickilicky",
+          "requirement": {
+            "trigger": "level-up",
+            "known_move": "rollout"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 109,
+    "name": "koffing",
+    "height": 6,
+    "weight": 10,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/109.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/109.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/109.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "levitate",
+      "neutralizing-gas",
+      "stench"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 110,
+          "name": "weezing",
+          "requirement": {
+            "level": 35,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 110,
+    "name": "weezing",
+    "height": 12,
+    "weight": 95,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/110.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/110.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/110.png"
+    },
+    "types": [
+      "poison"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 120
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "levitate",
+      "neutralizing-gas",
+      "stench"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 109,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 111,
+    "name": "rhyhorn",
+    "height": 10,
+    "weight": 1150,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/111.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/111.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/111.png"
+    },
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 85
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 30
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 30
+      },
+      {
+        "name": "speed",
+        "base_stat": 25
+      }
+    ],
+    "abilities": [
+      "lightning-rod",
+      "rock-head",
+      "reckless"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 112,
+          "name": "rhydon",
+          "requirement": {
+            "level": 42,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 112,
+    "name": "rhydon",
+    "height": 19,
+    "weight": 1200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/112.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/112.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/112.png"
+    },
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 105
+      },
+      {
+        "name": "attack",
+        "base_stat": 130
+      },
+      {
+        "name": "defense",
+        "base_stat": 120
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "lightning-rod",
+      "rock-head",
+      "reckless"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 111,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 464,
+          "name": "rhyperior",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 113,
+    "name": "chansey",
+    "height": 11,
+    "weight": 346,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/113.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/113.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/113.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 250
+      },
+      {
+        "name": "attack",
+        "base_stat": 5
+      },
+      {
+        "name": "defense",
+        "base_stat": 5
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 105
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "natural-cure",
+      "serene-grace",
+      "healer"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 440,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 242,
+          "name": "blissey",
+          "requirement": {
+            "trigger": "level-up",
+            "min_happiness": 160
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 114,
+    "name": "tangela",
+    "height": 10,
+    "weight": 350,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/114.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/114.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/114.png"
+    },
+    "types": [
+      "grass"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 115
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 40
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "chlorophyll",
+      "leaf-guard",
+      "regenerator"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 465,
+          "name": "tangrowth",
+          "requirement": {
+            "trigger": "level-up",
+            "known_move": "ancient-power"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 115,
+    "name": "kangaskhan",
+    "height": 22,
+    "weight": 800,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/115.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/115.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/115.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 105
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "early-bird",
+      "scrappy",
+      "inner-focus"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 116,
+    "name": "horsea",
+    "height": 4,
+    "weight": 80,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/116.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/116.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/116.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 40
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 25
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "sniper",
+      "damp"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 117,
+          "name": "seadra",
+          "requirement": {
+            "level": 32,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 117,
+    "name": "seadra",
+    "height": 12,
+    "weight": 250,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/117.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/117.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/117.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "poison-point",
+      "sniper",
+      "damp"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 116,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 230,
+          "name": "kingdra",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 118,
+    "name": "goldeen",
+    "height": 6,
+    "weight": 150,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/118.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/118.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/118.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 45
+      },
+      {
+        "name": "attack",
+        "base_stat": 67
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 35
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 63
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "water-veil",
+      "lightning-rod"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 119,
+          "name": "seaking",
+          "requirement": {
+            "level": 33,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 119,
+    "name": "seaking",
+    "height": 13,
+    "weight": 390,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/119.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/119.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/119.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 92
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 68
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "water-veil",
+      "lightning-rod"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 118,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 120,
+    "name": "staryu",
+    "height": 8,
+    "weight": 345,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/120.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/120.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/120.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "illuminate",
+      "natural-cure",
+      "analytic"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 121,
+          "name": "starmie",
+          "requirement": {
+            "item": "water-stone",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 121,
+    "name": "starmie",
+    "height": 11,
+    "weight": 800,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/121.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/121.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/121.png"
+    },
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 75
+      },
+      {
+        "name": "defense",
+        "base_stat": 85
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 115
+      }
+    ],
+    "abilities": [
+      "illuminate",
+      "natural-cure",
+      "analytic"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 120,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 122,
+    "name": "mr-mime",
+    "height": 13,
+    "weight": 545,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/122.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/122.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/122.png"
+    },
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 40
+      },
+      {
+        "name": "attack",
+        "base_stat": 45
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 120
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "soundproof",
+      "filter",
+      "technician"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 439,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 866,
+          "name": "mr-rime",
+          "requirement": {
+            "level": 42,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 123,
+    "name": "scyther",
+    "height": 15,
+    "weight": 560,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/123.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/123.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/123.png"
+    },
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 110
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 80
+      },
+      {
+        "name": "speed",
+        "base_stat": 105
+      }
+    ],
+    "abilities": [
+      "swarm",
+      "technician",
+      "steadfast"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 212,
+          "name": "scizor",
+          "requirement": {
+            "trigger": "trade"
+          }
+        },
+        {
+          "id": 900,
+          "name": "kleavor",
+          "requirement": {
+            "item": "black-augurite",
+            "trigger": "use-item"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 124,
+    "name": "jynx",
+    "height": 14,
+    "weight": 406,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/124.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/124.png"
+    },
+    "types": [
+      "ice",
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 50
+      },
+      {
+        "name": "defense",
+        "base_stat": 35
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 115
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 95
+      }
+    ],
+    "abilities": [
+      "oblivious",
+      "forewarn",
+      "dry-skin"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 238,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 125,
+    "name": "electabuzz",
+    "height": 11,
+    "weight": 300,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/125.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/125.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/125.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 83
+      },
+      {
+        "name": "defense",
+        "base_stat": 57
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 105
+      }
+    ],
+    "abilities": [
+      "static",
+      "vital-spirit"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 239,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 466,
+          "name": "electivire",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 126,
+    "name": "magmar",
+    "height": 13,
+    "weight": 445,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/126.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/126.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/126.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 95
+      },
+      {
+        "name": "defense",
+        "base_stat": 57
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 93
+      }
+    ],
+    "abilities": [
+      "flame-body",
+      "vital-spirit"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 240,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 467,
+          "name": "magmortar",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 127,
+    "name": "pinsir",
+    "height": 15,
+    "weight": 550,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/127.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/127.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/127.png"
+    },
+    "types": [
+      "bug"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 125
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "hyper-cutter",
+      "mold-breaker",
+      "moxie"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 128,
+    "name": "tauros",
+    "height": 14,
+    "weight": 884,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/128.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/128.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/128.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 75
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 40
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 110
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "anger-point",
+      "sheer-force"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 129,
+    "name": "magikarp",
+    "height": 9,
+    "weight": 100,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/129.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/129.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/129.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 20
+      },
+      {
+        "name": "attack",
+        "base_stat": 10
+      },
+      {
+        "name": "defense",
+        "base_stat": 55
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 15
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 20
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "rattled"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 130,
+          "name": "gyarados",
+          "requirement": {
+            "level": 20,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 130,
+    "name": "gyarados",
+    "height": 65,
+    "weight": 2350,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/130.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png"
+    },
+    "types": [
+      "water",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 95
+      },
+      {
+        "name": "attack",
+        "base_stat": 125
+      },
+      {
+        "name": "defense",
+        "base_stat": 79
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 81
+      }
+    ],
+    "abilities": [
+      "intimidate",
+      "moxie"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 129,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 131,
+    "name": "lapras",
+    "height": 25,
+    "weight": 2200,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/131.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png"
+    },
+    "types": [
+      "water",
+      "ice"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 130
+      },
+      {
+        "name": "attack",
+        "base_stat": 85
+      },
+      {
+        "name": "defense",
+        "base_stat": 80
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 60
+      }
+    ],
+    "abilities": [
+      "water-absorb",
+      "shell-armor",
+      "hydration"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 132,
+    "name": "ditto",
+    "height": 3,
+    "weight": 40,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/132.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 48
+      },
+      {
+        "name": "attack",
+        "base_stat": 48
+      },
+      {
+        "name": "defense",
+        "base_stat": 48
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 48
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 48
+      },
+      {
+        "name": "speed",
+        "base_stat": 48
+      }
+    ],
+    "abilities": [
+      "limber",
+      "imposter"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 133,
+    "name": "eevee",
+    "height": 3,
+    "weight": 65,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/133.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 55
+      },
+      {
+        "name": "attack",
+        "base_stat": 55
+      },
+      {
+        "name": "defense",
+        "base_stat": 50
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 45
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 65
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "run-away",
+      "adaptability",
+      "anticipation"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 134,
+          "name": "vaporeon",
+          "requirement": {
+            "item": "water-stone",
+            "trigger": "use-item"
+          }
+        },
+        {
+          "id": 135,
+          "name": "jolteon",
+          "requirement": {
+            "item": "thunder-stone",
+            "trigger": "use-item"
+          }
+        },
+        {
+          "id": 136,
+          "name": "flareon",
+          "requirement": {
+            "item": "fire-stone",
+            "trigger": "use-item"
+          }
+        },
+        {
+          "id": 196,
+          "name": "espeon",
+          "requirement": {
+            "trigger": "level-up",
+            "time_of_day": "day",
+            "min_happiness": 160
+          }
+        },
+        {
+          "id": 197,
+          "name": "umbreon",
+          "requirement": {
+            "trigger": "level-up",
+            "time_of_day": "night",
+            "min_happiness": 160
+          }
+        },
+        {
+          "id": 470,
+          "name": "leafeon",
+          "requirement": {
+            "trigger": "level-up",
+            "location": "eterna-forest"
+          }
+        },
+        {
+          "id": 471,
+          "name": "glaceon",
+          "requirement": {
+            "trigger": "level-up",
+            "location": "sinnoh-route-217"
+          }
+        },
+        {
+          "id": 700,
+          "name": "sylveon",
+          "requirement": {
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 134,
+    "name": "vaporeon",
+    "height": 10,
+    "weight": 290,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/134.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png"
+    },
+    "types": [
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 130
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 110
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "water-absorb",
+      "hydration"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 133,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 135,
+    "name": "jolteon",
+    "height": 8,
+    "weight": 245,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/135.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/135.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/135.png"
+    },
+    "types": [
+      "electric"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 65
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 110
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 95
+      },
+      {
+        "name": "speed",
+        "base_stat": 130
+      }
+    ],
+    "abilities": [
+      "volt-absorb",
+      "quick-feet"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 133,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 136,
+    "name": "flareon",
+    "height": 9,
+    "weight": 250,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/136.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/136.png"
+    },
+    "types": [
+      "fire"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 130
+      },
+      {
+        "name": "defense",
+        "base_stat": 60
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 110
+      },
+      {
+        "name": "speed",
+        "base_stat": 65
+      }
+    ],
+    "abilities": [
+      "flash-fire",
+      "guts"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 133,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 137,
+    "name": "porygon",
+    "height": 8,
+    "weight": 365,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/137.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/137.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/137.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 65
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 70
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 85
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 40
+      }
+    ],
+    "abilities": [
+      "trace",
+      "download",
+      "analytic"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 233,
+          "name": "porygon2",
+          "requirement": {
+            "trigger": "trade"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 138,
+    "name": "omanyte",
+    "height": 4,
+    "weight": 75,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/138.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/138.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/138.png"
+    },
+    "types": [
+      "rock",
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 35
+      },
+      {
+        "name": "attack",
+        "base_stat": 40
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 90
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 55
+      },
+      {
+        "name": "speed",
+        "base_stat": 35
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "shell-armor",
+      "weak-armor"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 139,
+          "name": "omastar",
+          "requirement": {
+            "level": 40,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 139,
+    "name": "omastar",
+    "height": 10,
+    "weight": 350,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/139.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/139.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/139.png"
+    },
+    "types": [
+      "rock",
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 70
+      },
+      {
+        "name": "attack",
+        "base_stat": 60
+      },
+      {
+        "name": "defense",
+        "base_stat": 125
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 115
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "shell-armor",
+      "weak-armor"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 138,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 140,
+    "name": "kabuto",
+    "height": 5,
+    "weight": 115,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/140.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/140.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/140.png"
+    },
+    "types": [
+      "rock",
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 30
+      },
+      {
+        "name": "attack",
+        "base_stat": 80
+      },
+      {
+        "name": "defense",
+        "base_stat": 90
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 55
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 45
+      },
+      {
+        "name": "speed",
+        "base_stat": 55
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "battle-armor",
+      "weak-armor"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 141,
+          "name": "kabutops",
+          "requirement": {
+            "level": 40,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 141,
+    "name": "kabutops",
+    "height": 13,
+    "weight": 405,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/141.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/141.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/141.png"
+    },
+    "types": [
+      "rock",
+      "water"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 60
+      },
+      {
+        "name": "attack",
+        "base_stat": 115
+      },
+      {
+        "name": "defense",
+        "base_stat": 105
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "swift-swim",
+      "battle-armor",
+      "weak-armor"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 140,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 142,
+    "name": "aerodactyl",
+    "height": 18,
+    "weight": 590,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/142.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/142.png"
+    },
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 80
+      },
+      {
+        "name": "attack",
+        "base_stat": 105
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 60
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 75
+      },
+      {
+        "name": "speed",
+        "base_stat": 130
+      }
+    ],
+    "abilities": [
+      "rock-head",
+      "pressure",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 143,
+    "name": "snorlax",
+    "height": 21,
+    "weight": 4600,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/143.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png"
+    },
+    "types": [
+      "normal"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 160
+      },
+      {
+        "name": "attack",
+        "base_stat": 110
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 65
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 110
+      },
+      {
+        "name": "speed",
+        "base_stat": 30
+      }
+    ],
+    "abilities": [
+      "immunity",
+      "thick-fat",
+      "gluttony"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 446,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 144,
+    "name": "articuno",
+    "height": 17,
+    "weight": 554,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/144.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/144.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/144.png"
+    },
+    "types": [
+      "ice",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 85
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 95
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 125
+      },
+      {
+        "name": "speed",
+        "base_stat": 85
+      }
+    ],
+    "abilities": [
+      "pressure",
+      "snow-cloak"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 145,
+    "name": "zapdos",
+    "height": 16,
+    "weight": 526,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/145.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/145.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/145.png"
+    },
+    "types": [
+      "electric",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 90
+      },
+      {
+        "name": "defense",
+        "base_stat": 85
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 125
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "pressure",
+      "static"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 146,
+    "name": "moltres",
+    "height": 20,
+    "weight": 600,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/146.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/146.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png"
+    },
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 90
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 90
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 125
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 85
+      },
+      {
+        "name": "speed",
+        "base_stat": 90
+      }
+    ],
+    "abilities": [
+      "pressure",
+      "flame-body"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "height": 18,
+    "weight": 33,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/147.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/147.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/147.png"
+    },
+    "types": [
+      "dragon"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 41
+      },
+      {
+        "name": "attack",
+        "base_stat": 64
+      },
+      {
+        "name": "defense",
+        "base_stat": 45
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 50
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 50
+      },
+      {
+        "name": "speed",
+        "base_stat": 50
+      }
+    ],
+    "abilities": [
+      "shed-skin",
+      "marvel-scale"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [
+        {
+          "id": 148,
+          "name": "dragonair",
+          "requirement": {
+            "level": 30,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 148,
+    "name": "dragonair",
+    "height": 40,
+    "weight": 165,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/148.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/148.png"
+    },
+    "types": [
+      "dragon"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 61
+      },
+      {
+        "name": "attack",
+        "base_stat": 84
+      },
+      {
+        "name": "defense",
+        "base_stat": 65
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 70
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 70
+      },
+      {
+        "name": "speed",
+        "base_stat": 70
+      }
+    ],
+    "abilities": [
+      "shed-skin",
+      "marvel-scale"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 147,
+        "name": null
+      },
+      "evolves_to": [
+        {
+          "id": 149,
+          "name": "dragonite",
+          "requirement": {
+            "level": 55,
+            "trigger": "level-up"
+          }
+        }
+      ],
+      "can_evolve": true
+    }
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "height": 22,
+    "weight": 2100,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/149.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png"
+    },
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 91
+      },
+      {
+        "name": "attack",
+        "base_stat": 134
+      },
+      {
+        "name": "defense",
+        "base_stat": 95
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 80
+      }
+    ],
+    "abilities": [
+      "inner-focus",
+      "multiscale"
+    ],
+    "evolution": {
+      "evolves_from": {
+        "id": 148,
+        "name": null
+      },
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 150,
+    "name": "mewtwo",
+    "height": 20,
+    "weight": 1220,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 106
+      },
+      {
+        "name": "attack",
+        "base_stat": 110
+      },
+      {
+        "name": "defense",
+        "base_stat": 90
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 154
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 90
+      },
+      {
+        "name": "speed",
+        "base_stat": 130
+      }
+    ],
+    "abilities": [
+      "pressure",
+      "unnerve"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  },
+  {
+    "id": 151,
+    "name": "mew",
+    "height": 4,
+    "weight": 40,
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png",
+      "front_shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/151.png",
+      "official_artwork": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/151.png"
+    },
+    "types": [
+      "psychic"
+    ],
+    "stats": [
+      {
+        "name": "hp",
+        "base_stat": 100
+      },
+      {
+        "name": "attack",
+        "base_stat": 100
+      },
+      {
+        "name": "defense",
+        "base_stat": 100
+      },
+      {
+        "name": "special-attack",
+        "base_stat": 100
+      },
+      {
+        "name": "special-defense",
+        "base_stat": 100
+      },
+      {
+        "name": "speed",
+        "base_stat": 100
+      }
+    ],
+    "abilities": [
+      "synchronize"
+    ],
+    "evolution": {
+      "evolves_from": null,
+      "evolves_to": [],
+      "can_evolve": false
+    }
+  }
+]
