@@ -98,8 +98,8 @@ class AzureFunctionsDataverseService {
   async catchPokemon(trainerId: string, pokemonId: string): Promise<PokedexEntry> {
     try {
       const pokedexData = {
-        pokemon_user: trainerId,
-        pokemon_pokemon: pokemonId
+        "pokemon_user@odata.bind": `/contacts(${trainerId})`,
+        "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${pokemonId})`
       };
       
       const response = await axios.post(`${this.baseUrl}/pokemon_pokedexes`, pokedexData);
@@ -114,14 +114,14 @@ class AzureFunctionsDataverseService {
     try {
       // Query the pokedex table with expanded Pokemon details
       const response = await axios.get(
-        `${this.baseUrl}/pokemon_pokedexes?$filter=pokemon_user eq '${trainerId}'&$expand=pokemon_pokemon&$orderby=createdon desc`
+        `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${trainerId}'&$expand=pokemon_Pokemon&$orderby=createdon desc`
       );
       
       // Transform the response to match our CaughtPokemon interface
       return response.data.value.map((entry: any) => ({
         pokedexId: entry.pokemon_pokedexid,
-        pokemonId: entry.pokemon_pokemon,
-        name: entry.pokemon_pokemon?.pokemon_name || 'Unknown'
+        pokemonId: entry._pokemon_pokemon_value,
+        name: entry.pokemon_Pokemon?.pokemon_name || 'Unknown'
       }));
     } catch (error) {
       console.error('Error fetching caught pokemon by trainer:', error);

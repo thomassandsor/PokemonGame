@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
+import { Button, Spinner, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useMsal, useAccount } from '@azure/msal-react';
 import { getCaughtPokemonByTrainer, getContactByEmail, type CaughtPokemon, type Contact } from '../../services/azureFunctionsDataverseService';
 import { dataverseService } from '../../services/azureFunctionsDataverseService';
 import { Pokemon } from '../../types/pokemon';
-import pokemonData from '../../data/pokemon.json';
+import { pokemonMasterDataService } from '../../services/pokemonMasterDataService';
 import './MyPage.css';
+import '../../styles/PokemonCard.css';
 
 interface EnhancedCaughtPokemon extends CaughtPokemon {
   pokemonDetails?: Pokemon;
@@ -21,6 +22,8 @@ const MyPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [contact, setContact] = useState<Contact | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedPokemon, setSelectedPokemon] = useState<EnhancedCaughtPokemon | null>(null);
 
   useEffect(() => {
     initializeUser();
@@ -54,21 +57,20 @@ const MyPage: React.FC = () => {
         }
       }
       
+      // Load all Pokemon data for details
+      const allPokemon = await pokemonMasterDataService.getAllPokemon();
+      
       setContact(userContact);
       
       // Load user's Pokemon
       if (userContact?.contactid) {
         const userPokemon = await getCaughtPokemonByTrainer(userContact.contactid);
         
-        // Enhance with Pokemon details from JSON data
-        const allPokemonData = pokemonData as Pokemon[];
-        const enhancedPokemon: EnhancedCaughtPokemon[] = userPokemon.map(caught => {
-          const pokemonDetails = allPokemonData.find(p => p.id.toString() === caught.pokemonId);
-          return {
-            ...caught,
-            pokemonDetails
-          };
-        });
+        // Enhance each caught Pokemon with full details from the Pokemon data
+        const enhancedPokemon: EnhancedCaughtPokemon[] = userPokemon.map(caught => ({
+          ...caught,
+          pokemonDetails: allPokemon.find(p => p.name === caught.name.toLowerCase())
+        }));
         
         setPokemon(enhancedPokemon);
       }
@@ -81,143 +83,115 @@ const MyPage: React.FC = () => {
     }
   };
 
-  // Helper function to get Pokemon type colors
-  const getTypeColor = (type: string): string => {
-    const typeColors: { [key: string]: string } = {
-      normal: '#a8a878',
-      fire: '#f08030',
-      water: '#6890f0',
-      electric: '#f8d030',
-      grass: '#78c850',
-      ice: '#98d8d8',
-      fighting: '#c03028',
-      poison: '#a040a0',
-      ground: '#e0c068',
-      flying: '#a890f0',
-      psychic: '#f85888',
-      bug: '#a8b820',
-      rock: '#b8a038',
-      ghost: '#705898',
-      dragon: '#7038f8',
-      dark: '#705848',
-      steel: '#b8b8d0',
-      fairy: '#ee99ac'
-    };
-    return typeColors[type] || '#68a090';
+  // Handle Pokemon card click
+  const handlePokemonClick = (poke: EnhancedCaughtPokemon) => {
+    setSelectedPokemon(poke);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedPokemon(null);
   };
 
   if (loading) {
     return (
-      <Container className="text-center mt-5">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-        <p className="mt-3">Loading your Pokemon...</p>
-      </Container>
+      <div className="pokemon-page-container">
+        <div className="pokemon-loading-container">
+          <Spinner animation="border" role="status" className="spinner-border">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+          <p>Loading your Pokemon...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Row className="mb-4">
-        <Col>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h1>Welcome, {contact?.firstname || 'Trainer'}! 🎯</h1>
-              <p className="text-muted">
-                You have caught {pokemon.length} Pokemon so far!
-              </p>
-            </div>
-          </div>
-        </Col>
-      </Row>
+    <div className="pokemon-page-container">
+      <div className="pokemon-page-header">
+        <h1>Welcome, {contact?.firstname || 'Trainer'}! 🎯</h1>
+        <p>You have caught {pokemon.length} Pokemon so far!</p>
+      </div>
 
       {error && (
-        <Alert variant="danger" className="mb-4">
+        <div className="pokemon-error-container">
           {error}
-        </Alert>
+        </div>
       )}
 
       {pokemon.length === 0 ? (
-        <Row className="justify-content-center">
-          <Col md={6} className="text-center">
-            <Card className="p-4">
-              <Card.Body>
-                <h3>No Pokemon Yet! 🔍</h3>
-                <p className="text-muted mb-4">
-                  Start your Pokemon journey by scanning QR codes to catch your first Pokemon!
-                </p>
-                <Button 
-                  variant="primary" 
-                  size="lg"
-                  onClick={() => navigate('/scan-pokemon')}
-                >
-                  Scan Your First Pokemon
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+        <div className="pokemon-grid">
+          <div className="welcome-card">
+            <h3>🎮 Start Your Pokemon Journey!</h3>
+            <p>You haven't caught any Pokemon yet. Use the scanner to catch your first Pokemon and begin your adventure!</p>
+            <Button 
+              variant="light" 
+              size="lg"
+              onClick={() => navigate('/scan-pokemon')}
+              style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: 'none',
+                color: '#1a1a2e',
+                fontWeight: '600',
+                padding: '12px 24px',
+                borderRadius: '12px'
+              }}
+            >
+              Scan Your First Pokemon
+            </Button>
+          </div>
+        </div>
       ) : (
-        <Row className="pokemon-grid">
+        <div className="pokemon-grid">
           {pokemon.map((poke) => (
-            <Col key={poke.pokedexId} lg={4} md={6} className="mb-4">
-              <Card className="pokemon-card h-100">
-                {poke.pokemonDetails && (
-                  <div className="pokemon-image-container text-center pt-3">
-                    <img
-                      src={poke.pokemonDetails.sprites.official_artwork || poke.pokemonDetails.sprites.front_default || ''}
-                      alt={poke.pokemonDetails.name}
-                      className="pokemon-image"
-                      style={{
-                        width: '120px',
-                        height: '120px',
-                        objectFit: 'contain'
-                      }}
-                    />
+            <div 
+              key={poke.pokedexId} 
+              className="pokemon-card-container"
+              onClick={() => handlePokemonClick(poke)}
+            >
+              <div className="pokemon-image-wrapper">
+                {poke.pokemonDetails ? (
+                  <img
+                    src={poke.pokemonDetails.sprites.other?.['official-artwork']?.front_default || poke.pokemonDetails.sprites.front_default || ''}
+                    alt={poke.pokemonDetails.name}
+                  />
+                ) : (
+                  <div className="pokemon-placeholder">
+                    🎮
                   </div>
                 )}
-                <Card.Body>
-                  <Card.Title className="text-center">
-                    {poke.pokemonDetails ? (
-                      <>
-                        <div className="pokemon-number text-muted small">
-                          #{poke.pokemonDetails.id.toString().padStart(3, '0')}
-                        </div>
-                        <div className="pokemon-name text-capitalize">
-                          {poke.pokemonDetails.name}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="pokemon-name text-capitalize">{poke.name}</div>
-                    )}
-                  </Card.Title>
-                  
-                  {poke.pokemonDetails && (
-                    <div className="pokemon-types text-center mb-3">
-                      {poke.pokemonDetails.types.map(type => (
-                        <span 
-                          key={type} 
-                          className={`badge me-1 type-${type}`}
-                          style={{
-                            backgroundColor: getTypeColor(type),
-                            color: 'white'
-                          }}
-                        >
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
-                  <Card.Text className="text-muted text-center">
-                    <small>Caught Pokemon</small>
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
+              </div>
+              
+              {poke.pokemonDetails && (
+                <div className="pokemon-number">
+                  #{poke.pokemonDetails.id.toString().padStart(3, '0')}
+                </div>
+              )}
+              
+              <div className="pokemon-name">
+                {poke.pokemonDetails ? poke.pokemonDetails.name : poke.name}
+              </div>
+              
+              {poke.pokemonDetails && (
+                <div className="pokemon-types-container">
+                  {poke.pokemonDetails.types.map(typeInfo => (
+                    <span 
+                      key={typeInfo.type.name} 
+                      className={`pokemon-type-badge type-${typeInfo.type.name}`}
+                    >
+                      {typeInfo.type.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              <div className="pokemon-caught-indicator">
+                Caught Pokemon
+              </div>
+            </div>
           ))}
-        </Row>
+        </div>
       )}
 
       {/* Floating Add Button */}
@@ -229,7 +203,109 @@ const MyPage: React.FC = () => {
       >
         +
       </Button>
-    </Container>
+
+      {/* Pokemon Detail Modal */}
+      <Modal show={showDetailModal} onHide={handleCloseModal} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {selectedPokemon?.pokemonDetails ? (
+              <>
+                #{selectedPokemon.pokemonDetails.id.toString().padStart(3, '0')} - {selectedPokemon.pokemonDetails.name}
+              </>
+            ) : (
+              selectedPokemon?.name
+            )}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedPokemon && (
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1', minWidth: '200px', textAlign: 'center' }}>
+                {selectedPokemon.pokemonDetails ? (
+                  <img
+                    src={selectedPokemon.pokemonDetails.sprites.other?.['official-artwork']?.front_default || 
+                         selectedPokemon.pokemonDetails.sprites.front_default || ''}
+                    alt={selectedPokemon.pokemonDetails.name}
+                    style={{
+                      width: '200px',
+                      height: '200px',
+                      objectFit: 'contain'
+                    }}
+                  />
+                ) : (
+                  <div 
+                    className="pokemon-placeholder"
+                    style={{
+                      width: '200px',
+                      height: '200px',
+                      backgroundColor: '#f8f9fa',
+                      border: '2px dashed #dee2e6',
+                      borderRadius: '8px',
+                      margin: '0 auto',
+                      fontSize: '48px',
+                      color: '#6c757d',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    🎮
+                  </div>
+                )}
+              </div>
+              <div style={{ flex: '1', minWidth: '250px' }}>
+                <h5>Details</h5>
+                {selectedPokemon.pokemonDetails && (
+                  <>
+                    <div style={{ marginBottom: '16px' }}>
+                      <strong>Types:</strong>
+                      <div style={{ marginTop: '8px' }}>
+                        {selectedPokemon.pokemonDetails.types.map(typeInfo => (
+                          <span 
+                            key={typeInfo.type.name} 
+                            className={`pokemon-type-badge type-${typeInfo.type.name}`}
+                            style={{ marginRight: '8px' }}
+                          >
+                            {typeInfo.type.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <strong>Height:</strong> {(selectedPokemon.pokemonDetails.height / 10).toFixed(1)}m
+                    </div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <strong>Weight:</strong> {(selectedPokemon.pokemonDetails.weight / 10).toFixed(1)}kg
+                    </div>
+                    <div style={{ marginBottom: '16px' }}>
+                      <strong>Base Experience:</strong> {selectedPokemon.pokemonDetails.base_experience}
+                    </div>
+                    {selectedPokemon.pokemonDetails.stats && (
+                      <div>
+                        <strong>Stats:</strong>
+                        <div style={{ marginTop: '8px' }}>
+                          {selectedPokemon.pokemonDetails.stats.map(stat => (
+                            <div key={stat.stat.name} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ textTransform: 'capitalize' }}>{stat.stat.name.replace('-', ' ')}:</span>
+                              <span><strong>{stat.base_stat}</strong></span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
 };
 
