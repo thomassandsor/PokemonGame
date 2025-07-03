@@ -4,7 +4,7 @@
 Your Pokemon Game is already configured for Azure Static Web Apps deployment with GitHub Actions. Here's how to deploy and manage it.
 
 ## Current Setup
-- ✅ GitHub workflows configured (2 files in `.github/workflows/`)
+- ✅ GitHub workflow configured (`azure-static-web-apps.yml`)
 - ✅ Azure Static Web Apps configuration (`staticwebapp.config.json`)
 - ✅ React app build process configured
 - ✅ Azure Functions API integration ready
@@ -23,7 +23,6 @@ Make sure these secrets are configured in your GitHub repository:
 
 #### Azure Static Web Apps Secrets:
 - `AZURE_STATIC_WEB_APPS_API_TOKEN` - Your Azure Static Web Apps deployment token
-- `AZURE_STATIC_WEB_APPS_API_TOKEN_RED_FOREST_0B2B6AE03` - Alternative deployment token
 
 #### Environment Variables:
 - `REACT_APP_CLIENT_ID` - Your Azure AD App Registration Client ID
