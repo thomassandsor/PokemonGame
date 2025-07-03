@@ -1,12 +1,8 @@
 // Battle Challenge Service for Pokemon Game
 import { 
   StatusCodes, 
-  ChallengeTypes, 
   StateCodes, 
-  DataverseUtils, 
-  type StatusCode, 
-  type ChallengeType, 
-  type StateCode 
+  DataverseUtils 
 } from '../constants/dataverseMappings';
 import { 
   PokemonBattleRecord, 

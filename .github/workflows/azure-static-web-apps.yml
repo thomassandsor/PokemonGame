@@ -28,7 +28,6 @@ jobs:
           app_location: "/" # App source code path
           api_location: "api" # Api source code path - Azure Functions
           output_location: "build" # Built app content directory - optional
-          skip_deploy_on_missing_secrets: true
         env:
           REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
           REACT_APP_AUTHORITY: ${{ secrets.REACT_APP_AUTHORITY }}

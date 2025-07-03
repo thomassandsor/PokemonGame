@@ -3,9 +3,7 @@ import {
   PokemonMasterRecord, 
   PokemonPokedexRecord, 
   PokemonMasterSchema, 
-  PokemonPokedexSchema, 
-  DataverseValidator, 
-  DataverseQueryBuilder 
+  DataverseValidator 
 } from '../constants/dataverseSchema';
 
 // Types for our entities

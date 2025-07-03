@@ -35,7 +35,6 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   const [selectedPokemon, setSelectedPokemon] = useState<BattleArenaPokemon | null>(null);
   const [openChallenges, setOpenChallenges] = useState<PokemonBattleExpanded[]>([]);
   const [userChallenges, setUserChallenges] = useState<PokemonBattle[]>([]);
-  const [selectedChallenge, setSelectedChallenge] = useState<PokemonBattle | null>(null);
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isReplaying, setIsReplaying] = useState(false);
@@ -161,7 +160,6 @@ const BattleArena: React.FC<BattleArenaProps> = ({
       const result = await BattleChallengeService.getBattleResult(challenge.pokemon_battleid);
       if (result) {
         setBattleResult(result);
-        setSelectedChallenge(challenge);
         setCurrentStep(0);
         setViewMode('battle-replay');
       } else {
