@@ -9,14 +9,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [customPokemonIds, setCustomPokemonIds] = useState<string>('');
-  const [pokemonCount, setPokemonCount] = useState<number>(20); // New state for Pokemon count
 
   const handleQuickImport = async () => {
     setImportStatus('importing');
     setImportResult(null);
     
     try {
-      const popularIds = PokemonImportService.getPopularPokemonIds().slice(0, pokemonCount);
+      const popularIds = PokemonImportService.getPopularPokemonIds().slice(0, 20); // Import first 20
       const result = await PokemonImportService.importAndSave(popularIds);
       
       setImportResult(result);
@@ -25,7 +24,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
       setImportResult({
         success: false,
         imported: 0,
-        failed: pokemonCount,
+        failed: 20,
         errors: [error instanceof Error ? error.message : 'Unknown error']
       });
       setImportStatus('error');
@@ -115,30 +114,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
             <div className="admin-cards">
               <div className="admin-card">
                 <h3>📥 Quick Import Popular Pokemon</h3>
-                <p>Import the most popular Pokemon from PokeAPI</p>
-                <div className="pokemon-count-selector">
-                  <label htmlFor="pokemonCount">Number of Pokemon to import:</label>
-                  <input
-                    id="pokemonCount"
-                    type="range"
-                    min="1"
-                    max="150"
-                    value={pokemonCount}
-                    onChange={(e) => setPokemonCount(Number(e.target.value))}
-                    className="pokemon-range"
-                    disabled={importStatus === 'importing'}
-                  />
-                  <div className="range-display">
-                    <span className="range-value">{pokemonCount}</span>
-                    <span className="range-label">Pokemon</span>
-                  </div>
-                </div>
+                <p>Import the first 20 most popular Pokemon from PokeAPI</p>
                 <button 
                   className="admin-button primary"
                   onClick={handleQuickImport}
                   disabled={importStatus === 'importing'}
                 >
-                  {importStatus === 'importing' ? `🔄 Importing ${pokemonCount} Pokemon...` : `📥 Import ${pokemonCount} Pokemon`}
+                  {importStatus === 'importing' ? '🔄 Importing...' : '📥 Quick Import'}
                 </button>
               </div>
 
@@ -252,5 +234,3 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
     </div>
   );
 };
-
-export default AdminPanel;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { EvolutionService, EvolutionOption as ServiceEvolutionOption } from '../../services/evolutionService';
 import './EvolutionLab.css';
 
 interface EvolutionLabProps {
@@ -6,106 +7,45 @@ interface EvolutionLabProps {
   onPokemonUpdate: (pokemon: any) => void;
 }
 
-interface EvolutionOption {
-  id: number;
-  name: string;
-  sprite: string;
-  requiredLevel?: number;
-  requiredItem?: string;
-  method: string;
-}
-
 const EvolutionLab: React.FC<EvolutionLabProps> = ({ userPokemon, onPokemonUpdate }) => {
   const [selectedPokemon, setSelectedPokemon] = useState<any>(null);
-  const [evolutionOptions, setEvolutionOptions] = useState<EvolutionOption[]>([]);
+  const [evolutionOptions, setEvolutionOptions] = useState<ServiceEvolutionOption[]>([]);
   const [isEvolving, setIsEvolving] = useState(false);
-
-  // Mock evolution data - in a real app this would come from an API
-  const evolutionMap: { [key: number]: EvolutionOption[] } = {
-    1: [{ // Bulbasaur
-      id: 2,
-      name: 'Ivysaur',
-      sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png',
-      requiredLevel: 16,
-      method: 'Level up to 16'
-    }],
-    4: [{ // Charmander
-      id: 5,
-      name: 'Charmeleon',
-      sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png',
-      requiredLevel: 16,
-      method: 'Level up to 16'
-    }],
-    7: [{ // Squirtle
-      id: 8,
-      name: 'Wartortle',
-      sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png',
-      requiredLevel: 16,
-      method: 'Level up to 16'
-    }],
-    25: [{ // Pikachu
-      id: 26,
-      name: 'Raichu',
-      sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png',
-      requiredItem: 'Thunder Stone',
-      method: 'Use Thunder Stone'
-    }],
-    // Add more evolution mappings as needed
-  };
 
   const selectPokemon = (pokemon: any) => {
     setSelectedPokemon(pokemon);
     const pokemonId = pokemon.id || pokemon.pokemon_id || pokemon.pokemon_number;
-    const evolutions = evolutionMap[pokemonId] || [];
+    const evolutions = EvolutionService.getEvolutionOptions(pokemonId);
     setEvolutionOptions(evolutions);
   };
 
-  const canEvolve = (evolution: EvolutionOption): boolean => {
+  const canEvolve = (evolution: ServiceEvolutionOption): boolean => {
     if (!selectedPokemon) return false;
-    
-    const pokemonLevel = selectedPokemon.level || 5;
-    
-    if (evolution.requiredLevel && pokemonLevel < evolution.requiredLevel) {
-      return false;
-    }
-    
-    // In a real app, you'd check for required items in the user's inventory
-    if (evolution.requiredItem) {
-      // For demo purposes, let's assume they have the item
-      return true;
-    }
-    
-    return true;
+    return EvolutionService.canEvolve(selectedPokemon, evolution);
   };
 
-  const evolvePokemon = async (evolution: EvolutionOption) => {
+  const evolvePokemon = async (evolution: ServiceEvolutionOption) => {
     if (!selectedPokemon || !canEvolve(evolution)) return;
     
     setIsEvolving(true);
     
-    // Simulate evolution process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const evolvedPokemon = {
-      ...selectedPokemon,
-      id: evolution.id,
-      name: evolution.name,
-      pokemon_id: evolution.id,
-      pokemon_name: evolution.name,
-      sprite: evolution.sprite,
-      // Increase stats on evolution
-      attack: (selectedPokemon.attack || 50) + 10,
-      defense: (selectedPokemon.defense || 50) + 10,
-      hp: (selectedPokemon.hp || 50) + 15,
-      maxHp: (selectedPokemon.maxHp || 50) + 15
-    };
-    
-    onPokemonUpdate(evolvedPokemon);
-    setSelectedPokemon(evolvedPokemon);
-    setEvolutionOptions([]);
-    setIsEvolving(false);
-    
-    alert(`${selectedPokemon.name} evolved into ${evolution.name}!`);
+    try {
+      const evolvedPokemon = await EvolutionService.evolvePokemon(selectedPokemon, evolution);
+      
+      onPokemonUpdate(evolvedPokemon);
+      setSelectedPokemon(evolvedPokemon);
+      
+      // Get new evolution options for the evolved Pokemon  
+      const newEvolutions = EvolutionService.getEvolutionOptions(evolvedPokemon.id);
+      setEvolutionOptions(newEvolutions);
+      
+      alert(`${selectedPokemon.name || selectedPokemon.pokemon_name} evolved into ${evolution.name}!`);
+    } catch (error) {
+      console.error('Evolution failed:', error);
+      alert('Evolution failed! Please try again.');
+    } finally {
+      setIsEvolving(false);
+    }
   };
 
   return (
@@ -127,7 +67,7 @@ const EvolutionLab: React.FC<EvolutionLabProps> = ({ userPokemon, onPokemonUpdat
             <div className="pokemon-grid">
               {userPokemon.map((pokemon, index) => {
                 const pokemonId = pokemon.id || pokemon.pokemon_id || pokemon.pokemon_number;
-                const hasEvolutions = evolutionMap[pokemonId]?.length > 0;
+                const hasEvolutions = EvolutionService.getEvolutionOptions(pokemonId).length > 0;
                 
                 return (
                   <div 
@@ -174,7 +114,7 @@ const EvolutionLab: React.FC<EvolutionLabProps> = ({ userPokemon, onPokemonUpdat
                   <div key={evolution.id} className="evolution-option">
                     <img src={evolution.sprite} alt={evolution.name} />
                     <h3>{evolution.name}</h3>
-                    <p className="evolution-method">{evolution.method}</p>
+                    <p className="evolution-method">{evolution.description}</p>
                     <button 
                       onClick={() => evolvePokemon(evolution)}
                       disabled={!canEvolve(evolution) || isEvolving}
@@ -182,9 +122,9 @@ const EvolutionLab: React.FC<EvolutionLabProps> = ({ userPokemon, onPokemonUpdat
                     >
                       {isEvolving ? 'Evolving...' : canEvolve(evolution) ? 'Evolve!' : 'Cannot Evolve'}
                     </button>
-                    {!canEvolve(evolution) && evolution.requiredLevel && (
+                    {!canEvolve(evolution) && (
                       <p className="requirement">
-                        Requires level {evolution.requiredLevel}
+                        {evolution.description}
                       </p>
                     )}
                   </div>

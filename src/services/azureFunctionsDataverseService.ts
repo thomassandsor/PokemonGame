@@ -1,4 +1,12 @@
 import axios from 'axios';
+import { 
+  PokemonMasterRecord, 
+  PokemonPokedexRecord, 
+  PokemonMasterSchema, 
+  PokemonPokedexSchema, 
+  DataverseValidator, 
+  DataverseQueryBuilder 
+} from '../constants/dataverseSchema';
 
 // Types for our entities
 export interface Contact {
@@ -9,20 +17,9 @@ export interface Contact {
   createdon?: string;
 }
 
-// Master Pokemon table (pokemon_pokemon)
-export interface PokemonMaster {
-  pokemon_pokemonid?: string;
-  pokemon_name: string;
-  createdon?: string;
-}
-
-// Junction table for caught Pokemon (pokemon_pokedex)
-export interface PokedexEntry {
-  pokemon_pokedexid?: string;
-  pokemon_user: string; // Reference to trainer (contact)
-  pokemon_pokemon: string; // Reference to master Pokemon
-  createdon?: string;
-}
+// Re-export schema interfaces for backward compatibility
+export interface PokemonMaster extends PokemonMasterRecord {}
+export interface PokedexEntry extends PokemonPokedexRecord {}
 
 // Combined view for displaying caught Pokemon with details
 export interface CaughtPokemon {
@@ -162,11 +159,11 @@ class AzureFunctionsDataverseService {
   }
 
   // Helper method to find or create a Pokemon in the master table
-  async findOrCreatePokemon(pokemonName: string): Promise<PokemonMaster> {
+  async findOrCreatePokemon(pokemonId: number, pokemonName: string): Promise<PokemonMaster> {
     try {
-      // First, try to find existing Pokemon by name
+      // First, try to find existing Pokemon by ID
       const response = await axios.get(
-        `${this.baseUrl}/pokemon_pokemons?$filter=pokemon_name eq '${pokemonName}'`
+        `${this.baseUrl}/${PokemonMasterSchema.tableName}?$filter=pokemon_id eq ${pokemonId}`
       );
       
       if (response.data.value.length > 0) {
@@ -174,12 +171,19 @@ class AzureFunctionsDataverseService {
         return response.data.value[0];
       }
       
-      // Pokemon doesn't exist, create it
-      const newPokemon: Omit<PokemonMaster, 'pokemon_pokemonid' | 'createdon'> = {
+      // Pokemon doesn't exist, create it with current schema
+      const newPokemon: Partial<PokemonMaster> = {
+        pokemon_id: pokemonId,
         pokemon_name: pokemonName
       };
+
+      // Validate before creating
+      const validation = DataverseValidator.validatePokemonMaster(newPokemon);
+      if (!validation.valid) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      }
       
-      const createResponse = await axios.post(`${this.baseUrl}/pokemon_pokemons`, newPokemon);
+      const createResponse = await axios.post(`${this.baseUrl}/${PokemonMasterSchema.tableName}`, newPokemon);
       return createResponse.data;
       
     } catch (error) {
@@ -188,16 +192,16 @@ class AzureFunctionsDataverseService {
     }
   }
 
-  // Convenient method to catch a Pokemon (find/create + add to pokedex)
-  async catchPokemonByName(trainerId: string, pokemonName: string): Promise<PokedexEntry> {
+  // Convenient method to catch a Pokemon (find/create + add to pokedex) 
+  async catchPokemonByIdAndName(trainerId: string, pokemonId: number, pokemonName: string): Promise<PokedexEntry> {
     try {
       // Find or create the Pokemon in the master table
-      const masterPokemon = await this.findOrCreatePokemon(pokemonName);
+      const masterPokemon = await this.findOrCreatePokemon(pokemonId, pokemonName);
       
       // Add it to the trainer's pokedex
       return await this.catchPokemon(trainerId, masterPokemon.pokemon_pokemonid!);
     } catch (error) {
-      console.error('Error catching Pokemon by name:', error);
+      console.error('Error catching Pokemon by ID and name:', error);
       throw error;
     }
   }
@@ -227,8 +231,8 @@ export const getPokemonById = (pokemonId: string) =>
 export const catchPokemon = (trainerId: string, pokemonId: string) => 
   dataverseService.catchPokemon(trainerId, pokemonId);
 
-export const catchPokemonByName = (trainerId: string, pokemonName: string) => 
-  dataverseService.catchPokemonByName(trainerId, pokemonName);
+export const catchPokemonByName = (trainerId: string, pokemonId: number, pokemonName: string) => 
+  dataverseService.catchPokemonByIdAndName(trainerId, pokemonId, pokemonName);
 
 export const getCaughtPokemonByTrainer = (trainerId: string) => 
   dataverseService.getCaughtPokemonByTrainer(trainerId);

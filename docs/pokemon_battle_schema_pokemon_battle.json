@@ -1,0 +1,1060 @@
+﻿{
+    "@odata.context":  "https://pokemongame.crm4.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,SchemaName,DisplayName,Attributes(LogicalName,SchemaName,DisplayName,AttributeType,IsPrimaryId))/$entity",
+    "MetadataId":  "b0ff943e-1253-f011-877a-6045bd968350",
+    "LogicalName":  "pokemon_battle",
+    "SchemaName":  "pokemon_Battle",
+    "DisplayName":  {
+                        "LocalizedLabels":  [
+                                                {
+                                                    "Label":  "Battle",
+                                                    "LanguageCode":  1033,
+                                                    "IsManaged":  false,
+                                                    "MetadataId":  "87210c67-9f84-49d0-99bb-619d8a99f09c",
+                                                    "HasChanged":  null
+                                                }
+                                            ],
+                        "UserLocalizedLabel":  {
+                                                   "Label":  "Battle",
+                                                   "LanguageCode":  1033,
+                                                   "IsManaged":  false,
+                                                   "MetadataId":  "87210c67-9f84-49d0-99bb-619d8a99f09c",
+                                                   "HasChanged":  null
+                                               }
+                    },
+    "Attributes":  [
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "1190edf5-0180-403c-b9a0-b7018620aa9b",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdby",
+                           "SchemaName":  "CreatedBy",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Created By",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "47468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Created By",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "47468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "fdb3bb45-0550-4138-8a93-e5fe2dd018ff",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdbyname",
+                           "SchemaName":  "CreatedByName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "cf1c1c15-d2e6-402d-b260-5c61d1644b10",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdbyyominame",
+                           "SchemaName":  "CreatedByYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+                           "MetadataId":  "95851e4c-5ce2-4c19-829b-9ca0f49f5af9",
+                           "AttributeType":  "DateTime",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdon",
+                           "SchemaName":  "CreatedOn",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Created On",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "45468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Created On",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "45468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "1fc4e92c-588a-4b74-a6a4-7f78b00271af",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdonbehalfby",
+                           "SchemaName":  "CreatedOnBehalfBy",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Created By (Delegate)",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "4e468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Created By (Delegate)",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "4e468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "7e2501a5-d90b-43fa-8d29-858a220fcdbc",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdonbehalfbyname",
+                           "SchemaName":  "CreatedOnBehalfByName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "c154a577-ed01-4de3-b292-b6871342e69d",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "createdonbehalfbyyominame",
+                           "SchemaName":  "CreatedOnBehalfByYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.IntegerAttributeMetadata",
+                           "MetadataId":  "37ac31b5-0802-4de2-a889-fdd868479f44",
+                           "AttributeType":  "Integer",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "importsequencenumber",
+                           "SchemaName":  "ImportSequenceNumber",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Import Sequence Number",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "a9468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Import Sequence Number",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "a9468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "17b32a8a-06fe-43a0-91d4-787f39e9c755",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedby",
+                           "SchemaName":  "ModifiedBy",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Modified By",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "4c468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Modified By",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "4c468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "0027e629-348f-4176-82d4-85c08bdfa193",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedbyname",
+                           "SchemaName":  "ModifiedByName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "c810a18e-5b55-4278-9bab-e8a044480248",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedbyyominame",
+                           "SchemaName":  "ModifiedByYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+                           "MetadataId":  "92a46bf6-f5a3-4fa2-9ef4-9821a5c1ccc2",
+                           "AttributeType":  "DateTime",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedon",
+                           "SchemaName":  "ModifiedOn",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Modified On",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "49468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Modified On",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "49468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "a950f7e1-726c-44b6-bef2-da43b652f9e0",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedonbehalfby",
+                           "SchemaName":  "ModifiedOnBehalfBy",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Modified By (Delegate)",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "50468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Modified By (Delegate)",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "50468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "b34b21af-f0e0-4585-802e-7c97d6bbf4bc",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedonbehalfbyname",
+                           "SchemaName":  "ModifiedOnBehalfByName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "f1eef0b5-09ab-4a4e-9394-ef341c709fcf",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "modifiedonbehalfbyyominame",
+                           "SchemaName":  "ModifiedOnBehalfByYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+                           "MetadataId":  "72415ff0-9852-4481-af59-c55cdb1a572e",
+                           "AttributeType":  "DateTime",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "overriddencreatedon",
+                           "SchemaName":  "OverriddenCreatedOn",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Record Created On",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "ab468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Record Created On",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "ab468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "a1c28cc3-c977-422f-9e7a-6f58b1e797cd",
+                           "AttributeType":  "Owner",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "ownerid",
+                           "SchemaName":  "OwnerId",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Owner",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "6f468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Owner",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "6f468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "a913e9d2-c7b6-4c62-95a8-4fe1c7173095",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owneridname",
+                           "SchemaName":  "OwnerIdName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.EntityNameAttributeMetadata",
+                           "MetadataId":  "20d645b1-8fb2-4bfa-98de-05abea900ee6",
+                           "AttributeType":  "EntityName",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owneridtype",
+                           "SchemaName":  "OwnerIdType",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "74468d44-1253-f011-877a-6045bd968350",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owneridyominame",
+                           "SchemaName":  "OwnerIdYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "56ad0a9b-c9da-4d62-b75e-6332e5b174ae",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owningbusinessunit",
+                           "SchemaName":  "OwningBusinessUnit",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Owning Business Unit",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "77468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Owning Business Unit",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "77468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "4fc52ded-c5ec-44ec-82c3-52b0f13921bd",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owningbusinessunitname",
+                           "SchemaName":  "OwningBusinessUnitName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "38e32533-b2e1-4e2d-9ff0-fb4b70677a65",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owningteam",
+                           "SchemaName":  "OwningTeam",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Owning Team",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "81468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Owning Team",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "81468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "0c84f0ed-cc76-413e-97cc-8926a14f727f",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "owninguser",
+                           "SchemaName":  "OwningUser",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Owning User",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "79468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Owning User",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "79468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "MetadataId":  "6e9191be-92a1-44fb-a98b-75d92875fe8e",
+                           "AttributeType":  "Uniqueidentifier",
+                           "IsPrimaryId":  true,
+                           "LogicalName":  "pokemon_battleid",
+                           "SchemaName":  "pokemon_BattleId",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Battle",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "43468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Battle",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "43468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "d98d82d1-6f57-f011-877b-7c1e525e5f72",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_battleresult",
+                           "SchemaName":  "pokemon_BattleResult",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Battle Result",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "91add7bf-18f9-4287-9bcc-4c166ec931ec",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Battle Result",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "91add7bf-18f9-4287-9bcc-4c166ec931ec",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+                           "MetadataId":  "7ffff7bc-7557-f011-877b-7c1e525e5f72",
+                           "AttributeType":  "Picklist",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_challengetype",
+                           "SchemaName":  "pokemon_ChallengeType",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Challenge Type",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "d1abb7e1-d56b-476d-b722-f89aea2ac0e2",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Challenge Type",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "d1abb7e1-d56b-476d-b722-f89aea2ac0e2",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "MetadataId":  "be07b6e8-1a0d-4daf-8a32-4040230dab02",
+                           "AttributeType":  "Virtual",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_challengetypename",
+                           "SchemaName":  "pokemon_challengetypeName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "b1ff943e-1253-f011-877a-6045bd968350",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_id",
+                           "SchemaName":  "pokemon_id",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "id",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "6eaea120-29d2-431e-af11-3d41247f0d9b",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "id",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "6eaea120-29d2-431e-af11-3d41247f0d9b",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "f5026382-b45b-4f00-9bb3-8a60c6da08cd",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player1",
+                           "SchemaName":  "pokemon_Player1",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Player 1",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "9fb2132f-f90e-4c73-9e3e-cf2d6bb8941f",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Player 1",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "9fb2132f-f90e-4c73-9e3e-cf2d6bb8941f",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "262e2155-620b-4c1b-a77f-5cd1b7e08d84",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player1name",
+                           "SchemaName":  "pokemon_Player1Name",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "2fbdcc22-91be-4dd3-b61d-00c8e681f6e6",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player1pokemon",
+                           "SchemaName":  "pokemon_Player1Pokemon",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Player 1 - Pokemon",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "b9c051e0-ce86-4729-971f-f87705cbbff5",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Player 1 - Pokemon",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "b9c051e0-ce86-4729-971f-f87705cbbff5",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "2819e30e-bfb2-4280-93ca-c4148f4561d7",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player1pokemonname",
+                           "SchemaName":  "pokemon_Player1PokemonName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "3ea9f90e-85af-432e-9bdf-e5a930abbb59",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player1yominame",
+                           "SchemaName":  "pokemon_Player1YomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "36d6590f-8027-472d-8697-81e401032e1e",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player2",
+                           "SchemaName":  "pokemon_Player2",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Player 2",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "5690a6d0-465d-4ddc-8da3-a28ffe132944",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Player 2",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "5690a6d0-465d-4ddc-8da3-a28ffe132944",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "1ddefc4b-c37f-48e0-a696-d6867310ef41",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player2name",
+                           "SchemaName":  "pokemon_Player2Name",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "692cb76a-ac66-46be-bbe1-fd66a6fe29f2",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player2pokemon",
+                           "SchemaName":  "pokemon_Player2Pokemon",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Player 2 - Pokemon",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "3971d6c7-f61d-4f6f-8f35-697bbe995228",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Player 2 - Pokemon",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "3971d6c7-f61d-4f6f-8f35-697bbe995228",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "06b28270-d22a-4fb4-b67c-435ed6ca5243",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player2pokemonname",
+                           "SchemaName":  "pokemon_Player2PokemonName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "cf2e17d6-be84-4f07-ab07-af9f7590bdd5",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_player2yominame",
+                           "SchemaName":  "pokemon_Player2YomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "056ba2aa-1555-4462-ba22-dfbe1699df91",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_winnercontact",
+                           "SchemaName":  "pokemon_WinnerContact",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Winner Contact",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "729767e4-2fb6-4dd2-a399-a93c1b4bdeb1",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Winner Contact",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "729767e4-2fb6-4dd2-a399-a93c1b4bdeb1",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "a36007e9-e032-48bc-9d00-37b79bad0228",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_winnercontactname",
+                           "SchemaName":  "pokemon_WinnerContactName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "c80dc9a1-0d11-4580-b126-3b6f0b136f63",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_winnercontactyominame",
+                           "SchemaName":  "pokemon_WinnerContactYomiName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+                           "MetadataId":  "fb47ccaf-b5cc-482f-93e0-38ae9b1b8595",
+                           "AttributeType":  "Lookup",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_winnerpokemon",
+                           "SchemaName":  "pokemon_WinnerPokemon",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Winner - Pokemon",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "f00ba59d-4e4c-4ec3-b5cc-a3d00694d0fb",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Winner - Pokemon",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "f00ba59d-4e4c-4ec3-b5cc-a3d00694d0fb",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StringAttributeMetadata",
+                           "MetadataId":  "8834478d-5252-416e-b8dc-44cf0a846142",
+                           "AttributeType":  "String",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "pokemon_winnerpokemonname",
+                           "SchemaName":  "pokemon_WinnerPokemonName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StateAttributeMetadata",
+                           "MetadataId":  "224e531e-9f8e-438c-b2dd-8853103b66d7",
+                           "AttributeType":  "State",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "statecode",
+                           "SchemaName":  "statecode",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Status",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "93468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Status",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "93468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "MetadataId":  "a9ca1093-7c0b-426b-8cb5-8a85d4887046",
+                           "AttributeType":  "Virtual",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "statecodename",
+                           "SchemaName":  "statecodeName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.StatusAttributeMetadata",
+                           "MetadataId":  "a9f4215a-b48f-4b40-809e-087e5e6a012d",
+                           "AttributeType":  "Status",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "statuscode",
+                           "SchemaName":  "statuscode",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Status Reason",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "9d468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Status Reason",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "9d468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "MetadataId":  "57cac56a-3793-429e-bc7a-389ab56accb3",
+                           "AttributeType":  "Virtual",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "statuscodename",
+                           "SchemaName":  "statuscodeName",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+
+                                                                   ],
+                                               "UserLocalizedLabel":  null
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.IntegerAttributeMetadata",
+                           "MetadataId":  "730aa39d-f12b-4490-a7e2-10cb0838ba31",
+                           "AttributeType":  "Integer",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "timezoneruleversionnumber",
+                           "SchemaName":  "TimeZoneRuleVersionNumber",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Time Zone Rule Version Number",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "ad468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Time Zone Rule Version Number",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "ad468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.IntegerAttributeMetadata",
+                           "MetadataId":  "96f7d32d-ea72-443d-b52a-b4d0da03efab",
+                           "AttributeType":  "Integer",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "utcconversiontimezonecode",
+                           "SchemaName":  "UTCConversionTimeZoneCode",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "UTC Conversion Time Zone Code",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "af468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "UTC Conversion Time Zone Code",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "af468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       },
+                       {
+                           "@odata.type":  "#Microsoft.Dynamics.CRM.BigIntAttributeMetadata",
+                           "MetadataId":  "59a092ff-939e-4348-a74e-4be0feaf133f",
+                           "AttributeType":  "BigInt",
+                           "IsPrimaryId":  false,
+                           "LogicalName":  "versionnumber",
+                           "SchemaName":  "VersionNumber",
+                           "DisplayName":  {
+                                               "LocalizedLabels":  [
+                                                                       {
+                                                                           "Label":  "Version Number",
+                                                                           "LanguageCode":  1033,
+                                                                           "IsManaged":  false,
+                                                                           "MetadataId":  "a7468d44-1253-f011-877a-6045bd968350",
+                                                                           "HasChanged":  null
+                                                                       }
+                                                                   ],
+                                               "UserLocalizedLabel":  {
+                                                                          "Label":  "Version Number",
+                                                                          "LanguageCode":  1033,
+                                                                          "IsManaged":  false,
+                                                                          "MetadataId":  "a7468d44-1253-f011-877a-6045bd968350",
+                                                                          "HasChanged":  null
+                                                                      }
+                                           }
+                       }
+                   ]
+}

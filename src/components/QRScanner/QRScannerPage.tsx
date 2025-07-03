@@ -17,7 +17,8 @@ const QRScannerPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [pokemonData, setPokemonData] = useState({
-    name: ''
+    name: '',
+    id: 1
   });
 
   useEffect(() => {
@@ -75,7 +76,8 @@ const QRScannerPage: React.FC = () => {
       }
       
       setPokemonData({
-        name: pokemonInfo.name || 'Unknown Pokemon'
+        name: pokemonInfo.name || 'Unknown Pokemon',
+        id: pokemonInfo.id || 1 // Default to Bulbasaur if no ID provided
       });
       
       setShowModal(true);
@@ -103,7 +105,7 @@ const QRScannerPage: React.FC = () => {
       }
 
       // Catch the Pokemon using the simplified schema
-      await catchPokemonByName(contact.contactid, pokemonData.name);
+      await catchPokemonByName(contact.contactid, pokemonData.id, pokemonData.name);
       
       setSuccess(`${pokemonData.name} has been added to your collection!`);
       setShowModal(false);
