@@ -10,6 +10,11 @@ import {
   DataverseValidator, 
   DataverseQueryBuilder 
 } from '../constants/dataverseSchema';
+import { 
+  CompleteBattleData, 
+  BattlePokemon 
+} from '../types/battleTypes';
+import { BattleSimulationService } from './battleSimulationService';
 
 // Basic battle record interface (for creation/updates)
 export interface PokemonBattle extends PokemonBattleRecord {}
@@ -43,54 +48,14 @@ export interface PokemonBattleExpanded {
   };
 }
 
-export interface BattlePokemon {
-  id: number;
-  name: string;
-  level: number;
-  hp: number;
-  maxHp: number;
-  attack: number;
-  defense: number;
-  speed: number;
-  types: string[];
-  moves: string[];
-}
-
-export interface BattleStep {
-  stepNumber: number;
-  attacker: 'player1' | 'player2';
-  defender: 'player1' | 'player2';
-  move: string;
-  damage: number;
-  critical: boolean;
-  effectiveness: 'not_effective' | 'normal' | 'super_effective';
-  attackerHpRemaining: number;
-  defenderHpRemaining: number;
-  message: string;
-}
-
+// Legacy interface for backwards compatibility  
 export interface BattleResult {
-  battleId: string;
-  players: {
-    player1: { id: string; pokemon: BattlePokemon };
-    player2: { id: string; pokemon: BattlePokemon };
-  };
-  battleSteps: BattleStep[];
-  result: {
-    winner: 'player1' | 'player2';
-    loser: 'player1' | 'player2';
-    totalTurns: number;
-    battleDuration: string;
-    experienceGained: {
-      player1: number;
-      player2: number;
-    };
-  };
-  metadata: {
-    simulatedAt: string;
-    simulationVersion: string;
-    battleType: string;
-  };
+  battleSteps: any[];
+  winner: string;
+  battleLog: string[];
+  finalState: any;
+  // New field to store complete battle data
+  completeBattleData?: CompleteBattleData;
 }
 
 export class BattleChallengeService {
@@ -135,7 +100,7 @@ export class BattleChallengeService {
         
         // If it's a training challenge, immediately simulate vs AI
         if (challengeType === 'training') {
-          await this.simulateTrainingBattle(result.pokemon_battleid, playerId, pokemonId);
+          await this.simulateBattle(result.pokemon_battleid);
         }
         
         return { success: true, battleId: result.pokemon_battleid };
@@ -260,24 +225,102 @@ export class BattleChallengeService {
 
   // Simulate battle (called after both players joined)
   private static async simulateBattle(battleId: string): Promise<void> {
-    // This will be called by Azure Functions to simulate the battle
-    await fetch(`${this.API_BASE}/simulate-battle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ battleId })
-    });
+    try {
+      // Get battle details first
+      const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
+      if (!response.ok) return;
+      
+      const battle = await response.json();
+      
+      // Mock player data - in real implementation, fetch from user tables
+      const player1 = { id: battle.pokemon_player1 || 'player1', name: 'Trainer 1' };
+      const player2 = { id: battle.pokemon_player2 || 'player2', name: 'Trainer 2' };
+      
+      // Mock Pokemon data - in real implementation, fetch from Pokemon tables
+      const pokemon1: BattlePokemon = {
+        id: battle.pokemon_player1pokemon || '1',
+        pokemon_id: 25, // Pikachu
+        name: 'Pikachu',
+        level: 20,
+        hp: 70,
+        max_hp: 70,
+        attack: 55,
+        defense: 40,
+        speed: 90,
+        types: ['electric'],
+        sprite_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+        moves: []
+      };
+      
+      const pokemon2: BattlePokemon = {
+        id: battle.pokemon_player2pokemon || '2',
+        pokemon_id: 4, // Charmander
+        name: 'Charmander',
+        level: 18,
+        hp: 65,
+        max_hp: 65,
+        attack: 52,
+        defense: 43,
+        speed: 65,
+        types: ['fire'],
+        sprite_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png',
+        moves: []
+      };
+      
+      // Simulate the battle
+      const battleData = await BattleSimulationService.simulateBattle(
+        player1,
+        player2,
+        pokemon1,
+        pokemon2,
+        'casual'
+      );
+      
+      // Convert to legacy format for backwards compatibility
+      const legacyResult: BattleResult = {
+        battleSteps: battleData.battle_turns.map((turn, index) => ({
+          stepNumber: index + 1,
+          message: turn.turn_result.turn_summary
+        })),
+        winner: battleData.final_result.winner_name,
+        battleLog: battleData.battle_log,
+        finalState: {
+          player1HP: battleData.battle_turns[battleData.battle_turns.length - 1]?.turn_result.player1_pokemon_hp || 0,
+          player2HP: battleData.battle_turns[battleData.battle_turns.length - 1]?.turn_result.player2_pokemon_hp || 0
+        },
+        completeBattleData: battleData
+      };
+      
+      // Store battle result in Dataverse
+      await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pokemon_battleresult: JSON.stringify(legacyResult),
+          modifiedon: new Date().toISOString()
+        })
+      });
+      
+    } catch (error) {
+      console.error('Error simulating battle:', error);
+    }
   }
 
-  // Simulate training battle vs AI
-  private static async simulateTrainingBattle(
-    battleId: string, 
-    playerId: string, 
-    pokemonId: string
-  ): Promise<void> {
-    await fetch(`${this.API_BASE}/simulate-training-battle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ battleId, playerId, pokemonId })
-    });
+  // Helper method to convert user Pokemon to BattlePokemon format
+  static convertUserPokemonToBattle(userPokemon: any): BattlePokemon {
+    return {
+      id: userPokemon.id || userPokemon.pokemon_id?.toString() || '',
+      pokemon_id: userPokemon.pokemon_id || userPokemon.id || 25,
+      name: userPokemon.name || userPokemon.pokemon_name || 'Unknown',
+      level: userPokemon.level || 5,
+      hp: userPokemon.hp || userPokemon.current_hp || 50,
+      max_hp: userPokemon.maxHp || userPokemon.max_hp || 50,
+      attack: userPokemon.attack || 30,
+      defense: userPokemon.defense || 25,
+      speed: userPokemon.speed || 20,
+      types: userPokemon.types || ['normal'],
+      sprite_url: userPokemon.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${userPokemon.pokemon_id || userPokemon.id || 25}.png`,
+      moves: userPokemon.moves || []
+    };
   }
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BattleChallengeService, PokemonBattle, PokemonBattleExpanded, BattleResult } from '../../services/battleChallengeService';
 import { StatusCodes, ChallengeTypes } from '../../constants/dataverseMappings';
+import { CompleteBattleData } from '../../types/battleTypes';
+import BattleReplay from './BattleReplay';
 import './BattleArena.css';
 
 interface BattleArenaPokemon {
@@ -234,6 +236,24 @@ const BattleArena: React.FC<BattleArenaProps> = ({
   const closePokemonModal = () => {
     setShowPokemonModal(false);
     setChallengeToJoin(null);
+  };
+
+  // Convert user Pokemon to BattleArena format
+  const convertToBattleArenaPokemon = (userPokemon: any[]): BattleArenaPokemon[] => {
+    return userPokemon.map(pokemon => ({
+      id: pokemon.id || pokemon.pokemon_id?.toString() || '',
+      name: pokemon.name || pokemon.pokemon_name || 'Unknown',
+      level: pokemon.level || 5,
+      hp: pokemon.hp || 50,
+      maxHp: pokemon.maxHp || pokemon.max_hp || 50,
+      attack: pokemon.attack || 30,
+      defense: pokemon.defense || 25,
+      speed: pokemon.speed || 20,
+      types: pokemon.types || ['normal'],
+      sprite: pokemon.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokemon_id || pokemon.id || 25}.png`,
+      moves: pokemon.moves || ['Tackle', 'Scratch'],
+      experience: pokemon.experience || 0
+    }));
   };
 
   return (
@@ -498,151 +518,96 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 
       {/* Battle Replay View */}
       {viewMode === 'battle-replay' && battleResult && (
-        <div className="battle-replay">
-          <div className="replay-header">
-            <button onClick={() => setViewMode('history')} className="back-btn">
-              ← Back to History
-            </button>
-            <h2>Battle Replay</h2>
-            <div className="replay-controls">
-              <button onClick={replayPreviousStep} disabled={currentStep === 0}>
-                ← Previous
-              </button>
-              <button onClick={autoReplay} disabled={isReplaying}>
-                ▶ Auto Replay
-              </button>
-              <button onClick={replayNextStep} disabled={currentStep >= battleResult.battleSteps.length}>
-                Next →
-              </button>
-            </div>
-          </div>
-
-          {/* Battle Field */}
-          <div className="battle-field replay">
-            <div className="battle-display">
-              <div className="pokemon-battle-card player">
-                <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${battleResult.players.player1.pokemon.id}.png`} 
-                     alt={battleResult.players.player1.pokemon.name} />
-                <h3>{battleResult.players.player1.pokemon.name}</h3>
-                <div className="hp-bar">
-                  <div 
-                    className="hp-fill"
-                    style={{ 
-                      width: `${currentStep > 0 && battleResult.battleSteps[currentStep - 1] 
-                        ? (battleResult.battleSteps[currentStep - 1].attackerHpRemaining / battleResult.players.player1.pokemon.maxHp) * 100
-                        : 100}%` 
-                    }}
-                  ></div>
-                </div>
-                <p>Level {battleResult.players.player1.pokemon.level}</p>
-              </div>
-              
-              <div className="vs-indicator">VS</div>
-              
-              <div className="pokemon-battle-card opponent">
-                <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${battleResult.players.player2.pokemon.id}.png`} 
-                     alt={battleResult.players.player2.pokemon.name} />
-                <h3>{battleResult.players.player2.pokemon.name}</h3>
-                <div className="hp-bar">
-                  <div 
-                    className="hp-fill"
-                    style={{ 
-                      width: `${currentStep > 0 && battleResult.battleSteps[currentStep - 1] 
-                        ? (battleResult.battleSteps[currentStep - 1].defenderHpRemaining / battleResult.players.player2.pokemon.maxHp) * 100
-                        : 100}%` 
-                    }}
-                  ></div>
-                </div>
-                <p>Level {battleResult.players.player2.pokemon.level}</p>
-              </div>
-            </div>
-
-            {/* Current Step Info */}
-            <div className="step-info">
-              <p>Step {currentStep} of {battleResult.battleSteps.length}</p>
-              {currentStep > 0 && battleResult.battleSteps[currentStep - 1] && (
-                <div className="step-details">
-                  <p className="step-message">{battleResult.battleSteps[currentStep - 1].message}</p>
-                  <p>Damage: {battleResult.battleSteps[currentStep - 1].damage}</p>
-                  {battleResult.battleSteps[currentStep - 1].critical && (
-                    <p className="critical">Critical Hit!</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Battle Summary */}
-            {currentStep >= battleResult.battleSteps.length && (
-              <div className="battle-summary">
-                <h3>Battle Complete!</h3>
-                <p>Winner: {battleResult.result.winner === 'player1' ? battleResult.players.player1.pokemon.name : battleResult.players.player2.pokemon.name}</p>
-                <p>Total Turns: {battleResult.result.totalTurns}</p>
-                <p>Duration: {battleResult.result.battleDuration}</p>
-                <p>Experience Gained: Player 1: {battleResult.result.experienceGained.player1}, Player 2: {battleResult.result.experienceGained.player2}</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <BattleReplay
+          battleResult={battleResult}
+          currentStep={currentStep}
+          isReplaying={isReplaying}
+          onNext={replayNextStep}
+          onPrevious={replayPreviousStep}
+          onAutoReplay={autoReplay}
+          onClose={() => setViewMode('history')}
+        />
       )}
 
       {/* Pokemon Selection Modal */}
       {showPokemonModal && (
         <div className="modal-overlay" onClick={closePokemonModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content mobile-friendly" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Select Your Pokemon</h3>
               <button className="close-btn" onClick={closePokemonModal}>×</button>
             </div>
             <div className="modal-body">
-              <p>Choose a Pokemon to accept this challenge:</p>
-              <div className="pokemon-grid">
-                {userPokemon && userPokemon.length > 0 ? (
-                  userPokemon.map((pokemon) => (
-                    <div 
-                      key={pokemon.pokemon_pokedexid}
-                      className="pokemon-card selectable"
-                      onClick={() => handlePokemonSelect({
-                        id: pokemon.pokemon_pokedexid,
-                        name: pokemon.pokemon_nickname || pokemon.pokemon_Pokemon?.pokemon_name || 'Unknown',
-                        level: pokemon.pokemon_level || 1,
-                        hp: pokemon.pokemon_current_hp || 100,
-                        maxHp: pokemon.pokemon_max_hp || 100,
-                        attack: 50, // Default values - can be enhanced later
-                        defense: 50,
-                        speed: 50,
-                        types: ['normal'], // Can be enhanced later
-                        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokemon_Pokemon?.pokemon_id || 1}.png`
-                      })}
-                    >
-                      <div className="pokemon-image">
-                        <img 
-                          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokemon_Pokemon?.pokemon_id || 1}.png`}
-                          alt={pokemon.pokemon_nickname || pokemon.pokemon_Pokemon?.pokemon_name || 'Unknown'}
-                          onError={(e) => {
-                            e.currentTarget.src = '/pokemon-placeholder.png';
-                          }}
-                        />
-                      </div>
-                      <div className="pokemon-info">
-                        <h4>{pokemon.pokemon_nickname || pokemon.pokemon_Pokemon?.pokemon_name || 'Unknown'}</h4>
-                        <p>Level {pokemon.pokemon_level || 1}</p>
-                        <div className="hp-bar">
-                          <div 
-                            className="hp-fill"
-                            style={{ width: `${((pokemon.pokemon_current_hp || 100) / (pokemon.pokemon_max_hp || 100)) * 100}%` }}
-                          ></div>
-                        </div>
-                        <p>HP: {pokemon.pokemon_current_hp || 100}/{pokemon.pokemon_max_hp || 100}</p>
-                      </div>
+              <p className="modal-description">Choose a Pokemon to accept this challenge:</p>
+              
+              {/* Convert and use user's actual Pokemon */}
+              {(() => {
+                const battlePokemon = convertToBattleArenaPokemon(userPokemon || []);
+                
+                if (battlePokemon.length === 0) {
+                  return (
+                    <div className="no-pokemon">
+                      <div className="no-pokemon-icon">🔍</div>
+                      <h4>No Pokemon Available</h4>
+                      <p>You need to catch some Pokemon first!</p>
+                      <p>Visit the <strong>Pokemon Browser</strong> or <strong>QR Scanner</strong> to add Pokemon to your collection.</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="no-pokemon">
-                    <p>No Pokemon available for battle!</p>
-                    <p>Visit the QR Scanner to catch some Pokemon first.</p>
+                  );
+                }
+
+                return (
+                  <div className="pokemon-selection-grid">
+                    {battlePokemon.map((pokemon) => (
+                      <div 
+                        key={pokemon.id}
+                        className="pokemon-selection-card"
+                        onClick={() => handlePokemonSelect(pokemon)}
+                      >
+                        <div className="pokemon-avatar">
+                          <img 
+                            src={pokemon.sprite}
+                            alt={pokemon.name}
+                            onError={(e) => {
+                              e.currentTarget.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png`;
+                            }}
+                          />
+                        </div>
+                        <div className="pokemon-details">
+                          <h4 className="pokemon-name">{pokemon.name}</h4>
+                          <div className="pokemon-stats">
+                            <span className="level-badge">Lv. {pokemon.level}</span>
+                            <div className="hp-display">
+                              <div className="hp-bar">
+                                <div 
+                                  className="hp-fill"
+                                  style={{ width: `${(pokemon.hp / pokemon.maxHp) * 100}%` }}
+                                ></div>
+                              </div>
+                              <span className="hp-text">{pokemon.hp}/{pokemon.maxHp}</span>
+                            </div>
+                          </div>
+                          <div className="pokemon-combat-stats">
+                            <span className="stat">⚔️ {pokemon.attack}</span>
+                            <span className="stat">🛡️ {pokemon.defense}</span>
+                            <span className="stat">⚡ {pokemon.speed}</span>
+                          </div>
+                          <div className="pokemon-types">
+                            {pokemon.types.map((type, index) => (
+                              <span key={index} className={`type-badge type-${type}`}>
+                                {type}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="selection-indicator">
+                          <span className="select-text">Tap to Select</span>
+                          <span className="arrow">→</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                );
+              })()}
             </div>
           </div>
         </div>
