@@ -105,16 +105,9 @@ function App() {
   const isAuthenticated = useIsAuthenticated();
   const { accounts } = useMsal();
   
-  // Demo mode for UI testing (temporary)
-  const urlParams = new URLSearchParams(window.location.search);
-  const isDemoMode = urlParams.get('demo') === 'true';
-  const effectiveAuth = isAuthenticated || isDemoMode;
-  
   // Debug logging
   React.useEffect(() => {
     console.log('Authentication status:', isAuthenticated);
-    console.log('Demo mode:', isDemoMode);
-    console.log('Effective auth:', effectiveAuth);
     console.log('Number of accounts:', accounts.length);
     console.log('Accounts:', accounts);
     console.log('MSAL config being used:', {
@@ -122,7 +115,7 @@ function App() {
       clientId: process.env.REACT_APP_CLIENT_ID,
       redirectUri: process.env.REACT_APP_REDIRECT_URI
     });
-  }, [isAuthenticated, accounts, isDemoMode, effectiveAuth]);
+  }, [isAuthenticated, accounts]);
 
   return (
     <Router>
@@ -130,35 +123,35 @@ function App() {
         <Routes>
           <Route 
             path="/login" 
-            element={!effectiveAuth ? <LoginPage /> : <Navigate to="/my-page" />} 
+            element={!isAuthenticated ? <LoginPage /> : <Navigate to="/my-page" />} 
           />
           <Route 
             path="/my-page" 
-            element={effectiveAuth ? <MyPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <MyPage /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/scan-pokemon" 
-            element={effectiveAuth ? <QRScannerPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <QRScannerPage /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/pokemon-browser" 
-            element={effectiveAuth ? <PokemonBrowser /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <PokemonBrowser /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/battle-arena" 
-            element={effectiveAuth ? <BattleArenaWrapper /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <BattleArenaWrapper /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/evolution-lab" 
-            element={effectiveAuth ? <EvolutionLabWrapper /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <EvolutionLabWrapper /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/admin" 
-            element={effectiveAuth ? <AdminPanel /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 
-            element={<Navigate to={effectiveAuth ? "/my-page" : "/login"} />} 
+            element={<Navigate to={isAuthenticated ? "/my-page" : "/login"} />} 
           />
         </Routes>
       </Layout>

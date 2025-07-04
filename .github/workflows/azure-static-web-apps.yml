@@ -29,12 +29,16 @@ jobs:
           api_location: "api" # Api source code path - Azure Functions
           output_location: "build" # Built app content directory - optional
         env:
-          REACT_APP_CLIENT_ID: ${{ secrets.REACT_APP_CLIENT_ID }}
-          REACT_APP_AUTHORITY: ${{ secrets.REACT_APP_AUTHORITY }}
-          REACT_APP_REDIRECT_URI: ${{ secrets.REACT_APP_REDIRECT_URI }}
-          REACT_APP_POST_LOGOUT_REDIRECT_URI: ${{ secrets.REACT_APP_POST_LOGOUT_REDIRECT_URI }}
-          REACT_APP_DATAVERSE_URL: ${{ secrets.REACT_APP_DATAVERSE_URL }}
-          REACT_APP_DATAVERSE_SCOPE: ${{ secrets.REACT_APP_DATAVERSE_SCOPE }}
+          REACT_APP_CLIENT_ID: ${{ vars.REACT_APP_CLIENT_ID }}
+          REACT_APP_AUTHORITY: ${{ vars.REACT_APP_AUTHORITY }}
+          REACT_APP_KNOWN_AUTHORITY: ${{ vars.REACT_APP_KNOWN_AUTHORITY }}
+          REACT_APP_REDIRECT_URI: ${{ vars.REACT_APP_REDIRECT_URI }}
+          REACT_APP_POST_LOGOUT_REDIRECT_URI: ${{ vars.REACT_APP_POST_LOGOUT_REDIRECT_URI }}
+          DATAVERSE_URL: ${{ vars.DATAVERSE_URL }}
+          DATAVERSE_TENANT_ID: ${{ vars.DATAVERSE_TENANT_ID }}
+          DATAVERSE_CLIENT_ID: ${{ vars.DATAVERSE_CLIENT_ID }}
+          DATAVERSE_CLIENT_SECRET: ${{ secrets.DATAVERSE_CLIENT_SECRET }}
+          DATAVERSE_SCOPE: ${{ vars.DATAVERSE_SCOPE }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
