@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { PokemonImportService, ImportResult } from '../../services/pokemonImportService';
+import { PortalSettingsService } from '../../services/portalSettingsService';
+import { useDemoMode } from '../../contexts/DemoContext';
+import defaultSettings from '../../data/defaultPortalSettings.json';
 import '../../styles/AdminPanel.css';
 
 interface AdminPanelProps {}
@@ -10,6 +13,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [customPokemonIds, setCustomPokemonIds] = useState<string>('');
   const [pokemonCount, setPokemonCount] = useState<number>(20); // New state for Pokemon count
+  const { isDemoMode, setDemoMode, demoUser, loading: demoLoading } = useDemoMode();
+  const [settingsImportStatus, setSettingsImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
+  const [settingsImportResult, setSettingsImportResult] = useState<{ imported: number; skipped: number; failed: number; errors: string[] } | null>(null);
 
   const handleQuickImport = async () => {
     setImportStatus('importing');
@@ -76,6 +82,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
       }
     } catch (error) {
       alert(`❌ Dataverse connection error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleSettingsImport = async () => {
+    setSettingsImportStatus('importing');
+    setSettingsImportResult(null);
+    
+    try {
+      // Import from the JSON file
+      const settings = defaultSettings.portal_settings.settings.map(setting => ({
+        key: setting.key,
+        value: setting.value,
+        description: setting.description
+      }));
+      
+      // Import with skipIfSameValue option to avoid unnecessary updates
+      const result = await PortalSettingsService.importDefaultSettings(settings, { skipIfSameValue: true });
+      
+      setSettingsImportResult(result);
+      setSettingsImportStatus(result.failed === 0 ? 'success' : 'error');
+    } catch (error) {
+      setSettingsImportResult({
+        imported: 0,
+        skipped: 0,
+        failed: 1,
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      });
+      setSettingsImportStatus('error');
     }
   };
 
@@ -231,6 +265,62 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
             <h2>⚙️ System Settings</h2>
             <div className="admin-cards">
               <div className="admin-card">
+                <h3>📥 Portal Settings Import</h3>
+                <p>Import default portal settings from JSON configuration</p>
+                {settingsImportResult && (
+                  <div className={`import-result ${settingsImportStatus}`}>
+                    <p><strong>Import Results:</strong></p>
+                    <p>✅ Imported: {settingsImportResult.imported}</p>
+                    <p>⏭️ Skipped (unchanged): {settingsImportResult.skipped}</p>
+                    <p>❌ Failed: {settingsImportResult.failed}</p>
+                    {settingsImportResult.errors.length > 0 && (
+                      <div className="import-errors">
+                        <p><strong>Errors:</strong></p>
+                        <ul>
+                          {settingsImportResult.errors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <button 
+                  className="admin-button primary"
+                  onClick={handleSettingsImport}
+                  disabled={settingsImportStatus === 'importing'}
+                >
+                  {settingsImportStatus === 'importing' ? '🔄 Importing Settings...' : '📥 Import Portal Settings'}
+                </button>
+              </div>
+              
+              <div className="admin-card">
+                <h3>🎭 Demo Mode</h3>
+                <p>Enable testing mode to bypass authentication</p>
+                <div className="demo-mode-info">
+                  <p><strong>Status:</strong> {demoLoading ? '🔄 Loading...' : (isDemoMode ? '✅ Enabled' : '❌ Disabled')}</p>
+                  {isDemoMode && !demoLoading && (
+                    <p><strong>Demo User:</strong> {demoUser.email}</p>
+                  )}
+                  <p><strong>Storage:</strong> Dataverse (pokemon_portalsetting)</p>
+                </div>
+                <div className="demo-mode-controls">
+                  <button 
+                    className={`admin-button ${isDemoMode ? 'secondary' : 'primary'}`}
+                    onClick={() => setDemoMode(!isDemoMode)}
+                    disabled={demoLoading}
+                  >
+                    {demoLoading ? '🔄 Updating...' : (isDemoMode ? '🔒 Disable Demo Mode' : '🎭 Enable Demo Mode')}
+                  </button>
+                </div>
+                <div className="demo-mode-help">
+                  <p><small>💡 <strong>URL Bypass:</strong> Add <code>?demo=true</code> or <code>?bypass=true</code> to any URL to enable demo mode</small></p>
+                  <p><small>Example: <code>http://localhost:3000/battle-arena?demo=true</code></small></p>
+                  <p><small>⚙️ Setting is stored in Dataverse and affects all users globally</small></p>
+                </div>
+              </div>
+              
+              <div className="admin-card">
                 <h3>🔧 API Configuration</h3>
                 <p>Configure API endpoints and authentication</p>
                 <button className="admin-button">⚙️ Configure APIs</button>
@@ -238,12 +328,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
               <div className="admin-card">
                 <h3>🗃️ Database Management</h3>
                 <p>Backup and maintenance operations</p>
-                <button className="admin-button">🗃️ Database Tools</button>
+                <button 
+                  className="admin-button"
+                  onClick={handleTestDataverseConnection}
+                >
+                  🔗 Test Dataverse Connection
+                </button>
               </div>
               <div className="admin-card">
                 <h3>📱 App Settings</h3>
                 <p>Configure app-wide settings and features</p>
-                <button className="admin-button">📱 App Settings</button>
+                <button className="admin-button">📱 View All Settings</button>
               </div>
             </div>
           </div>

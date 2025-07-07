@@ -217,6 +217,47 @@
   opacity: 0.9;
 }
 
+/* Demo Mode Styles */
+.demo-mode-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  border-left: 4px solid #fbbf24;
+}
+
+.demo-mode-info p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.demo-mode-controls {
+  margin: 16px 0;
+}
+
+.demo-mode-help {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border-left: 4px solid #60a5fa;
+}
+
+.demo-mode-help p {
+  margin: 4px 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.demo-mode-help code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #fbbf24;
+}
+
 @media (max-width: 768px) {
   .admin-panel {
     padding: 16px;

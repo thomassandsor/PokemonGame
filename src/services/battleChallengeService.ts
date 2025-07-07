@@ -23,7 +23,7 @@ export interface PokemonBattle extends PokemonBattleRecord {}
 export interface PokemonBattleExpanded {
   // All base fields
   pokemon_battleid?: string;
-  statuscode?: 1 | 895550001;
+  statuscode?: 1 | 895550002 | 895550001;
   statecode?: 0 | 1;
   pokemon_challengetype?: 1 | 2;
   createdon?: string;
@@ -100,7 +100,7 @@ export class BattleChallengeService {
         
         // If it's a training challenge, immediately simulate vs AI
         if (challengeType === 'training') {
-          await this.simulateBattle(result.pokemon_battleid);
+          await this.simulateBattleWithRealData(result.pokemon_battleid);
         }
         
         return { success: true, battleId: result.pokemon_battleid };
@@ -160,21 +160,32 @@ export class BattleChallengeService {
     challengerId: string, 
     pokemonId: string
   ): Promise<{ success: boolean; error?: string }> {
+    // Validate input
+    if (!challengerId || !pokemonId) {
+      return { success: false, error: 'Missing challengerId or pokemonId for joinChallenge.' };
+    }
     try {
+      const patchBody = {
+        "pokemon_Player2@odata.bind": `/contacts(${challengerId})`,
+        "pokemon_Player2Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
+        statuscode: 895550002, // Hardcoded to correct Dataverse value for 'Battle Started'
+        modifiedon: new Date().toISOString()
+      };
+      console.log('PATCH joinChallenge body:', patchBody);
       const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pokemon_player2: challengerId,
-          pokemon_player2pokemon: pokemonId,
-          statuscode: StatusCodes.COMPLETED, // Mark as completed when second player joins
-          modifiedon: new Date().toISOString()
-        })
+        body: JSON.stringify(patchBody)
       });
 
       if (response.ok) {
+        // Wait for Dataverse to persist the update
+        const ready = await this.waitForBattleUpdate(battleId, challengerId, pokemonId);
+        if (!ready) {
+          return { success: false, error: 'Timed out waiting for battle update in Dataverse.' };
+        }
         // Trigger battle simulation
-        await this.simulateBattle(battleId);
+        await this.simulateBattleWithRealData(battleId);
         return { success: true };
       } else {
         return { success: false, error: `Failed to join battle: ${response.statusText}` };
@@ -183,6 +194,52 @@ export class BattleChallengeService {
       return { 
         success: false, 
         error: `Error joining battle: ${error instanceof Error ? error.message : 'Unknown error'}` 
+      };
+    }
+  }
+
+  // Start a battle (join and set status to BATTLE_STARTED)
+  static async startBattle(
+    battleId: string, 
+    challengerId: string, 
+    pokemonId: string
+  ): Promise<{ success: boolean; error?: string }> {
+    // Validate input
+    if (!challengerId || !pokemonId) {
+      return { success: false, error: 'Missing challengerId or pokemonId for startBattle.' };
+    }
+    try {
+      const patchBody = {
+        "pokemon_Player2@odata.bind": `/contacts(${challengerId})`,
+        "pokemon_Player2Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
+        statuscode: 895550002, // Hardcoded to correct Dataverse value for 'Battle Started'
+        modifiedon: new Date().toISOString()
+      };
+      console.log('PATCH startBattle body:', patchBody);
+      const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patchBody)
+      });
+
+      if (!response.ok) {
+        return { success: false, error: `Failed to start battle: ${response.statusText}` };
+      }
+
+      // Wait for Dataverse to persist the update
+      const ready = await this.waitForBattleUpdate(battleId, challengerId, pokemonId);
+      if (!ready) {
+        return { success: false, error: 'Timed out waiting for battle update in Dataverse.' };
+      }
+
+      // Now simulate the battle with real Pokemon data
+      await this.simulateBattleWithRealData(battleId);
+
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: `Error starting battle: ${error instanceof Error ? error.message : 'Unknown error'}` 
       };
     }
   }
@@ -223,87 +280,136 @@ export class BattleChallengeService {
     }
   }
 
-  // Simulate battle (called after both players joined)
-  private static async simulateBattle(battleId: string): Promise<void> {
+  // Simulate battle with real Pokemon data from Dataverse
+  private static async simulateBattleWithRealData(battleId: string): Promise<void> {
     try {
-      // Get battle details first
-      const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
-      if (!response.ok) return;
+      console.log(`🎮 Starting battle simulation for battle ID: ${battleId}`);
       
-      const battle = await response.json();
+      // Get battle details with expanded Pokemon and trainer data
+      const battleResponse = await fetch(
+        `${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2($select=firstname),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`
+      );
       
-      // Mock player data - in real implementation, fetch from user tables
-      const player1 = { id: battle.pokemon_player1 || 'player1', name: 'Trainer 1' };
-      const player2 = { id: battle.pokemon_player2 || 'player2', name: 'Trainer 2' };
+      if (!battleResponse.ok) {
+        console.error('Failed to fetch battle details for simulation');
+        return;
+      }
       
-      // Mock Pokemon data - in real implementation, fetch from Pokemon tables
-      const pokemon1: BattlePokemon = {
-        id: battle.pokemon_player1pokemon || '1',
-        pokemon_id: 25, // Pikachu
-        name: 'Pikachu',
-        level: 20,
-        hp: 70,
-        max_hp: 70,
-        attack: 55,
-        defense: 40,
-        speed: 90,
-        types: ['electric'],
-        sprite_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
-        moves: []
+      const battle = await battleResponse.json();
+      console.log('Battle data for simulation:', battle);
+      
+      // Extract trainer information
+      const player1 = {
+        id: battle._pokemon_player1_value || 'player1',
+        name: battle.pokemon_Player1?.firstname || 'Trainer 1'
       };
       
-      const pokemon2: BattlePokemon = {
-        id: battle.pokemon_player2pokemon || '2',
-        pokemon_id: 4, // Charmander
-        name: 'Charmander',
-        level: 18,
-        hp: 65,
-        max_hp: 65,
-        attack: 52,
-        defense: 43,
-        speed: 65,
-        types: ['fire'],
-        sprite_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png',
-        moves: []
+      const player2 = {
+        id: battle._pokemon_player2_value || 'player2', 
+        name: battle.pokemon_Player2?.firstname || 'Trainer 2'
       };
       
-      // Simulate the battle
+      // Get Pokemon details from Pokedex entries
+      const pokemon1Data = await this.fetchPokemonDetails(battle._pokemon_player1pokemon_value);
+      const pokemon2Data = await this.fetchPokemonDetails(battle._pokemon_player2pokemon_value);
+      
+      if (!pokemon1Data || !pokemon2Data) {
+        console.error('Failed to fetch Pokemon details for battle simulation');
+        return;
+      }
+      
+      console.log(`⚔️ Battle: ${player1.name}'s ${pokemon1Data.name} vs ${player2.name}'s ${pokemon2Data.name}`);
+      
+      // Simulate the battle using the advanced simulation service
       const battleData = await BattleSimulationService.simulateBattle(
         player1,
         player2,
-        pokemon1,
-        pokemon2,
+        pokemon1Data,
+        pokemon2Data,
         'casual'
       );
       
-      // Convert to legacy format for backwards compatibility
-      const legacyResult: BattleResult = {
-        battleSteps: battleData.battle_turns.map((turn, index) => ({
-          stepNumber: index + 1,
-          message: turn.turn_result.turn_summary
-        })),
-        winner: battleData.final_result.winner_name,
-        battleLog: battleData.battle_log,
-        finalState: {
-          player1HP: battleData.battle_turns[battleData.battle_turns.length - 1]?.turn_result.player1_pokemon_hp || 0,
-          player2HP: battleData.battle_turns[battleData.battle_turns.length - 1]?.turn_result.player2_pokemon_hp || 0
-        },
-        completeBattleData: battleData
-      };
+      console.log(`🏆 Battle result: ${battleData.final_result.winner_name} wins!`);
       
-      // Store battle result in Dataverse
+      // Store the complete battle result in the pokemon_battleresult field
       await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pokemon_battleresult: JSON.stringify(legacyResult),
+          pokemon_battleresult: JSON.stringify(battleData),
+          statuscode: StateCodes.INACTIVE, // Mark battle as completed
           modifiedon: new Date().toISOString()
         })
       });
       
+      console.log(`✅ Battle simulation complete and saved to database`);
+      
     } catch (error) {
-      console.error('Error simulating battle:', error);
+      console.error('Error in battle simulation:', error);
     }
+  }
+
+  // Fetch detailed Pokemon data from Pokedex entry
+  private static async fetchPokemonDetails(pokedexEntryId: string): Promise<BattlePokemon | null> {
+    try {
+      const response = await fetch(
+        `${this.API_BASE}/pokemon_pokedexes(${pokedexEntryId})?$expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)`
+      );
+      
+      if (!response.ok) return null;
+      
+      const pokedexEntry = await response.json();
+      const pokemon = pokedexEntry.pokemon_Pokemon;
+      
+      if (!pokemon) return null;
+      
+      // Convert to BattlePokemon format with realistic stats based on level
+      const level = pokedexEntry.pokemon_level || 5;
+      const baseHp = Math.floor(50 + (level * 2.5));
+      
+      return {
+        id: pokedexEntry.pokemon_pokedexid,
+        pokemon_id: pokemon.pokemon_id || 1,
+        name: pokedexEntry.pokemon_nickname || pokemon.pokemon_name || 'Unknown',
+        level: level,
+        hp: pokedexEntry.pokemon_current_hp || baseHp,
+        max_hp: pokedexEntry.pokemon_max_hp || baseHp,
+        attack: 30 + Math.floor(level * 1.5),
+        defense: 25 + Math.floor(level * 1.2),
+        speed: 20 + Math.floor(level * 1.8),
+        types: this.getPokemonTypes(pokemon.pokemon_name || 'unknown'),
+        sprite_url: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokemon_id || 1}.png`,
+        moves: []
+      };
+    } catch (error) {
+      console.error('Error fetching Pokemon details:', error);
+      return null;
+    }
+  }
+
+  // Get Pokemon types based on name (in a real app, this would be from a database)
+  private static getPokemonTypes(pokemonName: string): string[] {
+    const typeMap: { [key: string]: string[] } = {
+      'bulbasaur': ['grass', 'poison'],
+      'ivysaur': ['grass', 'poison'],
+      'venusaur': ['grass', 'poison'],
+      'charmander': ['fire'],
+      'charmeleon': ['fire'],
+      'charizard': ['fire', 'flying'],
+      'squirtle': ['water'],
+      'wartortle': ['water'],
+      'blastoise': ['water'],
+      'pikachu': ['electric'],
+      'raichu': ['electric'],
+      'alakazam': ['psychic'],
+      'machamp': ['fighting'],
+      'gengar': ['ghost', 'poison'],
+      'dragonite': ['dragon', 'flying'],
+      'mewtwo': ['psychic'],
+      'mew': ['psychic']
+    };
+    
+    return typeMap[pokemonName.toLowerCase()] || ['normal'];
   }
 
   // Helper method to convert user Pokemon to BattlePokemon format
@@ -322,5 +428,45 @@ export class BattleChallengeService {
       sprite_url: userPokemon.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${userPokemon.pokemon_id || userPokemon.id || 25}.png`,
       moves: userPokemon.moves || []
     };
+  }
+
+  // Wait for Dataverse to persist player2 and their Pokemon before simulating battle
+  private static async waitForBattleUpdate(battleId: string, challengerId: string, pokemonId: string, maxAttempts = 10, delayMs = 800): Promise<boolean> {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
+        if (response.ok) {
+          const battle = await response.json();
+          if (
+            battle._pokemon_player2_value === challengerId &&
+            battle._pokemon_player2pokemon_value === pokemonId
+          ) {
+            return true;
+          }
+        }
+      } catch (e) {
+        // Ignore and retry
+      }
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    return false;
+  }
+
+  // Wait for battle record to have both player2 and their Pokemon (polling)
+  private static async waitForBattlePlayers(battleId: string, requiredPlayers: number, timeoutMs: number = 10000): Promise<boolean> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
+        if (response.ok) {
+          const battle = await response.json();
+          const hasPlayer2 = !!battle._pokemon_player2_value && !!battle._pokemon_player2pokemon_value;
+          if (requiredPlayers === 2 && hasPlayer2) return true;
+          if (requiredPlayers === 1) return true; // For future use
+        }
+      } catch {}
+      await new Promise(res => setTimeout(res, 400)); // Wait 400ms before retry
+    }
+    return false;
   }
 }

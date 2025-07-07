@@ -7,9 +7,12 @@ import QRScannerPage from './components/QRScanner/QRScannerPage';
 import { AdminPanel } from './components/AdminPanel/AdminPanel';
 import { DataverseQueryBuilder } from './constants/dataverseSchema';
 import BattleArena from './components/BattleArena/BattleArena';
+import BattleJoin from './components/BattleArena/BattleJoin';
+import BattleResult from './components/BattleArena/BattleResult';
 import EvolutionLab from './components/EvolutionLab/EvolutionLab';
 import PokemonBrowser from './components/PokemonBrowser/PokemonBrowser';
 import Layout from './components/Layout/Layout';
+import { DemoProvider, useDemoMode } from './contexts/DemoContext';
 import './App.css';
 
 // Wrapper components to provide required props
@@ -78,11 +81,7 @@ const BattleArenaWrapper: React.FC = () => {
   };
   
   return (
-    <BattleArena 
-      userPokemon={userPokemon}
-      onPokemonUpdate={handlePokemonUpdate}
-      onEvolutionAvailable={handleEvolutionAvailable}
-    />
+    <BattleArena />
   );
 };
 
@@ -101,13 +100,19 @@ const EvolutionLabWrapper: React.FC = () => {
   );
 };
 
-function App() {
+function AppContent() {
   const isAuthenticated = useIsAuthenticated();
   const { accounts } = useMsal();
+  const { isDemoMode } = useDemoMode();
+  
+  // Use demo mode OR actual authentication
+  const isUserLoggedIn = isDemoMode || isAuthenticated;
   
   // Debug logging
   React.useEffect(() => {
     console.log('Authentication status:', isAuthenticated);
+    console.log('Demo mode:', isDemoMode);
+    console.log('User logged in (combined):', isUserLoggedIn);
     console.log('Number of accounts:', accounts.length);
     console.log('Accounts:', accounts);
     console.log('MSAL config being used:', {
@@ -115,7 +120,7 @@ function App() {
       clientId: process.env.REACT_APP_CLIENT_ID,
       redirectUri: process.env.REACT_APP_REDIRECT_URI
     });
-  }, [isAuthenticated, accounts]);
+  }, [isAuthenticated, accounts, isDemoMode, isUserLoggedIn]);
 
   return (
     <Router>
@@ -123,39 +128,55 @@ function App() {
         <Routes>
           <Route 
             path="/login" 
-            element={!isAuthenticated ? <LoginPage /> : <Navigate to="/my-page" />} 
+            element={!isUserLoggedIn ? <LoginPage /> : <Navigate to="/my-page" />} 
           />
           <Route 
             path="/my-page" 
-            element={isAuthenticated ? <MyPage /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <MyPage /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/scan-pokemon" 
-            element={isAuthenticated ? <QRScannerPage /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <QRScannerPage /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/pokemon-browser" 
-            element={isAuthenticated ? <PokemonBrowser /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <PokemonBrowser /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/battle-arena" 
-            element={isAuthenticated ? <BattleArenaWrapper /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <BattleArenaWrapper /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/battle/join/:battleId" 
+            element={isUserLoggedIn ? <BattleJoin /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/battle/result/:battleId" 
+            element={isUserLoggedIn ? <BattleResult /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/evolution-lab" 
-            element={isAuthenticated ? <EvolutionLabWrapper /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <EvolutionLabWrapper /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/admin" 
-            element={isAuthenticated ? <AdminPanel /> : <Navigate to="/login" />} 
+            element={isUserLoggedIn ? <AdminPanel /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 
-            element={<Navigate to={isAuthenticated ? "/my-page" : "/login"} />} 
+            element={<Navigate to={isUserLoggedIn ? "/my-page" : "/login"} />} 
           />
         </Routes>
       </Layout>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <DemoProvider>
+      <AppContent />
+    </DemoProvider>
   );
 }
 

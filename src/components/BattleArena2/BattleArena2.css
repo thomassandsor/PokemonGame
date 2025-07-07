@@ -1,5 +1,5 @@
-/* === BEGIN: Styles migrated from BattleArena2.css for modern Battle Arena === */
-.battle-arena-container {
+/* === BATTLE ARENA 2 - UPDATED BACKGROUND FOR BETTER CONTRAST === */
+.battle-arena2-container {
   min-height: 100vh;
   position: relative;
   z-index: 1;
@@ -8,7 +8,7 @@
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
   background-attachment: fixed;
 }
-.battle-arena-container::before {
+.battle-arena2-container::before {
   content: '';
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -29,7 +29,7 @@
   75% { transform: translateX(-5px) translateY(10px); }
 }
 
-.arena-header {
+.arena2-header {
   text-align: center;
   margin-bottom: 32px;
   padding: 32px 0;
@@ -40,14 +40,53 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   margin-bottom: 40px;
 }
-.arena-header h1 {
+.arena2-header::before {
+  content: '⚡';
+  position: absolute;
+  top: -15px;
+  left: 30px;
+  font-size: 2rem;
+  background: #fbbf24;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.arena2-header::after {
+  content: '🔥';
+  position: absolute;
+  top: -15px;
+  right: 30px;
+  font-size: 2rem;
+  background: #ef4444;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.arena2-header h1 {
   font-size: 3rem;
   font-weight: 900;
   text-shadow: 3px 3px 0px #1f2937, -1px -1px 0px #ffffff;
   margin-bottom: 12px;
   color: #1f2937;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  background: none;
+  display: inline;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
-.arena-header p {
+.arena2-header p {
   font-size: 1.3rem;
   color: #374151;
   margin: 0;
@@ -60,7 +99,8 @@
   display: block;
 }
 
-.arena-nav {
+/* NAV BUTTONS - DISTINCT COLORS, NO TEXT SHADOWS */
+.arena2-nav {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -71,7 +111,7 @@
   max-width: 600px;
   z-index: 1;
 }
-.arena-nav-btn {
+.arena2-nav-btn {
   flex: 1 1 0;
   min-width: 120px;
   max-width: 340px;
@@ -91,24 +131,25 @@
   position: relative;
   opacity: 0.7;
 }
-.arena-nav-btn.active, .arena-nav-btn:focus {
+.arena2-nav-btn.active, .arena2-nav-btn:focus {
   background: #1976d2;
   color: #fff;
   border-color: #1976d2;
   opacity: 1;
   z-index: 2;
 }
-.arena-nav-btn:hover:not(.active) {
+.arena2-nav-btn:hover:not(.active) {
   filter: brightness(1.08);
   opacity: 0.85;
   transform: translateY(-2px) scale(1.03);
 }
 
-.arena-header h1, .arena-header p {
+.arena2-header h1, .arena2-header p {
   text-shadow: none;
 }
 
-.arena-table-section {
+/* TABLE CARD - WHITE WITH BLUE BORDER/SHADOW */
+.arena2-table-section {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 8px;
@@ -120,7 +161,7 @@
   max-width: 98vw;
 }
 
-.arena-battles-table {
+.arena2-battles-table {
   min-width: 600px;
   width: 100%;
   border-collapse: separate;
@@ -133,11 +174,11 @@
   font-size: 1rem;
 }
 
-.arena-battles-table thead {
+.arena2-battles-table thead {
   background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
 }
 
-.arena-battles-table th {
+.arena2-battles-table th {
   color: #fff;
   font-weight: 700;
   padding: 14px 10px;
@@ -147,7 +188,7 @@
   letter-spacing: 0.5px;
 }
 
-.arena-battles-table td {
+.arena2-battles-table td {
   background: #f7fbff;
   color: #222;
   padding: 12px 10px;
@@ -156,15 +197,15 @@
   font-size: 1rem;
 }
 
-.arena-battles-table tbody tr:nth-child(even) td {
+.arena2-battles-table tbody tr:nth-child(even) td {
   background: #e3f2fd;
 }
 
-.arena-battles-table tbody tr:hover td {
+.arena2-battles-table tbody tr:hover td {
   background: #bbdefb;
 }
 
-.arena-type-badge {
+.arena2-type-badge {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
@@ -174,18 +215,18 @@
   letter-spacing: 0.5px;
   color: #fff;
 }
-.arena-type-badge.training {
+.arena2-type-badge.training {
   background: linear-gradient(90deg, #43a047 60%, #a5d6a7 100%);
   color: #fff;
   border: 1px solid #388e3c;
 }
-.arena-type-badge.pvp {
+.arena2-type-badge.pvp {
   background: linear-gradient(90deg, #f44336 60%, #ffbdbd 100%);
   color: #fff;
   border: 1px solid #d32f2f;
 }
 
-.arena-status.active {
+.arena2-status.active {
   background: #ffe082;
   color: #f57c00;
   border-radius: 10px;
@@ -195,7 +236,7 @@
   box-shadow: none;
 }
 
-.arena-empty {
+.arena2-empty {
   color: #1976d2;
   background: #e3f2fd;
   border-radius: 10px;
@@ -206,7 +247,8 @@
   font-size: 1.1rem;
 }
 
-.arena-open-btn {
+/* OPEN BUTTON - DISTINCT POKEMON THEME */
+.arena2-open-btn {
   background: #1976d2;
   color: #fff;
   border: none;
@@ -221,117 +263,36 @@
   margin: 0 auto;
   display: inline-block;
 }
-.arena-open-btn:hover, .arena-open-btn:focus {
+.arena2-open-btn:hover, .arena2-open-btn:focus {
   background: #1565c0;
   transform: translateY(-2px) scale(1.04);
 }
 
-/* === Styles for Create Challenge Buttons === */
-.challenge-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  justify-content: center;
-  margin-top: 18px;
-  flex-wrap: wrap;
-}
-.challenge-btn {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background: #fff;
-  border: 3px solid #1976d2;
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.08);
-  padding: 18px 28px;
-  min-width: 220px;
-  max-width: 340px;
-  cursor: pointer;
-  transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
-  color: #1976d2;
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-.challenge-btn.training {
-  border-color: #43a047;
-}
-.challenge-btn.open {
-  border-color: #f44336;
-}
-.challenge-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.challenge-btn:hover:not(:disabled), .challenge-btn:focus:not(:disabled) {
-  box-shadow: 0 8px 32px rgba(25, 118, 210, 0.18);
-  background: #e3f2fd;
-  border-color: #1565c0;
-}
-.btn-icon {
-  font-size: 2.2rem;
-  margin-right: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.btn-content h4 {
-  margin: 0 0 2px 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1976d2;
-}
-.btn-content p {
-  margin: 0;
-  font-size: 0.97rem;
-  color: #374151;
-}
 @media (max-width: 767px) {
-  .arena-header h1 {
+  .arena2-header h1 {
     font-size: 2rem;
   }
-  .arena-battles-table th, .arena-battles-table td {
+  .arena2-battles-table th, .arena2-battles-table td {
     font-size: 0.92rem;
     padding: 10px 4px;
   }
-  .arena-battles-table {
+  .arena2-battles-table {
     min-width: 480px;
     font-size: 0.92rem;
   }
-  .arena-nav {
+  .arena2-nav {
     flex-direction: row;
     gap: 8px;
     margin-bottom: 18px;
   }
-  .arena-nav-btn {
+  .arena2-nav-btn {
     font-size: 1rem;
     padding: 12px 0;
     min-width: 90px;
   }
-  .arena-table-section {
+  .arena2-table-section {
     border-width: 2px;
     border-radius: 14px;
     margin-bottom: 18px;
   }
-  .challenge-buttons {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-  .challenge-btn {
-    min-width: 0;
-    width: 100%;
-    padding: 14px 10px;
-    font-size: 0.97rem;
-  }
-  .btn-icon {
-    font-size: 1.5rem;
-    margin-right: 10px;
-  }
 }
-/* === END: Styles migrated from BattleArena2.css === */

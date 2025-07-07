@@ -7,6 +7,7 @@
  */
 export const StatusCodes = {
   OPEN: 1,           // Challenge is open and waiting for a second player
+  BATTLE_STARTED: 895550002, // Battle has started and is in progress
   COMPLETED: 895550001  // Battle has been completed with results
 } as const;
 
@@ -40,6 +41,7 @@ export type StateCode = typeof StateCodes[keyof typeof StateCodes];
  */
 export const StatusCodeLabels: Record<StatusCode, string> = {
   [StatusCodes.OPEN]: 'Open',
+  [StatusCodes.BATTLE_STARTED]: 'Battle Started',
   [StatusCodes.COMPLETED]: 'Completed'
 };
 

@@ -17,7 +17,13 @@ export interface Contact {
 
 // Re-export schema interfaces for backward compatibility
 export interface PokemonMaster extends PokemonMasterRecord {}
-export interface PokedexEntry extends PokemonPokedexRecord {}
+export interface PokedexEntry extends PokemonPokedexRecord {
+  pokemon_attack?: number;
+  pokemon_defence?: number;
+  pokemon_Height?: number;
+  pokemon_HP?: number;
+  pokemon_level?: number;
+}
 
 // Combined view for displaying caught Pokemon with details
 export interface CaughtPokemon {
@@ -90,11 +96,22 @@ class AzureFunctionsDataverseService {
   }
 
   // Pokedex operations (pokemon_pokedex junction table)
-  async catchPokemon(trainerId: string, pokemonId: string): Promise<PokedexEntry> {
+  async catchPokemon(
+    trainerId: string,
+    pokemonId: string,
+    extraStats?: {
+      pokemon_attack?: number;
+      pokemon_defence?: number;
+      pokemon_Height?: number;
+      pokemon_HP?: number;
+      pokemon_level?: number;
+    }
+  ): Promise<PokedexEntry> {
     try {
       const pokedexData = {
         "pokemon_user@odata.bind": `/contacts(${trainerId})`,
-        "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${pokemonId})`
+        "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${pokemonId})`,
+        ...extraStats
       };
       
       const response = await axios.post(`${this.baseUrl}/pokemon_pokedexes`, pokedexData);
@@ -105,19 +122,31 @@ class AzureFunctionsDataverseService {
     }
   }
 
-  async getCaughtPokemonByTrainer(trainerId: string): Promise<CaughtPokemon[]> {
+  async getCaughtPokemonByTrainer(trainerId: string): Promise<any[]> {
     try {
       // Query the pokedex table with expanded Pokemon details
       const response = await axios.get(
         `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${trainerId}'&$expand=pokemon_Pokemon&$orderby=createdon desc`
       );
-      
-      // Transform the response to match our CaughtPokemon interface
-      return response.data.value.map((entry: any) => ({
-        pokedexId: entry.pokemon_pokedexid,
-        pokemonId: entry._pokemon_pokemon_value,
-        name: entry.pokemon_Pokemon?.pokemon_name || 'Unknown'
-      }));
+      // Map the response to use the actual field names from the API
+      return response.data.value.map((entry: any) => {
+        const master = entry.pokemon_Pokemon || {};
+        return {
+          pokedexId: entry.pokemon_pokedexid,
+          pokemonId: entry._pokemon_pokemon_value, // foreign key to master
+          name: entry.pokemon_name || master.pokemon_name || 'Unknown',
+          id: entry.pokemon_pokedexid, // unique pokedex entry id
+          pokemon_id: master.pokemon_id, // master table id
+          pokemon_name: entry.pokemon_name || master.pokemon_name,
+          pokemon_level: entry.pokemon_level,
+          pokemon_hp: entry.pokemon_hp,
+          pokemon_hpmax: entry.pokemon_hpmax,
+          pokemon_attack: entry.pokemon_attack,
+          pokemon_defence: entry.pokemon_defence,
+          pokemon_height: entry.pokemon_height,
+          // Add any other fields as needed
+        };
+      });
     } catch (error) {
       console.error('Error fetching caught pokemon by trainer:', error);
       throw error;
@@ -226,8 +255,18 @@ export const getPokemonById = (pokemonId: string) =>
   dataverseService.getPokemonById(pokemonId);
 
 // Pokedex functions (for caught Pokemon)
-export const catchPokemon = (trainerId: string, pokemonId: string) => 
-  dataverseService.catchPokemon(trainerId, pokemonId);
+export const catchPokemon = (
+  trainerId: string,
+  pokemonId: string,
+  extraStats?: {
+    pokemon_attack?: number;
+    pokemon_defence?: number;
+    pokemon_Height?: number;
+    pokemon_HP?: number;
+    pokemon_level?: number;
+  }
+) => 
+  dataverseService.catchPokemon(trainerId, pokemonId, extraStats);
 
 export const catchPokemonByName = (trainerId: string, pokemonId: number, pokemonName: string) => 
   dataverseService.catchPokemonByIdAndName(trainerId, pokemonId, pokemonName);

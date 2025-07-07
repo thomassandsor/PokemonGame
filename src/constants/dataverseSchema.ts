@@ -302,6 +302,51 @@ export const PokemonBattleSchema = {
 } as const;
 
 /**
+ * PORTAL SETTINGS TABLE (pokemon_portalsetting)
+ * System-wide configuration settings stored as key-value pairs
+ */
+export const PortalSettingsSchema = {
+  tableName: 'pokemon_portalsettings',
+  primaryKey: 'pokemon_portalsettingid',
+  fields: {
+    // Primary key
+    pokemon_portalsettingid: {
+      type: DataverseFieldType.UniqueIdentifier,
+      displayName: 'Portal Setting ID',
+      required: true,
+      description: 'Unique identifier for the portal setting'
+    },
+    
+    // Setting key (e.g., "demo_mode", "maintenance_mode", etc.)
+    pokemon_settingkey: {
+      type: DataverseFieldType.SingleLineText,
+      displayName: 'Setting Key',
+      required: true,
+      maxLength: 100,
+      description: 'Unique key identifier for the setting'
+    },
+    
+    // Setting value (stored as text - all values are strings)
+    pokemon_settingvalue: {
+      type: DataverseFieldType.MultipleLineText,
+      displayName: 'Setting Value',
+      required: false,
+      maxLength: 4000,
+      description: 'The value of the setting as text (true/false for booleans, numbers as text, etc.)'
+    },
+    
+    // Setting description - what values are possible/expected
+    pokemon_description: {
+      type: DataverseFieldType.MultipleLineText,
+      displayName: 'Description',
+      required: false,
+      maxLength: 2000,
+      description: 'Description of the setting and what values are possible to enter'
+    }
+  }
+};
+
+/**
  * TYPE-SAFE INTERFACES GENERATED FROM SCHEMA
  */
 
@@ -343,13 +388,23 @@ export interface PokemonBattleRecord {
   pokemon_winnercontact?: string;
   pokemon_winnerpokemon?: string;
   pokemon_challengetype?: 1 | 2; // 1=PVP, 2=Training (optional, has default)
-  statuscode?: 1 | 895550001; // 1=Open, 895550001=Completed (optional, has default)
+  statuscode?: 1 | 895550002 | 895550001; // 1=Open, 895550002=Battle Started, 895550001=Completed (optional, has default)
   statecode?: 0 | 1; // 0=Active, 1=Inactive (optional, defaults to Active)
   createdon?: string;
   modifiedon?: string;
   createdby?: string;
   modifiedby?: string;
   ownerid?: string;
+}
+
+/**
+ * Portal Settings Record Type - Simplified to match actual Dataverse table
+ */
+export interface PortalSettingRecord {
+  pokemon_portalsettingid?: string;
+  pokemon_settingkey: string;
+  pokemon_settingvalue?: string;
+  pokemon_description?: string;
 }
 
 /**
@@ -422,6 +477,26 @@ export class DataverseValidator {
     
     return { valid: errors.length === 0, errors };
   }
+  
+  static validatePortalSetting(data: Partial<PortalSettingRecord>): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    
+    if (!data.pokemon_settingkey) {
+      errors.push('pokemon_settingkey is required');
+    } else if (data.pokemon_settingkey.length > 100) {
+      errors.push('pokemon_settingkey cannot exceed 100 characters');
+    }
+    
+    if (data.pokemon_settingvalue && data.pokemon_settingvalue.length > 4000) {
+      errors.push('pokemon_settingvalue cannot exceed 4000 characters');
+    }
+    
+    if (data.pokemon_description && data.pokemon_description.length > 2000) {
+      errors.push('pokemon_description cannot exceed 2000 characters');
+    }
+    
+    return { valid: errors.length === 0, errors };
+  }
 }
 
 /**
@@ -442,6 +517,17 @@ export class DataverseQueryBuilder {
     return `${PokemonPokedexSchema.tableName}?$filter=_pokemon_user_value eq '${userId}'&$expand=pokemon_Pokemon&$orderby=createdon desc`;
   }
   
+  static getAllUserPokemon(userId?: string): string {
+    // Get all Pokemon in the current user's Pokedex
+    const baseQuery = `${PokemonPokedexSchema.tableName}?$expand=pokemon_Pokemon&$orderby=createdon desc`;
+    
+    if (userId) {
+      return `${PokemonPokedexSchema.tableName}?$filter=_pokemon_user_value eq '${userId}'&$expand=pokemon_Pokemon&$orderby=createdon desc`;
+    }
+    
+    return baseQuery;
+  }
+  
   static getOpenBattleChallenges(): string {
     // Filter for battles that are in "Open" status and active state
     // Use the working expand pattern with correct navigation property names
@@ -450,5 +536,13 @@ export class DataverseQueryBuilder {
   
   static getUserBattles(userId: string): string {
     return `${PokemonBattleSchema.tableName}?$filter=(pokemon_player1 eq '${userId}' or pokemon_player2 eq '${userId}')&$orderby=modifiedon desc`;
+  }
+  
+  static getAllPortalSettings(): string {
+    return `${PortalSettingsSchema.tableName}?$orderby=pokemon_settingkey`;
+  }
+  
+  static getPortalSetting(key: string): string {
+    return `${PortalSettingsSchema.tableName}?$filter=pokemon_settingkey eq '${key}'`;
   }
 }

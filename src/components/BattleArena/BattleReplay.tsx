@@ -1,7 +1,6 @@
 // Mobile-friendly Battle Replay Component
 import React from 'react';
 import { BattleResult } from '../../services/battleChallengeService';
-import { CompleteBattleData } from '../../types/battleTypes';
 
 interface BattleReplayProps {
   battleResult: BattleResult;

@@ -17,33 +17,6 @@
   z-index: 1000;
 }
 
-.navbar::before {
-  content: '⚡';
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  color: #fbbf24;
-  animation: sparkle 2s ease-in-out infinite;
-}
-
-.navbar::after {
-  content: '🔥';
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.5rem;
-  color: #ef4444;
-  animation: sparkle 2s ease-in-out infinite reverse;
-}
-
-@keyframes sparkle {
-  0%, 100% { transform: translateY(-50%) scale(1) rotate(0deg); opacity: 0.8; }
-  50% { transform: translateY(-50%) scale(1.2) rotate(180deg); opacity: 1; }
-}
-
 .navbar-brand {
   font-weight: 900 !important;
   color: #ffffff !important;
