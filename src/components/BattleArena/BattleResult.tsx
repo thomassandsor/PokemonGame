@@ -15,8 +15,6 @@ const BattleResult: React.FC<BattleResultProps> = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [currentTurn, setCurrentTurn] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
 
   const loadBattleResult = useCallback(async () => {
     if (!battleId) {
@@ -46,51 +44,13 @@ const BattleResult: React.FC<BattleResultProps> = () => {
     loadBattleResult();
   }, [loadBattleResult]);
 
-  const getSpeedDelay = (): number => {
-    switch (playbackSpeed) {
-      case 'slow': return 3000;
-      case 'fast': return 500;
-      default: return 1500;
-    }
-  };
-
-  const playBattle = () => {
-    if (!battleData || isPlaying) return;
-    
-    setIsPlaying(true);
-    setCurrentTurn(0);
-    
-    const playTurn = (turnIndex: number) => {
-      if (turnIndex >= battleData.battle_turns.length) {
-        setIsPlaying(false);
-        return;
-      }
-      
-      setCurrentTurn(turnIndex);
-      
-      setTimeout(() => {
-        if (isPlaying) {
-          playTurn(turnIndex + 1);
-        }
-      }, getSpeedDelay());
-    };
-    
-    playTurn(0);
-  };
-
-  const stopBattle = () => {
-    setIsPlaying(false);
-  };
-
-  const skipToEnd = () => {
+  const nextTurn = () => {
     if (!battleData) return;
-    setCurrentTurn(battleData.battle_turns.length - 1);
-    setIsPlaying(false);
+    setCurrentTurn(prev => Math.min(prev + 1, battleData.battle_turns.length - 1));
   };
 
-  const skipToBeginning = () => {
-    setCurrentTurn(0);
-    setIsPlaying(false);
+  const previousTurn = () => {
+    setCurrentTurn(prev => Math.max(prev - 1, 0));
   };
 
   const getPokemonSprite = (pokemonId: number): string => {
@@ -160,59 +120,51 @@ const BattleResult: React.FC<BattleResultProps> = () => {
         </p>
       </div>
 
-      {/* Battle Replay Area */}
+      {/* Compact Battle Display */}
       <div className="battle-replay-container">
-        <div className="battle-arena">
-          <div className="battle-pokemon-side">
-            <h3>{battleData.metadata.player1_name}</h3>
-            <div className="battle-pokemon-display">
+        <div className="compact-battle-arena">
+          <div className="trainer-pokemon">
+            <div className="trainer-name">{battleData.metadata.player1_name}</div>
+            <div className="pokemon-compact">
               <img 
                 src={getPokemonSprite(player1Pokemon.pokemon_id)}
                 alt={player1Pokemon.name}
-                className={`pokemon-sprite ${currentP1HP <= 0 ? 'fainted' : ''}`}
+                className={`pokemon-sprite-small ${currentP1HP <= 0 ? 'fainted' : ''}`}
               />
-              <div className="pokemon-info">
-                <div className="pokemon-name">{player1Pokemon.name}</div>
-                <div className="pokemon-level">Level {player1Pokemon.level}</div>
-                <div className="hp-display">
-                  <div className="hp-bar">
-                    <div 
-                      className="hp-fill"
-                      style={{ width: `${(currentP1HP / player1Pokemon.max_hp) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span>{currentP1HP}/{player1Pokemon.max_hp} HP</span>
+              <div className="pokemon-compact-info">
+                <div className="pokemon-name-small">{player1Pokemon.name} (Lv.{player1Pokemon.level})</div>
+                <div className="hp-bar-small">
+                  <div 
+                    className="hp-fill-small"
+                    style={{ width: `${(currentP1HP / player1Pokemon.max_hp) * 100}%` }}
+                  ></div>
                 </div>
+                <div className="hp-text-small">{currentP1HP}/{player1Pokemon.max_hp}</div>
               </div>
             </div>
           </div>
 
-          <div className="battle-vs">
-            <div className="vs-indicator">
-              <span>VS</span>
-            </div>
+          <div className="vs-divider">
+            <span>VS</span>
           </div>
 
-          <div className="battle-pokemon-side">
-            <h3>{battleData.metadata.player2_name}</h3>
-            <div className="battle-pokemon-display">
+          <div className="trainer-pokemon">
+            <div className="trainer-name">{battleData.metadata.player2_name}</div>
+            <div className="pokemon-compact">
               <img 
                 src={getPokemonSprite(player2Pokemon.pokemon_id)}
                 alt={player2Pokemon.name}
-                className={`pokemon-sprite ${currentP2HP <= 0 ? 'fainted' : ''}`}
+                className={`pokemon-sprite-small ${currentP2HP <= 0 ? 'fainted' : ''}`}
               />
-              <div className="pokemon-info">
-                <div className="pokemon-name">{player2Pokemon.name}</div>
-                <div className="pokemon-level">Level {player2Pokemon.level}</div>
-                <div className="hp-display">
-                  <div className="hp-bar">
-                    <div 
-                      className="hp-fill"
-                      style={{ width: `${(currentP2HP / player2Pokemon.max_hp) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span>{currentP2HP}/{player2Pokemon.max_hp} HP</span>
+              <div className="pokemon-compact-info">
+                <div className="pokemon-name-small">{player2Pokemon.name} (Lv.{player2Pokemon.level})</div>
+                <div className="hp-bar-small">
+                  <div 
+                    className="hp-fill-small"
+                    style={{ width: `${(currentP2HP / player2Pokemon.max_hp) * 100}%` }}
+                  ></div>
                 </div>
+                <div className="hp-text-small">{currentP2HP}/{player2Pokemon.max_hp}</div>
               </div>
             </div>
           </div>
@@ -230,67 +182,27 @@ const BattleResult: React.FC<BattleResultProps> = () => {
           )}
         </div>
 
-        {/* Playback Controls */}
-        <div className="playback-controls">
-          <div className="control-buttons">
-            <button 
-              className="btn btn-secondary"
-              onClick={skipToBeginning}
-              disabled={isPlaying}
-            >
-              ⏮️ Start
-            </button>
-            
-            {!isPlaying ? (
-              <button 
-                className="btn btn-primary"
-                onClick={playBattle}
-              >
-                ▶️ Play Battle
-              </button>
-            ) : (
-              <button 
-                className="btn btn-secondary"
-                onClick={stopBattle}
-              >
-                ⏸️ Pause
-              </button>
-            )}
-            
-            <button 
-              className="btn btn-secondary"
-              onClick={skipToEnd}
-              disabled={isPlaying}
-            >
-              ⏭️ End
-            </button>
+        {/* Battle Navigation */}
+        <div className="battle-navigation">
+          <button 
+            className="btn btn-secondary"
+            onClick={previousTurn}
+            disabled={currentTurn === 0}
+          >
+            ← Previous Turn
+          </button>
+          
+          <div className="turn-counter">
+            <span>Turn {currentTurn + 1} of {battleData.battle_turns.length}</span>
           </div>
-
-          <div className="speed-controls">
-            <label>Speed: </label>
-            <select 
-              value={playbackSpeed} 
-              onChange={(e) => setPlaybackSpeed(e.target.value as any)}
-              disabled={isPlaying}
-            >
-              <option value="slow">🐌 Slow</option>
-              <option value="normal">⚡ Normal</option>
-              <option value="fast">🚀 Fast</option>
-            </select>
-          </div>
-
-          <div className="turn-scrubber">
-            <input
-              type="range"
-              min="0"
-              max={battleData.battle_turns.length - 1}
-              value={currentTurn}
-              onChange={(e) => setCurrentTurn(parseInt(e.target.value))}
-              disabled={isPlaying}
-              className="turn-slider"
-            />
-            <span>{currentTurn + 1} / {battleData.battle_turns.length}</span>
-          </div>
+          
+          <button 
+            className="btn btn-secondary"
+            onClick={nextTurn}
+            disabled={currentTurn === battleData.battle_turns.length - 1}
+          >
+            Next Turn →
+          </button>
         </div>
 
         {/* Battle Summary */}
