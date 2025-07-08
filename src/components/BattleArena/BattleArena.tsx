@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './BattleArena.css';
 import { BattleChallengeService, PokemonBattleExpanded, PokemonBattle, BattleResult } from '../../services/battleChallengeService';
 import BattleReplay from './BattleReplay';
@@ -76,7 +76,7 @@ export default function BattleArena() {
   };
 
   // Load user battles
-  const loadUserBattles = async () => {
+  const loadUserBattles = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -87,7 +87,7 @@ export default function BattleArena() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   // Create challenge (now only called after selecting a Pokémon)
   const createChallenge = async (challengeType: 'open' | 'training', pokemonId: string) => {
@@ -117,19 +117,33 @@ export default function BattleArena() {
   const viewBattleResult = async (challenge: PokemonBattle) => {
     if (!challenge.pokemon_battleid) return;
     setLoading(true);
-    try {
-      const result = await BattleChallengeService.getBattleResult(challenge.pokemon_battleid);
-      if (result) {
-        setReplay({ battle: result, step: 0 });
-        setCurrentStep(0);
-        setIsReplaying(false);
-      } else {
-        setMessage('Battle result not ready yet.');
-      }
-    } catch (err) {
-      setMessage('Failed to load battle result');
+    setMessage('Simulating battle and writing result. Please wait...');
+    // Poll for battle result
+    let result = null;
+    let attempts = 0;
+    while (attempts < 20) { // Wait up to ~16s
+      result = await BattleChallengeService.getBattleResult(challenge.pokemon_battleid);
+      if (result) break; // Result is now directly CompleteBattleData
+      await new Promise(res => setTimeout(res, 800));
+      attempts++;
     }
     setLoading(false);
+    setMessage(null);
+    if (result) {
+      // Create a BattleResult object for backwards compatibility with replay component
+      const battleResult = {
+        battleSteps: result.battle_turns || [],
+        winner: result.final_result?.winner_name || 'Unknown',
+        battleLog: result.battle_log || [],
+        finalState: result.final_result || {},
+        completeBattleData: result
+      };
+      setReplay({ battle: battleResult, step: 0 });
+      setCurrentStep(0);
+      setIsReplaying(false);
+    } else {
+      setMessage('Battle result not ready yet. Try again in a few seconds.');
+    }
   };
 
   // Navigation effect
@@ -139,7 +153,7 @@ export default function BattleArena() {
     setReplay(null);
     if (nav === 'challenges') loadBattles();
     if (nav === 'history') loadUserBattles();
-  }, [nav]);
+  }, [nav, loadUserBattles]);
 
   // Navigation bar
   const navBar = (
@@ -341,51 +355,55 @@ export default function BattleArena() {
       {loadingSpinner}
       {error && <div className="arena-empty">{error}</div>}
       {!loading && !error && (
-        <div className="challenge-list">
-          {userBattles.length === 0 ? (
-            <div className="no-challenges">
-              <p>No battles yet!</p>
-              <p>Create a challenge to start battling.</p>
-            </div>
-          ) : (
-            userBattles.map((challenge) => (
-              <div key={challenge.pokemon_battleid || 'unknown'} className="challenge-card history">
-                <div className="challenge-info">
-                  <h3>
-                    {challenge.pokemon_challengetype === 2 ? '🤖 Training Battle' : challenge.pokemon_player2 ? '⚔️ Player Battle' : '🔄 Waiting for Opponent'}
-                  </h3>
-                  <p>Status: <span className={`status ${challenge.statuscode === 1 ? 'open' : 'completed'}`}>
-                    {challenge.statuscode === 1 ? 'Open' : 'Completed'}
-                  </span></p>
-                  <p>Created: {challenge.createdon ? new Date(challenge.createdon).toLocaleString() : 'Unknown'}</p>
-                  {challenge.modifiedon && challenge.modifiedon !== challenge.createdon && (
-                    <p>Updated: {new Date(challenge.modifiedon).toLocaleString()}</p>
-                  )}
-                  {challenge.pokemon_winnercontact && (
-                    <p>Winner: {challenge.pokemon_winnercontact === userId ? 'You!' : 'Opponent'}</p>
-                  )}
-                  <p>Your Pokémon: {challenge.pokemon_player1 === userId ? challenge.pokemon_player1pokemon : challenge.pokemon_player2pokemon}</p>
-                  {challenge.pokemon_player2 && (
-                    <p>Opponent Pokémon: {challenge.pokemon_player1 === userId ? challenge.pokemon_player2pokemon : challenge.pokemon_player1pokemon}</p>
-                  )}
-                </div>
-                <div className="challenge-actions">
-                  {challenge.statuscode === 895550002 && challenge.pokemon_battleresult && (
-                    <button
-                      onClick={() => viewBattleResult(challenge)}
-                      className="view-btn"
-                    >
-                      Watch Replay
-                    </button>
-                  )}
-                  {challenge.statuscode === 1 && !challenge.pokemon_battleresult && (
-                    <span className="battle-status">Battle in progress...</span>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <table className="arena-battles-table">
+          <thead>
+            <tr>
+              <th>Trainer</th>
+              <th>Your Pokémon</th>
+              <th>Opponent</th>
+              <th>Opponent's Pokémon</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userBattles.length === 0 ? (
+              <tr><td colSpan={7} className="arena-empty">No battles yet!</td></tr>
+            ) : (
+              userBattles.map((battle) => {
+                const isPlayer1 = (battle as any)._pokemon_player1_value === userId || (battle as any).pokemon_player1 === userId;
+                const yourTrainer = isPlayer1 ? (battle as any).pokemon_Player1?.firstname : (battle as any).pokemon_Player2?.firstname;
+                const yourPokemon = isPlayer1 ? (battle as any).pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name : (battle as any).pokemon_Player2Pokemon?.pokemon_Pokemon?.pokemon_name;
+                const opponentTrainer = isPlayer1 ? (battle as any).pokemon_Player2?.firstname : (battle as any).pokemon_Player1?.firstname;
+                const opponentPokemon = isPlayer1 ? (battle as any).pokemon_Player2Pokemon?.pokemon_Pokemon?.pokemon_name : (battle as any).pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name;
+                return (
+                  <tr key={battle.pokemon_battleid}>
+                    <td>{yourTrainer || 'You'}</td>
+                    <td>{yourPokemon || '-'}</td>
+                    <td>{opponentTrainer || '-'}</td>
+                    <td>{opponentPokemon || '-'}</td>
+                    <td>
+                      <span className={`status ${battle.statuscode === 1 ? 'open' : battle.statuscode === 895550002 ? 'started' : 'completed'}`}>
+                        {battle.statuscode === 1 ? 'Open' : battle.statuscode === 895550002 ? 'Started' : 'Completed'}
+                      </span>
+                    </td>
+                    <td>{battle.createdon ? new Date(battle.createdon).toLocaleDateString() : 'Unknown'}</td>
+                    <td>
+                      {battle.pokemon_battleresultjson ? (
+                        <button className="arena-open-btn" onClick={() => viewBattleResult(battle)}>
+                          View
+                        </button>
+                      ) : (
+                        <span className="battle-status">In progress</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       )}
     </section>
   );

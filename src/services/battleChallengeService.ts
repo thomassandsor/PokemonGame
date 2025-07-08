@@ -1,6 +1,5 @@
 // Battle Challenge Service for Pokemon Game
 import { 
-  StatusCodes, 
   StateCodes, 
   DataverseUtils 
 } from '../constants/dataverseMappings';
@@ -28,7 +27,7 @@ export interface PokemonBattleExpanded {
   pokemon_challengetype?: 1 | 2;
   createdon?: string;
   modifiedon?: string;
-  pokemon_battleresult?: string;
+  pokemon_battleresultjson?: string;
   
   // Raw Dataverse _value fields (always present as GUIDs)
   _pokemon_player1_value?: string;
@@ -168,8 +167,7 @@ export class BattleChallengeService {
       const patchBody = {
         "pokemon_Player2@odata.bind": `/contacts(${challengerId})`,
         "pokemon_Player2Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
-        statuscode: 895550002, // Hardcoded to correct Dataverse value for 'Battle Started'
-        modifiedon: new Date().toISOString()
+        statuscode: 895550002 // Hardcoded to correct Dataverse value for 'Battle Started'
       };
       console.log('PATCH joinChallenge body:', patchBody);
       const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
@@ -184,8 +182,13 @@ export class BattleChallengeService {
         if (!ready) {
           return { success: false, error: 'Timed out waiting for battle update in Dataverse.' };
         }
-        // Trigger battle simulation
+        // Trigger battle simulation and wait for result to be written
         await this.simulateBattleWithRealData(battleId);
+        // Wait for the battle result to be available in Dataverse
+        const resultReady = await this.waitForBattleResult(battleId);
+        if (!resultReady) {
+          return { success: false, error: 'Timed out waiting for battle result in Dataverse.' };
+        }
         return { success: true };
       } else {
         return { success: false, error: `Failed to join battle: ${response.statusText}` };
@@ -209,13 +212,17 @@ export class BattleChallengeService {
       return { success: false, error: 'Missing challengerId or pokemonId for startBattle.' };
     }
     try {
+      // Log the IDs before making the request
+      console.log('startBattle - battleId:', battleId);
+      console.log('startBattle - challengerId (Contact):', challengerId);
+      console.log('startBattle - pokemonId:', pokemonId);
       const patchBody = {
         "pokemon_Player2@odata.bind": `/contacts(${challengerId})`,
         "pokemon_Player2Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
-        statuscode: 895550002, // Hardcoded to correct Dataverse value for 'Battle Started'
-        modifiedon: new Date().toISOString()
+        statuscode: 895550002 // Hardcoded to correct Dataverse value for 'Battle Started'
       };
-      console.log('PATCH startBattle body:', patchBody);
+      // Log the PATCH body before sending
+      console.log('PATCH startBattle body:', JSON.stringify(patchBody));
       const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -231,10 +238,13 @@ export class BattleChallengeService {
       if (!ready) {
         return { success: false, error: 'Timed out waiting for battle update in Dataverse.' };
       }
-
-      // Now simulate the battle with real Pokemon data
+      // Simulate battle and wait for result to be written
       await this.simulateBattleWithRealData(battleId);
-
+      // Wait for the battle result to be available in Dataverse
+      const resultReady = await this.waitForBattleResult(battleId);
+      if (!resultReady) {
+        return { success: false, error: 'Timed out waiting for battle result in Dataverse.' };
+      }
       return { success: true };
     } catch (error) {
       return { 
@@ -244,16 +254,32 @@ export class BattleChallengeService {
     }
   }
 
-  // Get battle result for viewing
-  static async getBattleResult(battleId: string): Promise<BattleResult | null> {
+  // Get battle result for viewing - now returns CompleteBattleData
+  static async getBattleResult(battleId: string): Promise<CompleteBattleData | null> {
     try {
+      console.log(`🔍 Fetching battle result for ID: ${battleId}`);
       const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
       
       if (response.ok) {
         const battle = await response.json();
-        if (battle.pokemon_battleresult) {
-          return JSON.parse(battle.pokemon_battleresult);
+        console.log(`📊 Battle record retrieved:`, battle);
+        console.log(`📄 Battle result field:`, battle.pokemon_battleresultjson ? 'Present' : 'Missing');
+        
+        if (battle.pokemon_battleresultjson) {
+          try {
+            const parsedResult = JSON.parse(battle.pokemon_battleresultjson);
+            console.log(`✅ Successfully parsed battle result:`, parsedResult);
+            return parsedResult;
+          } catch (parseError) {
+            console.error(`❌ Failed to parse battle result JSON:`, parseError);
+            console.error(`📄 Raw JSON:`, battle.pokemon_battleresultjson);
+            return null;
+          }
+        } else {
+          console.log(`ℹ️ No battle result found - battle may not be completed yet`);
         }
+      } else {
+        console.error(`❌ Failed to fetch battle record:`, response.status, response.statusText);
       }
       return null;
     } catch (error) {
@@ -331,18 +357,25 @@ export class BattleChallengeService {
       
       console.log(`🏆 Battle result: ${battleData.final_result.winner_name} wins!`);
       
-      // Store the complete battle result in the pokemon_battleresult field
-      await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`, {
+      // Store the complete battle result in the pokemon_battleresultjson field (correct field name, no modifiedon)
+      const patchResultBody = {
+        pokemon_battleresultjson: JSON.stringify(battleData),
+        statuscode: 895550001 // Battle Completed
+      };
+      const patchUrl = `${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`;
+      console.log('PATCH battle result URL:', patchUrl);
+      console.log('PATCH battle result body:', patchResultBody);
+      const patchResultResponse = await fetch(patchUrl, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pokemon_battleresult: JSON.stringify(battleData),
-          statuscode: StateCodes.INACTIVE, // Mark battle as completed
-          modifiedon: new Date().toISOString()
-        })
+        body: JSON.stringify(patchResultBody)
       });
-      
-      console.log(`✅ Battle simulation complete and saved to database`);
+      if (!patchResultResponse.ok) {
+        const errorText = await patchResultResponse.text();
+        console.error('❌ Failed to PATCH battle result:', patchResultResponse.status, patchResultResponse.statusText, errorText);
+      } else {
+        console.log(`✅ Battle simulation complete and saved to database`);
+      }
       
     } catch (error) {
       console.error('Error in battle simulation:', error);
@@ -467,6 +500,30 @@ export class BattleChallengeService {
       } catch {}
       await new Promise(res => setTimeout(res, 400)); // Wait 400ms before retry
     }
+    return false;
+  }
+
+  // Wait for battle result to be available in Dataverse
+  private static async waitForBattleResult(battleId: string, maxAttempts = 20, delayMs = 800): Promise<boolean> {
+    console.log(`⏳ Waiting for battle result to be saved for battle ID: ${battleId}`);
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const response = await fetch(`${this.API_BASE}/${PokemonBattleSchema.tableName}(${battleId})`);
+        if (response.ok) {
+          const battle = await response.json();
+          if (battle.pokemon_battleresultjson) {
+            console.log(`✅ Battle result found after ${attempt + 1} attempts`);
+            return true;
+          } else {
+            console.log(`⏳ Attempt ${attempt + 1}/${maxAttempts}: Battle result not yet available`);
+          }
+        }
+      } catch (e) {
+        console.log(`⚠️ Attempt ${attempt + 1}/${maxAttempts}: Error checking for battle result:`, e);
+      }
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    console.log(`❌ Timed out waiting for battle result after ${maxAttempts} attempts`);
     return false;
   }
 }

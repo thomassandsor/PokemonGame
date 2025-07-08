@@ -17,6 +17,7 @@ import './App.css';
 
 // Wrapper components to provide required props
 const BattleArenaWrapper: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [userPokemon, setUserPokemon] = useState<any[]>([]);
 
   // Load user's Pokemon from Dataverse on component mount
@@ -70,12 +71,14 @@ const BattleArenaWrapper: React.FC = () => {
     loadUserPokemon();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handlePokemonUpdate = (updatedPokemon: any) => {
     setUserPokemon(prev => 
       prev.map(p => p.id === updatedPokemon.id ? updatedPokemon : p)
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEvolutionAvailable = (pokemon: any, options: any[]) => {
     console.log('Evolution available:', pokemon, options);
   };

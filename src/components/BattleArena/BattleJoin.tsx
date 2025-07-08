@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BattleChallengeService, PokemonBattleExpanded } from '../../services/battleChallengeService';
 import { StatusCodes } from '../../constants/dataverseMappings';
@@ -38,12 +38,7 @@ const BattleJoin: React.FC<BattleJoinProps> = () => {
   const [error, setError] = useState<string>('');
   const [currentUserId, setCurrentUserId] = useState<string>('');
 
-  // Load battle details and user's Pokemon
-  useEffect(() => {
-    loadBattleAndPokemon();
-  }, [battleId]);
-
-  const loadBattleAndPokemon = async () => {
+  const loadBattleAndPokemon = useCallback(async () => {
     if (!battleId) {
       setError('No battle ID provided');
       setStep('error');
@@ -135,7 +130,12 @@ const BattleJoin: React.FC<BattleJoinProps> = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [battleId, isDemoMode, demoUser, account, currentUserId]);
+
+  // Load battle details and user's Pokemon
+  useEffect(() => {
+    loadBattleAndPokemon();
+  }, [loadBattleAndPokemon]);
 
   const handlePokemonSelect = (pokemon: UserPokemon) => {
     setSelectedPokemon(pokemon);

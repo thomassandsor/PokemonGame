@@ -221,7 +221,7 @@ export const PokemonBattleSchema = {
     },
     
     // Battle results (EXISTING FIELDS)
-    pokemon_battleresult: {
+    pokemon_battleresultjson: {
       type: DataverseFieldType.MultipleLineText,
       required: false,
       description: 'JSON string containing battle steps and results'
@@ -384,7 +384,7 @@ export interface PokemonBattleRecord {
   pokemon_player1pokemon: string;
   pokemon_player2?: string;
   pokemon_player2pokemon?: string;
-  pokemon_battleresult?: string;
+  pokemon_battleresultjson?: string;
   pokemon_winnercontact?: string;
   pokemon_winnerpokemon?: string;
   pokemon_challengetype?: 1 | 2; // 1=PVP, 2=Training (optional, has default)
@@ -535,7 +535,10 @@ export class DataverseQueryBuilder {
   }
   
   static getUserBattles(userId: string): string {
-    return `${PokemonBattleSchema.tableName}?$filter=(pokemon_player1 eq '${userId}' or pokemon_player2 eq '${userId}')&$orderby=modifiedon desc`;
+    // Return all battles where user is player1 or player2, with expanded lookup data for display
+    // Use the same expand as getOpenBattleChallenges
+    const expandQuery = 'pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name)),pokemon_Player2($select=firstname),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name))';
+    return `${PokemonBattleSchema.tableName}?$filter=(_pokemon_player1_value eq '${userId}' or _pokemon_player2_value eq '${userId}')&$expand=${expandQuery}&$orderby=modifiedon desc`;
   }
   
   static getAllPortalSettings(): string {

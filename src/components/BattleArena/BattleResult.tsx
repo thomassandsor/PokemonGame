@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BattleChallengeService } from '../../services/battleChallengeService';
 import { CompleteBattleData } from '../../types/battleTypes';
@@ -18,11 +18,7 @@ const BattleResult: React.FC<BattleResultProps> = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
 
-  useEffect(() => {
-    loadBattleResult();
-  }, [battleId]);
-
-  const loadBattleResult = async () => {
+  const loadBattleResult = useCallback(async () => {
     if (!battleId) {
       setError('No battle ID provided');
       setLoading(false);
@@ -32,8 +28,9 @@ const BattleResult: React.FC<BattleResultProps> = () => {
     try {
       const result = await BattleChallengeService.getBattleResult(battleId);
       
-      if (result && result.completeBattleData) {
-        setBattleData(result.completeBattleData);
+      if (result) {
+        // Result is now directly CompleteBattleData, not wrapped in BattleResult
+        setBattleData(result);
       } else {
         setError('Battle result not found or battle not completed yet');
       }
@@ -43,7 +40,11 @@ const BattleResult: React.FC<BattleResultProps> = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [battleId]);
+
+  useEffect(() => {
+    loadBattleResult();
+  }, [loadBattleResult]);
 
   const getSpeedDelay = (): number => {
     switch (playbackSpeed) {
