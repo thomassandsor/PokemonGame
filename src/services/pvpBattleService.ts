@@ -109,11 +109,64 @@ export async function testApiConnection() {
   }
 }
 
+/**
+ * Debug utility to test Azure Functions environment and Dataverse connection
+ */
+export async function testAzureFunctionsConfig() {
+  console.log('🔧 Testing Azure Functions Configuration...');
+  console.log('='.repeat(60));
+  
+  try {
+    // Test a simple Azure Functions endpoint first
+    console.log('1. Testing basic Azure Functions connectivity...');
+    const basicResponse = await fetch('/api/health', { method: 'GET' });
+    console.log(`Basic Functions Status: ${basicResponse.status}`);
+    
+    // Test Dataverse proxy with detailed error info
+    console.log('\n2. Testing Dataverse proxy with error details...');
+    const dataverseResponse = await fetch('/api/dataverse/contacts?$top=1&$select=contactid');
+    
+    console.log(`Dataverse Proxy Status: ${dataverseResponse.status}`);
+    console.log(`Dataverse Proxy Status Text: ${dataverseResponse.statusText}`);
+    
+    const responseText = await dataverseResponse.text();
+    console.log('Raw Response:', responseText);
+    
+    if (!dataverseResponse.ok) {
+      console.log('❌ Dataverse proxy failed');
+      
+      // Try to get more specific error information
+      try {
+        const errorData = JSON.parse(responseText);
+        console.log('Parsed Error Data:', errorData);
+      } catch (parseError) {
+        console.log('Could not parse error response as JSON');
+      }
+    } else {
+      console.log('✅ Dataverse proxy working correctly');
+      try {
+        const data = JSON.parse(responseText);
+        console.log('Sample Data:', data);
+      } catch (parseError) {
+        console.log('Response received but could not parse as JSON');
+      }
+    }
+    
+    // Test environment variable access by calling a specific diagnostic endpoint
+    console.log('\n3. Testing environment variable access...');
+    console.log('Note: This will only work if diagnostic endpoints are available');
+    
+  } catch (error) {
+    console.error('❌ Azure Functions test failed:', error);
+  }
+}
+
 // Make functions available globally for console testing
 if (typeof window !== 'undefined') {
   (window as any).debugPortalSettings = debugPortalSettings;
   (window as any).clearAuthCache = clearAuthCache;
   (window as any).testApiConnection = testApiConnection;
+  (window as any).testAzureFunctionsConfig = testAzureFunctionsConfig;
 }
 
 export {};

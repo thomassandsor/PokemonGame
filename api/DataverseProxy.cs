@@ -36,8 +36,16 @@ namespace PokemonGame.API
                 
                 if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(tenantId))
                 {
-                    log.LogError("Missing required environment variables for Dataverse authentication");
-                    return new BadRequestObjectResult(new { error = "Dataverse configuration not found" });
+                    log.LogError($"Missing required environment variables for Dataverse authentication. ClientId: {!string.IsNullOrEmpty(clientId)}, ClientSecret: {!string.IsNullOrEmpty(clientSecret)}, TenantId: {!string.IsNullOrEmpty(tenantId)}");
+                    return new BadRequestObjectResult(new { 
+                        error = "Dataverse configuration not found",
+                        details = new {
+                            hasClientId = !string.IsNullOrEmpty(clientId),
+                            hasClientSecret = !string.IsNullOrEmpty(clientSecret),
+                            hasTenantId = !string.IsNullOrEmpty(tenantId),
+                            dataverseUrl = dataverseUrl
+                        }
+                    });
                 }
                 
                 // Get access token
@@ -76,6 +84,10 @@ namespace PokemonGame.API
                 var responseContent = await response.Content.ReadAsStringAsync();
                 
                 log.LogInformation($"Dataverse response status: {response.StatusCode}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    log.LogError($"Dataverse request failed. Status: {response.StatusCode}, Content: {responseContent}");
+                }
                 
                 // Return the response
                 return new ContentResult
@@ -88,7 +100,11 @@ namespace PokemonGame.API
             catch (Exception ex)
             {
                 log.LogError($"Error in DataverseProxy: {ex.Message}");
-                return new StatusCodeResult(500);
+                log.LogError($"Stack trace: {ex.StackTrace}");
+                return new ObjectResult(new { error = "Backend call failure", details = ex.Message }) 
+                { 
+                    StatusCode = 500 
+                };
             }
         }
         
