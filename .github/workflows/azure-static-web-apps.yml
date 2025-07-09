@@ -26,7 +26,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/" # App source code path
-          api_location: "api" # Azure Functions source code path
+          # api_location: "api" # Temporarily disabled - Azure Functions deployment failing
           output_location: "build" # Built app content directory - optional
         env:
           REACT_APP_CLIENT_ID: ${{ vars.REACT_APP_CLIENT_ID }}
