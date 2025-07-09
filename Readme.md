@@ -76,6 +76,8 @@ Create the following entities in your Dataverse environment:
 
 ### 4. Installation
 
+#### Frontend Setup
+
 1. Install dependencies:
    ```bash
    npm install
@@ -87,6 +89,32 @@ Create the following entities in your Dataverse environment:
    ```
 
 3. Open your browser and navigate to `http://localhost:3000`
+
+#### Azure Functions API Setup (for local development)
+
+1. Navigate to the API directory:
+   ```bash
+   cd api
+   ```
+
+2. Set up local configuration:
+   ```bash
+   cp local.settings.json.example local.settings.json
+   ```
+
+3. Edit `local.settings.json` with your Dataverse connection details
+
+4. Install Azure Functions Core Tools (if not already installed):
+   ```bash
+   npm install -g azure-functions-core-tools@4 --unsafe-perm true
+   ```
+
+5. Start the Azure Functions locally:
+   ```bash
+   func start
+   ```
+
+The API will be available at `http://localhost:7071`
 
 ## Available Scripts
 
@@ -119,13 +147,22 @@ Or simple text with just the Pokemon name.
 
 ## Deployment
 
-This application is designed to be deployed as an Azure Static Web App:
+This application is designed to be deployed as an Azure Static Web App with Azure Functions:
 
+### Frontend (Static Web App)
 1. Push your code to a GitHub repository
 2. Create an Azure Static Web App resource
 3. Connect it to your GitHub repository
 4. Configure the build settings for React
 5. Set up your environment variables in Azure
+
+### Backend (Azure Functions)
+The Azure Functions are automatically deployed alongside the Static Web App. Make sure to configure these environment variables in your Azure Functions App:
+- `DATAVERSE_URL`
+- `DATAVERSE_TENANT_ID`
+- `DATAVERSE_CLIENT_ID`
+- `DATAVERSE_CLIENT_SECRET`
+- `DATAVERSE_SCOPE`
 
 ## Technologies Used
 
@@ -135,6 +172,8 @@ This application is designed to be deployed as an Azure Static Web App:
 - **QR Scanner** for QR code scanning
 - **Axios** for HTTP requests
 - **React Router** for navigation
+- **Azure Functions** (.NET 6) for backend API
+- **Microsoft Dataverse** for data storage
 
 ## Contributing
 
