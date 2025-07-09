@@ -52,7 +52,7 @@ namespace PokemonGame.API
                 var accessToken = await GetAccessTokenAsync(clientId, clientSecret, tenantId, dataverseUrl, log);
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    return new UnauthorizedObjectResult(new { error = "Failed to authenticate with Dataverse" });
+                    return new BadRequestObjectResult(new { error = "Failed to authenticate with Dataverse", statusCode = 401 });
                 }
                 
                 // Build the target URL - remove /api/data/v9.2 from dataverseUrl if it exists and add it properly
