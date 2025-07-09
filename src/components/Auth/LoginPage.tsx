@@ -1,14 +1,40 @@
 import React from 'react';
-import { Card, Button, Row, Col, Alert } from 'react-bootstrap';
+import { Card, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { useMsal } from '@azure/msal-react';
 
 const LoginPage: React.FC = () => {
   const { instance } = useMsal();
   const [error, setError] = React.useState<string>('');
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  // Check if we're processing a redirect on page load
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasAuthParams = window.location.hash.includes('id_token') || 
+                         window.location.hash.includes('access_token') ||
+                         urlParams.has('code') || 
+                         urlParams.has('error');
+    
+    if (hasAuthParams) {
+      console.log('Authentication redirect detected, processing...');
+      setIsProcessing(true);
+      
+      // Clear any existing error since we're processing auth
+      setError('');
+      
+      // Give MSAL time to process the redirect
+      const timer = setTimeout(() => {
+        setIsProcessing(false);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleFreshRegistration = async () => {
     try {
       setError('');
+      setIsProcessing(true);
       // Force logout first, then fresh login
       await instance.logoutRedirect({
         postLogoutRedirectUri: window.location.origin + '/login?fresh=true'
@@ -16,12 +42,14 @@ const LoginPage: React.FC = () => {
     } catch (error) {
       console.error('Fresh registration failed:', error);
       setError(`Fresh registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setIsProcessing(false);
     }
   };
 
   const handleLogin = async () => {
     try {
       setError('');
+      setIsProcessing(true);
       console.log('Attempting login with config:', {
         authority: process.env.REACT_APP_AUTHORITY,
         clientId: process.env.REACT_APP_CLIENT_ID,
@@ -48,14 +76,17 @@ const LoginPage: React.FC = () => {
       } else {
         console.log('Using popup flow for desktop');
         await instance.loginPopup(customLoginRequest);
+        setIsProcessing(false);
       }
     } catch (error) {
       console.error('Login failed:', error);
+      setIsProcessing(false);
       
       // If popup fails, try redirect as fallback
       if (error instanceof Error && error.message.includes('popup')) {
         console.log('Popup failed, trying redirect...');
         try {
+          setIsProcessing(true);
           const customLoginRequest = {
             scopes: ["openid"],
             prompt: "consent",
@@ -66,6 +97,7 @@ const LoginPage: React.FC = () => {
           await instance.loginRedirect(customLoginRequest);
         } catch (redirectError) {
           console.error('Redirect also failed:', redirectError);
+          setIsProcessing(false);
           setError(`Login failed: ${redirectError instanceof Error ? redirectError.message : 'Unknown error'}`);
         }
       } else {
@@ -111,7 +143,14 @@ const LoginPage: React.FC = () => {
               <p className="text-muted">Welcome back, Trainer!</p>
             </div>
             
-            {error && <Alert variant="danger">{error}</Alert>}
+            {isProcessing && (
+              <Alert variant="info" className="text-center">
+                <Spinner animation="border" size="sm" className="me-2" />
+                Processing authentication...
+              </Alert>
+            )}
+            
+            {error && !isProcessing && <Alert variant="danger">{error}</Alert>}
             
             <div className="d-grid gap-2">
               <Button 
@@ -119,8 +158,16 @@ const LoginPage: React.FC = () => {
                 size="lg" 
                 onClick={handleLogin}
                 className="mb-2"
+                disabled={isProcessing}
               >
-                Sign In / Sign Up
+                {isProcessing ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Signing In...
+                  </>
+                ) : (
+                  'Sign In / Sign Up'
+                )}
               </Button>
               
               <Button 

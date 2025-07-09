@@ -105,25 +105,57 @@ const EvolutionLabWrapper: React.FC = () => {
 
 function AppContent() {
   const isAuthenticated = useIsAuthenticated();
-  const { accounts } = useMsal();
+  const { accounts, inProgress } = useMsal();
   const { isDemoMode } = useDemoMode();
+  const [isLoading, setIsLoading] = useState(true);
   
   // Use demo mode OR actual authentication
   const isUserLoggedIn = isDemoMode || isAuthenticated;
   
+  // Handle loading state - wait for MSAL to finish processing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // Give MSAL 2 seconds to process any redirect
+    
+    // If authentication is definitely complete, stop loading immediately
+    if (isAuthenticated || inProgress === 'none') {
+      setIsLoading(false);
+      clearTimeout(timer);
+    }
+    
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, inProgress]);
+  
   // Debug logging
   React.useEffect(() => {
     console.log('Authentication status:', isAuthenticated);
+    console.log('MSAL in progress:', inProgress);
     console.log('Demo mode:', isDemoMode);
     console.log('User logged in (combined):', isUserLoggedIn);
     console.log('Number of accounts:', accounts.length);
+    console.log('Loading state:', isLoading);
     console.log('Accounts:', accounts);
     console.log('MSAL config being used:', {
       authority: process.env.REACT_APP_AUTHORITY,
       clientId: process.env.REACT_APP_CLIENT_ID,
       redirectUri: process.env.REACT_APP_REDIRECT_URI
     });
-  }, [isAuthenticated, accounts, isDemoMode, isUserLoggedIn]);
+  }, [isAuthenticated, accounts, isDemoMode, isUserLoggedIn, inProgress, isLoading]);
+
+  // Show loading while MSAL processes authentication
+  if (isLoading || inProgress !== 'none') {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3">Processing authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
