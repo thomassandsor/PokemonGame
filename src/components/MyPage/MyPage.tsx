@@ -34,6 +34,7 @@ const MyPage: React.FC = () => {
 
     try {
       setLoading(true);
+      setError(''); // Clear any previous errors
       
       console.log('User account info:', account);
       console.log('Looking for contact with email:', account.username);
@@ -42,8 +43,8 @@ const MyPage: React.FC = () => {
       let userContact = await getContactByEmail(account.username);
       
       if (!userContact) {
-        // Create contact with info from Azure AD External Identities claims
-        console.log('Contact not found, creating new contact for:', account.username);
+        // Try to create contact if API is working
+        console.log('Contact not found, attempting to create new contact for:', account.username);
         try {
           userContact = await dataverseService.createContactFromAzureAD({
             name: account.name,
@@ -52,32 +53,67 @@ const MyPage: React.FC = () => {
           console.log('Successfully created contact:', userContact);
         } catch (createError) {
           console.error('Failed to create contact:', createError);
-          setError('Failed to create user profile. Please try again.');
-          return;
+          
+          // Provide fallback - create a mock contact for demo purposes
+          console.log('Creating fallback contact for demo purposes');
+          userContact = {
+            contactid: `demo-${Date.now()}`,
+            firstname: account.name?.split(' ')[0] || 'Demo',
+            lastname: account.name?.split(' ').slice(1).join(' ') || 'User',
+            emailaddress1: account.username || 'demo@example.com'
+          };
+          
+          setError('⚠️ Demo mode: API connection issues. Your progress may not be saved.');
         }
       }
       
-      // Load all Pokemon data for details
-      const allPokemon = await pokemonMasterDataService.getAllPokemon();
-      
       setContact(userContact);
       
-      // Load user's Pokemon
-      if (userContact?.contactid) {
-        const userPokemon = await getCaughtPokemonByTrainer(userContact.contactid);
-        
-        // Enhance each caught Pokemon with full details from the Pokemon data
-        const enhancedPokemon: EnhancedCaughtPokemon[] = userPokemon.map(caught => ({
-          ...caught,
-          pokemonDetails: allPokemon.find(p => p.name === caught.name.toLowerCase())
-        }));
-        
-        setPokemon(enhancedPokemon);
+      // Try to load user's Pokemon
+      if (userContact?.contactid && !userContact.contactid.startsWith('demo-')) {
+        try {
+          // Load all Pokemon data for details
+          const allPokemon = await pokemonMasterDataService.getAllPokemon();
+          const userPokemon = await getCaughtPokemonByTrainer(userContact.contactid);
+          
+          // Enhance each caught Pokemon with full details from the Pokemon data
+          const enhancedPokemon: EnhancedCaughtPokemon[] = userPokemon.map(caught => ({
+            ...caught,
+            pokemonDetails: allPokemon.find(p => p.name === caught.name.toLowerCase())
+          }));
+          
+          setPokemon(enhancedPokemon);
+        } catch (pokemonError) {
+          console.error('Failed to load Pokemon data:', pokemonError);
+          setError('⚠️ Could not load your Pokemon. Please check your connection.');
+          setPokemon([]); // Set empty array as fallback
+        }
+      } else if (userContact?.contactid?.startsWith('demo-')) {
+        // Demo mode - show some sample Pokemon
+        console.log('Demo mode: showing sample Pokemon');
+        const demoPokemon: EnhancedCaughtPokemon[] = [
+          {
+            pokedexId: '1',
+            pokemonId: '1',
+            name: 'Bulbasaur'
+            // pokemonDetails will be undefined for demo mode
+          }
+        ];
+        setPokemon(demoPokemon);
       }
       
     } catch (error) {
       console.error('Error initializing user:', error);
-      setError('Failed to load your Pokemon data. Please try refreshing the page.');
+      setError('⚠️ Connection issues detected. Some features may not work properly.');
+      
+      // Provide minimal fallback
+      setContact({
+        contactid: `fallback-${Date.now()}`,
+        firstname: account.name?.split(' ')[0] || 'User',
+        lastname: account.name?.split(' ').slice(1).join(' ') || '',
+        emailaddress1: account.username || 'user@example.com'
+      });
+      setPokemon([]);
     } finally {
       setLoading(false);
     }

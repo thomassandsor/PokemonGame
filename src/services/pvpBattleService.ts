@@ -80,10 +80,40 @@ export async function clearAuthCache() {
   }
 }
 
+/**
+ * Debug utility to test API connectivity
+ */
+export async function testApiConnection() {
+  console.log('🌐 Testing API Connection...');
+  console.log('='.repeat(50));
+  
+  try {
+    // Test the base API endpoint
+    const response = await fetch('/api/dataverse/contacts?$top=1');
+    
+    console.log('API Response Status:', response.status);
+    console.log('API Response Status Text:', response.statusText);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ API Connection Successful');
+      console.log('Sample Response:', data);
+    } else {
+      console.log('❌ API Connection Failed');
+      const errorText = await response.text();
+      console.log('Error Response:', errorText);
+    }
+    
+  } catch (error) {
+    console.error('❌ API Connection Error:', error);
+  }
+}
+
 // Make functions available globally for console testing
 if (typeof window !== 'undefined') {
   (window as any).debugPortalSettings = debugPortalSettings;
   (window as any).clearAuthCache = clearAuthCache;
+  (window as any).testApiConnection = testApiConnection;
 }
 
 export {};

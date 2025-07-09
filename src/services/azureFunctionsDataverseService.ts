@@ -55,13 +55,37 @@ class AzureFunctionsDataverseService {
 
   async getContactByEmail(email: string): Promise<Contact | null> {
     try {
+      console.log(`🔍 Looking for contact with email: ${email}`);
+      console.log(`🌐 API URL: ${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'`);
+      
       const response = await axios.get(
-        `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'`
+        `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'`,
+        {
+          timeout: 10000, // 10 second timeout
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
-      return response.data.value.length > 0 ? response.data.value[0] : null;
+      
+      console.log(`✅ Contact API response:`, response.data);
+      return response.data.value && response.data.value.length > 0 ? response.data.value[0] : null;
     } catch (error) {
-      console.error('Error getting contact by email:', error);
-      throw error;
+      console.error('❌ Error getting contact by email:', error);
+      
+      // Log detailed error information
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          url: error.config?.url,
+          baseURL: error.config?.baseURL
+        });
+      }
+      
+      // Don't throw the error, return null to allow graceful fallback
+      return null;
     }
   }
 
