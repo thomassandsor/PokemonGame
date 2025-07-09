@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/api';
 import { 
   PokemonMasterRecord, 
   PokemonPokedexRecord, 
@@ -36,10 +37,8 @@ class AzureFunctionsDataverseService {
   private baseUrl: string;
 
   constructor() {
-    // Azure Functions API base URL (will be localhost during development, Azure URL when deployed)
-    this.baseUrl = process.env.NODE_ENV === 'production' 
-      ? '/api/dataverse'  // Azure Static Web Apps automatically routes /api to Azure Functions
-      : 'http://localhost:7071/api/dataverse';  // Local Azure Functions development server
+    // Azure Functions API base URL
+    this.baseUrl = API_CONFIG.BASE_URL;
   }
 
   // Contact (Trainer) operations

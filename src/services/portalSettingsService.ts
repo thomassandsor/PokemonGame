@@ -1,4 +1,5 @@
 import { PortalSettingRecord, PortalSettingsSchema, DataverseValidator } from '../constants/dataverseSchema';
+import { API_CONFIG } from '../config/api';
 
 /**
  * Typed Portal Setting Interface - Simplified
@@ -14,7 +15,7 @@ export interface TypedPortalSetting<T = any> {
  * Manages system-wide configuration settings stored in Dataverse
  */
 export class PortalSettingsService {
-  private static readonly BASE_URL = '/api/dataverse';
+  private static readonly BASE_URL = API_CONFIG.BASE_URL;
 
   /**
    * Get all portal settings

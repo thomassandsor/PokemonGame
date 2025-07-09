@@ -4,6 +4,7 @@ import {
   DataverseValidator, 
   PokemonMasterSchema 
 } from '../constants/dataverseSchema';
+import { API_CONFIG } from '../config/api';
 
 export interface PokemonImportData {
   id: number;
@@ -43,7 +44,7 @@ export interface ImportResult {
 
 export class PokemonImportService {
   private static readonly POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2';
-  private static readonly DATAVERSE_API_URL = '/api/dataverse';
+  private static readonly DATAVERSE_API_URL = API_CONFIG.BASE_URL;
 
   // Import Pokemon data from PokeAPI
   static async importFromPokeAPI(pokemonIds: number[]): Promise<ImportResult> {

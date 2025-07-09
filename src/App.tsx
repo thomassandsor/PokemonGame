@@ -6,6 +6,7 @@ import MyPage from './components/MyPage/MyPage';
 import QRScannerPage from './components/QRScanner/QRScannerPage';
 import { AdminPanel } from './components/AdminPanel/AdminPanel';
 import { DataverseQueryBuilder } from './constants/dataverseSchema';
+import { API_CONFIG } from './config/api';
 import BattleArena from './components/BattleArena/BattleArena';
 import BattleJoin from './components/BattleArena/BattleJoin';
 import BattleResult from './components/BattleArena/BattleResult';
@@ -24,7 +25,7 @@ const BattleArenaWrapper: React.FC = () => {
   useEffect(() => {
     const loadUserPokemon = async () => {
       try {
-        const response = await fetch(`/api/dataverse/${DataverseQueryBuilder.getAllPokemon()}`);
+        const response = await fetch(`${API_CONFIG.BASE_URL}/${DataverseQueryBuilder.getAllPokemon()}`);
         if (response.ok) {
           const data = await response.json();
           // Transform Dataverse data to expected format

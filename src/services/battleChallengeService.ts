@@ -9,6 +9,7 @@ import {
   DataverseValidator, 
   DataverseQueryBuilder 
 } from '../constants/dataverseSchema';
+import { API_CONFIG } from '../config/api';
 import { 
   CompleteBattleData, 
   BattlePokemon 
@@ -58,7 +59,7 @@ export interface BattleResult {
 }
 
 export class BattleChallengeService {
-  private static readonly API_BASE = '/api/dataverse';
+  private static readonly API_BASE = API_CONFIG.BASE_URL;
 
   // Create a new battle challenge
   static async createChallenge(

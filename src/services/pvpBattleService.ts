@@ -1,5 +1,6 @@
 // PvP battle service for Pokemon game
 import { PortalSettingsService } from './portalSettingsService';
+import { API_CONFIG } from '../config/api';
 
 /**
  * Debug utility to check portal settings configuration
@@ -89,7 +90,7 @@ export async function testApiConnection() {
   
   try {
     // Test the base API endpoint
-    const response = await fetch('/api/dataverse/contacts?$top=1');
+    const response = await fetch(`${API_CONFIG.BASE_URL}/contacts?$top=1`);
     
     console.log('API Response Status:', response.status);
     console.log('API Response Status Text:', response.statusText);
@@ -132,7 +133,7 @@ export async function testAzureFunctionsConfig() {
     
     // Test Dataverse proxy with detailed error info
     console.log('\n2. Testing Dataverse proxy with error details...');
-    const dataverseResponse = await fetch('/api/dataverse/contacts?$top=1&$select=contactid');
+    const dataverseResponse = await fetch(`${API_CONFIG.BASE_URL}/contacts?$top=1&$select=contactid`);
     
     console.log(`Dataverse Proxy Status: ${dataverseResponse.status}`);
     console.log(`Dataverse Proxy Status Text: ${dataverseResponse.statusText}`);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PokemonImportService, ImportResult } from '../../services/pokemonImportService';
+import { API_CONFIG } from '../../config/api';
 import '../../styles/AdminPanel.css';
 
 interface AdminPanelProps {}
@@ -67,7 +68,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
 
   const handleTestDataverseConnection = async () => {
     try {
-      const response = await fetch('/api/dataverse/cr6b1_pokemons?$top=1');
+      const response = await fetch(`${API_CONFIG.BASE_URL}/cr6b1_pokemons?$top=1`);
       if (response.ok) {
         alert('✅ Dataverse connection successful!');
       } else {

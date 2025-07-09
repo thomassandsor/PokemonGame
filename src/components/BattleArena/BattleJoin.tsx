@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { BattleChallengeService, PokemonBattleExpanded } from '../../services/battleChallengeService';
 import { StatusCodes } from '../../constants/dataverseMappings';
 import { DataverseQueryBuilder } from '../../constants/dataverseSchema';
+import { API_CONFIG } from '../../config/api';
 import { useDemoMode } from '../../contexts/DemoContext';
 import { useMsal, useAccount } from '@azure/msal-react';
 import { getContactByEmail } from '../../services/azureFunctionsDataverseService';
@@ -68,10 +69,9 @@ const BattleJoin: React.FC<BattleJoinProps> = () => {
       
       setCurrentUserId(userId);
       
-      // Load battle details with expanded Pokemon data - simplified query first
-      console.log('Fetching battle data from:', `/api/dataverse/pokemon_battles(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
-      
-      const battleResponse = await fetch(`/api/dataverse/pokemon_battles(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
+      // Load battle details with expanded Pokemon data - simplified query first      console.log('Fetching battle data from:', `${API_CONFIG.BASE_URL}/pokemon_battles(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
+
+      const battleResponse = await fetch(`${API_CONFIG.BASE_URL}/pokemon_battles(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
       
       console.log('Battle response status:', battleResponse.status);
       console.log('Battle response ok:', battleResponse.ok);
@@ -97,7 +97,7 @@ const BattleJoin: React.FC<BattleJoinProps> = () => {
       setBattle(battleData);
 
       // Load user's Pokemon (filtered by user ID)
-      const pokemonResponse = await fetch(`/api/dataverse/${DataverseQueryBuilder.getAllUserPokemon(userId)}`);
+      const pokemonResponse = await fetch(`${API_CONFIG.BASE_URL}/${DataverseQueryBuilder.getAllUserPokemon(userId)}`);
       if (pokemonResponse.ok) {
         const pokemonData = await pokemonResponse.json();
         // Map HP and HP Max from correct fields
