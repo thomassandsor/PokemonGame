@@ -122,6 +122,14 @@ export async function testAzureFunctionsConfig() {
     const basicResponse = await fetch('/api/health', { method: 'GET' });
     console.log(`Basic Functions Status: ${basicResponse.status}`);
     
+    if (basicResponse.ok) {
+      const healthData = await basicResponse.json();
+      console.log('✅ Health check successful:', healthData);
+    } else {
+      const healthError = await basicResponse.text();
+      console.log('❌ Health check failed:', healthError);
+    }
+    
     // Test Dataverse proxy with detailed error info
     console.log('\n2. Testing Dataverse proxy with error details...');
     const dataverseResponse = await fetch('/api/dataverse/contacts?$top=1&$select=contactid');
@@ -161,12 +169,41 @@ export async function testAzureFunctionsConfig() {
   }
 }
 
+/**
+ * Quick debug utility to test if any Azure Functions work at all
+ */
+export async function testBasicAzureFunctions() {
+  console.log('🧪 Testing Basic Azure Functions...');
+  
+  const endpoints = [
+    '/api/health',
+    '/api/test',
+    '/api/ping'
+  ];
+  
+  for (const endpoint of endpoints) {
+    try {
+      console.log(`Testing ${endpoint}...`);
+      const response = await fetch(endpoint);
+      console.log(`${endpoint}: ${response.status} ${response.statusText}`);
+      
+      if (response.ok) {
+        const text = await response.text();
+        console.log(`Response: ${text.substring(0, 200)}...`);
+      }
+    } catch (error) {
+      console.log(`${endpoint}: Error - ${error}`);
+    }
+  }
+}
+
 // Make functions available globally for console testing
 if (typeof window !== 'undefined') {
   (window as any).debugPortalSettings = debugPortalSettings;
   (window as any).clearAuthCache = clearAuthCache;
   (window as any).testApiConnection = testApiConnection;
   (window as any).testAzureFunctionsConfig = testAzureFunctionsConfig;
+  (window as any).testBasicAzureFunctions = testBasicAzureFunctions;
 }
 
 export {};
