@@ -21,6 +21,17 @@ msalInstance.initialize().then(() => {
   }
 }).catch((error) => {
   console.error('MSAL initialization or redirect handling failed:', error);
+  
+  // Handle specific hash_empty_error
+  if (error.errorCode === 'hash_empty_error') {
+    console.log('Hash empty error detected - this is usually safe to ignore on first load');
+    // Clear any stale state and continue
+    try {
+      msalInstance.clearCache();
+    } catch (clearError) {
+      console.warn('Could not clear cache:', clearError);
+    }
+  }
 });
 
 const root = ReactDOM.createRoot(

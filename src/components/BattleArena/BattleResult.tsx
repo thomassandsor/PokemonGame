@@ -209,17 +209,101 @@ const BattleResult: React.FC<BattleResultProps> = () => {
         <div className="battle-summary">
           <h3>🏆 Battle Summary</h3>
           <div className="summary-stats">
-            <div className="stat-item">
-              <strong>Winner:</strong> {battleData.final_result.winner_name}
+            <div className="stat-item winner-stat">
+              <strong>🥇 Winner:</strong> 
+              <br />
+              <span className="winner-pokemon">
+                {battleData.final_result.winner_name === battleData.metadata.player1_name 
+                  ? `${player1Pokemon.name} (Lv.${player1Pokemon.level})` 
+                  : `${player2Pokemon.name} (Lv.${player2Pokemon.level})`}
+              </span>
+              <br />
+              <small className="trainer-label">
+                {battleData.final_result.winner_name === battleData.metadata.player1_name 
+                  ? `👤 ${battleData.metadata.player1_name}` 
+                  : `👤 ${battleData.metadata.player2_name}`}
+              </small>
             </div>
             <div className="stat-item">
-              <strong>Total Turns:</strong> {battleData.battle_turns.length}
+              <strong>⚔️ Battle Length:</strong> 
+              <br />
+              <span className="stat-value">{battleData.battle_turns.length} turns</span>
+              <br />
+              <small className="stat-detail">
+                {battleData.battle_turns.length <= 3 ? 'Quick victory!' : 
+                 battleData.battle_turns.length <= 6 ? 'Balanced fight' : 
+                 'Epic battle!'}
+              </small>
             </div>
             <div className="stat-item">
-              <strong>Duration:</strong> {battleData.metadata.duration_seconds} seconds
+              <strong>💥 Best Move:</strong> 
+              <br />
+              <span className="stat-value">
+                {(() => {
+                  let bestMove = { damage: 0, move: 'Attack', attacker: '', turn: 0 };
+                  battleData.battle_turns.forEach((turn, index) => {
+                    if ((turn.player1_action.damage_dealt || 0) > bestMove.damage) {
+                      bestMove = {
+                        damage: turn.player1_action.damage_dealt || 0,
+                        move: turn.player1_action.move_used || 'Attack',
+                        attacker: player1Pokemon.name,
+                        turn: index + 1
+                      };
+                    }
+                    if ((turn.player2_action.damage_dealt || 0) > bestMove.damage) {
+                      bestMove = {
+                        damage: turn.player2_action.damage_dealt || 0,
+                        move: turn.player2_action.move_used || 'Attack',
+                        attacker: player2Pokemon.name,
+                        turn: index + 1
+                      };
+                    }
+                  });
+                  return `${bestMove.move}`;
+                })()}
+              </span>
+              <br />
+              <small className="stat-detail">
+                {(() => {
+                  let bestDamage = 0;
+                  let bestAttacker = '';
+                  battleData.battle_turns.forEach((turn) => {
+                    if ((turn.player1_action.damage_dealt || 0) > bestDamage) {
+                      bestDamage = turn.player1_action.damage_dealt || 0;
+                      bestAttacker = player1Pokemon.name;
+                    }
+                    if ((turn.player2_action.damage_dealt || 0) > bestDamage) {
+                      bestDamage = turn.player2_action.damage_dealt || 0;
+                      bestAttacker = player2Pokemon.name;
+                    }
+                  });
+                  return `💪 ${bestDamage} damage by ${bestAttacker}`;
+                })()}
+              </small>
             </div>
             <div className="stat-item">
-              <strong>Victory Condition:</strong> {battleData.final_result.victory_condition}
+              <strong>❤️ Battle Damage:</strong> 
+              <br />
+              <span className="stat-value">
+                {(() => {
+                  const p1TotalDamage = battleData.battle_turns.reduce((total, turn) => 
+                    total + (turn.player1_action.damage_dealt || 0), 0);
+                  const p2TotalDamage = battleData.battle_turns.reduce((total, turn) => 
+                    total + (turn.player2_action.damage_dealt || 0), 0);
+                  return `${p1TotalDamage + p2TotalDamage} HP total`;
+                })()}
+              </span>
+              <br />
+              <small className="damage-breakdown">
+                <div>🟦 {player1Pokemon.name}: {
+                  battleData.battle_turns.reduce((total, turn) => 
+                    total + (turn.player2_action.damage_dealt || 0), 0)
+                } HP lost</div>
+                <div>🟥 {player2Pokemon.name}: {
+                  battleData.battle_turns.reduce((total, turn) => 
+                    total + (turn.player1_action.damage_dealt || 0), 0)
+                } HP lost</div>
+              </small>
             </div>
           </div>
         </div>

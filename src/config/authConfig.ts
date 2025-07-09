@@ -9,7 +9,7 @@ export const msalConfig = {
   },
   cache: {
     cacheLocation: "localStorage",
-    storeAuthStateInCookie: false,
+    storeAuthStateInCookie: true, // Changed to true for mobile/private browsing compatibility
   },
   system: {
     loggerOptions: {
@@ -35,6 +35,11 @@ export const msalConfig = {
         }
       },
     },
+    allowNativeBroker: false, // Disable native broker for better web compatibility
+    windowHashTimeout: 60000, // Increase timeout for slower mobile connections
+    iframeHashTimeout: 10000,
+    loadFrameTimeout: 10000,
+    asyncPopups: false // Disable async popups for better mobile compatibility
   },
 };
 
@@ -43,7 +48,8 @@ export const loginRequest = {
   scopes: ["openid", "profile", "email"],
   extraQueryParameters: {
     "response_mode": "fragment"
-  }
+  },
+  prompt: "select_account" // Added to handle authentication flow better
 };
 
 // Dataverse API configuration (Service-to-Service)

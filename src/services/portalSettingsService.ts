@@ -28,7 +28,7 @@ export class PortalSettingsService {
       }
       
       const data = await response.json();
-      return (data.value || []).map(this.mapFromDataverse);
+      return (data.value || []).map((record: any) => this.mapFromDataverse(record));
     } catch (error) {
       console.error('Error fetching portal settings:', error);
       throw error;

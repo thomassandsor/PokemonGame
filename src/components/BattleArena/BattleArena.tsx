@@ -5,6 +5,7 @@ import BattleReplay from './BattleReplay';
 import { useNavigate } from 'react-router-dom';
 import { useMsal, useAccount } from '@azure/msal-react';
 import { getCaughtPokemonByTrainer, getContactByEmail } from '../../services/azureFunctionsDataverseService';
+import { debugPortalSettings } from '../../services/pvpBattleService';
 
 const NAV_OPTIONS = [
   { key: 'challenges', label: 'Open Challenges' },
@@ -113,37 +114,10 @@ export default function BattleArena() {
     setPendingChallengeType(null);
   };
 
-  // View replay
-  const viewBattleResult = async (challenge: PokemonBattle) => {
+  // View battle result - navigate to result page
+  const viewBattleResult = (challenge: PokemonBattle) => {
     if (!challenge.pokemon_battleid) return;
-    setLoading(true);
-    setMessage('Simulating battle and writing result. Please wait...');
-    // Poll for battle result
-    let result = null;
-    let attempts = 0;
-    while (attempts < 20) { // Wait up to ~16s
-      result = await BattleChallengeService.getBattleResult(challenge.pokemon_battleid);
-      if (result) break; // Result is now directly CompleteBattleData
-      await new Promise(res => setTimeout(res, 800));
-      attempts++;
-    }
-    setLoading(false);
-    setMessage(null);
-    if (result) {
-      // Create a BattleResult object for backwards compatibility with replay component
-      const battleResult = {
-        battleSteps: result.battle_turns || [],
-        winner: result.final_result?.winner_name || 'Unknown',
-        battleLog: result.battle_log || [],
-        finalState: result.final_result || {},
-        completeBattleData: result
-      };
-      setReplay({ battle: battleResult, step: 0 });
-      setCurrentStep(0);
-      setIsReplaying(false);
-    } else {
-      setMessage('Battle result not ready yet. Try again in a few seconds.');
-    }
+    navigate(`/battle/result/${challenge.pokemon_battleid}`);
   };
 
   // Navigation effect
@@ -445,6 +419,23 @@ export default function BattleArena() {
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="Poké Ball" className="arena-logo" />
         <h1>Battle Arena</h1>
         <p>Challenge trainers and view all active Pokémon battles!</p>
+        
+        {/* Temporary Debug Button */}
+        <button 
+          onClick={() => debugPortalSettings()} 
+          style={{
+            marginTop: '10px',
+            padding: '5px 10px',
+            backgroundColor: '#ff6b6b',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '12px'
+          }}
+        >
+          🔍 Debug Portal Settings
+        </button>
       </header>
       {navBar}
       {messageBanner}

@@ -38,10 +38,66 @@ const LoginPage: React.FC = () => {
         }
       };
       
-      await instance.loginPopup(customLoginRequest);
+      // Check if we're in a mobile environment or private browsing
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isPrivateBrowsing = await checkPrivateBrowsing();
+      
+      if (isMobile || isPrivateBrowsing) {
+        console.log('Using redirect flow for mobile/private browsing');
+        await instance.loginRedirect(customLoginRequest);
+      } else {
+        console.log('Using popup flow for desktop');
+        await instance.loginPopup(customLoginRequest);
+      }
     } catch (error) {
       console.error('Login failed:', error);
-      setError(`Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // If popup fails, try redirect as fallback
+      if (error instanceof Error && error.message.includes('popup')) {
+        console.log('Popup failed, trying redirect...');
+        try {
+          const customLoginRequest = {
+            scopes: ["openid"],
+            prompt: "consent",
+            extraQueryParameters: {
+              "response_mode": "fragment"
+            }
+          };
+          await instance.loginRedirect(customLoginRequest);
+        } catch (redirectError) {
+          console.error('Redirect also failed:', redirectError);
+          setError(`Login failed: ${redirectError instanceof Error ? redirectError.message : 'Unknown error'}`);
+        }
+      } else {
+        let errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        
+        // Provide specific help for hash_empty_error
+        if (errorMessage.includes('hash_empty_error')) {
+          errorMessage = 'Authentication error on mobile/private browsing. Please try refreshing the page and logging in again. If the problem persists, try using a regular browser window.';
+        }
+        
+        setError(`Login failed: ${errorMessage}`);
+      }
+    }
+  };
+
+  // Check if running in private browsing mode
+  const checkPrivateBrowsing = async (): Promise<boolean> => {
+    try {
+      // Try to use localStorage - this fails in private browsing in some browsers
+      const testKey = '__test_private_browsing__';
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      
+      // Check for Safari private browsing
+      if (navigator.storage && navigator.storage.estimate) {
+        const estimate = await navigator.storage.estimate();
+        return (estimate.quota || 0) < 120000000; // Less than ~120MB usually indicates private mode
+      }
+      
+      return false;
+    } catch {
+      return true; // If localStorage access fails, assume private browsing
     }
   };
 

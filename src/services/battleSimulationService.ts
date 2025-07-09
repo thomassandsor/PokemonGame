@@ -10,6 +10,7 @@ import {
   BattleMetadata,
   BattleMove
 } from '../types/battleTypes';
+import { PortalSettingsService } from './portalSettingsService';
 
 export class BattleSimulationService {
   private static readonly DEFAULT_MOVES: BattleMove[] = [
@@ -90,10 +91,24 @@ export class BattleSimulationService {
     let battleEnded = false;
     let winner: 'player1' | 'player2' | 'draw' = 'draw';
     
+    // Get max turns from portal settings (default to 50 if not found)
+    let maxTurns = 50;
+    try {
+      const battleTurnsSetting = await PortalSettingsService.getSetting<number>('battle_turns');
+      if (battleTurnsSetting?.value) {
+        maxTurns = parseInt(String(battleTurnsSetting.value));
+        console.log(`🎮 Using portal setting for max battle turns: ${maxTurns}`);
+      } else {
+        console.log(`⚠️ Portal setting 'battle_turns' not found, using default: ${maxTurns}`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ Failed to fetch battle_turns setting, using default: ${maxTurns}`, error);
+    }
+    
     battleLog.push(`⚔️ Battle begins between ${player1.name}'s ${currentP1.name} and ${player2.name}'s ${currentP2.name}!`);
     
-    // Battle simulation loop
-    while (!battleEnded && turnNumber <= 50) { // Max 50 turns to prevent infinite battles
+    // Battle simulation loop with dynamic max turns
+    while (!battleEnded && turnNumber <= maxTurns) {
       const turn = await this.simulateTurn(
         turnNumber,
         currentP1,

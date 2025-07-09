@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { PokemonImportService, ImportResult } from '../../services/pokemonImportService';
 import { PortalSettingsService } from '../../services/portalSettingsService';
 import { useDemoMode } from '../../contexts/DemoContext';
+import AdminPortalSettings from '../Admin/AdminPortalSettings';
 import defaultSettings from '../../data/defaultPortalSettings.json';
 import '../../styles/AdminPanel.css';
 
 interface AdminPanelProps {}
 
 export const AdminPanel: React.FC<AdminPanelProps> = () => {
-  const [selectedTab, setSelectedTab] = useState<'pokemon' | 'users' | 'system'>('pokemon');
+  const [selectedTab, setSelectedTab] = useState<'pokemon' | 'users' | 'system' | 'settings'>('pokemon');
   const [importStatus, setImportStatus] = useState<'idle' | 'importing' | 'success' | 'error'>('idle');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [customPokemonIds, setCustomPokemonIds] = useState<string>('');
@@ -138,6 +139,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
           onClick={() => setSelectedTab('system')}
         >
           ⚙️ System Settings
+        </button>
+        <button 
+          className={`nav-button ${selectedTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setSelectedTab('settings')}
+        >
+          🔧 Portal Settings
         </button>
       </div>
 
@@ -341,6 +348,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = () => {
                 <button className="admin-button">📱 View All Settings</button>
               </div>
             </div>
+          </div>
+        )}
+
+        {selectedTab === 'settings' && (
+          <div className="admin-section">
+            <AdminPortalSettings />
           </div>
         )}
       </div>

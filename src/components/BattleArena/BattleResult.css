@@ -298,12 +298,58 @@
   border-radius: 8px;
   border: 1px solid rgba(59, 130, 246, 0.2);
   text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-item strong {
   color: #1f2937;
   display: block;
   margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #3b82f6;
+  display: block;
+  margin: 5px 0;
+}
+
+.winner-stat {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(255, 235, 59, 0.2));
+  border: 2px solid #fbbf24;
+}
+
+.winner-pokemon {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.trainer-label {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.stat-detail {
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.damage-breakdown {
+  text-align: left;
+  font-size: 11px;
+}
+
+.damage-breakdown div {
+  margin: 2px 0;
 }
 
 /* Action Buttons */
