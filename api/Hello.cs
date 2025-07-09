@@ -1,22 +1,29 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Api
 {
-    public static class Hello
+    public class Hello
     {
-        [FunctionName("Hello")]
-        public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "hello")] HttpRequest req,
-            ILogger log)
+        private readonly ILogger<Hello> _logger;
+
+        public Hello(ILogger<Hello> logger)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _logger = logger;
+        }
+
+        [Function("Hello")]
+        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "hello")] HttpRequestData req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
             
-            return new OkObjectResult("Hello from Azure Functions!");
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+            response.WriteString("Hello from Azure Functions!");
+            
+            return response;
         }
     }
 }

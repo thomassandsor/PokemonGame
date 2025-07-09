@@ -1,32 +1,38 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Net;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace PokemonGame.API
 {
-    public static class DataverseProxy
+    public class DataverseProxy
     {
-        private static readonly HttpClient httpClient = new HttpClient();
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<DataverseProxy> _logger;
         
-        [FunctionName("DataverseProxy")]
-        public static async Task<IActionResult> Run(
+        public DataverseProxy(HttpClient httpClient, ILogger<DataverseProxy> logger)
+        {
+            _httpClient = httpClient;
+            _logger = logger;
+        }
+        
+        [Function("DataverseProxy")]
+        public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "patch", "delete", 
-                Route = "dataverse/{*restOfPath}")] HttpRequest req,
-            string restOfPath,
-            ILogger log)
+                Route = "dataverse/{restOfPath}")] HttpRequestData req,
+            string restOfPath)
         {
             try
             {
-                log.LogInformation($"DataverseProxy function processed request for path: {restOfPath}");
+                _logger.LogInformation($"DataverseProxy function processed request for path: {restOfPath}");
                 
                 // Get configuration from environment variables
                 var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
@@ -36,8 +42,10 @@ namespace PokemonGame.API
                 
                 if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(tenantId))
                 {
-                    log.LogError($"Missing required environment variables for Dataverse authentication. ClientId: {!string.IsNullOrEmpty(clientId)}, ClientSecret: {!string.IsNullOrEmpty(clientSecret)}, TenantId: {!string.IsNullOrEmpty(tenantId)}");
-                    return new BadRequestObjectResult(new { 
+                    _logger.LogError($"Missing required environment variables for Dataverse authentication. ClientId: {!string.IsNullOrEmpty(clientId)}, ClientSecret: {!string.IsNullOrEmpty(clientSecret)}, TenantId: {!string.IsNullOrEmpty(tenantId)}");
+                    var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                    errorResponse.Headers.Add("Content-Type", "application/json");
+                    await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
                         error = "Dataverse configuration not found",
                         details = new {
                             hasClientId = !string.IsNullOrEmpty(clientId),
@@ -45,25 +53,29 @@ namespace PokemonGame.API
                             hasTenantId = !string.IsNullOrEmpty(tenantId),
                             dataverseUrl = dataverseUrl
                         }
-                    });
+                    }));
+                    return errorResponse;
                 }
                 
                 // Get access token
-                var accessToken = await GetAccessTokenAsync(clientId, clientSecret, tenantId, dataverseUrl, log);
+                var accessToken = await GetAccessTokenAsync(clientId, clientSecret, tenantId, dataverseUrl);
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    return new BadRequestObjectResult(new { error = "Failed to authenticate with Dataverse", statusCode = 401 });
+                    var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                    errorResponse.Headers.Add("Content-Type", "application/json");
+                    await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Failed to authenticate with Dataverse", statusCode = 401 }));
+                    return errorResponse;
                 }
                 
                 // Build the target URL - remove /api/data/v9.2 from dataverseUrl if it exists and add it properly
                 var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
                 var targetUrl = $"{baseUrl}/api/data/v9.2/{restOfPath}";
-                if (req.QueryString.HasValue)
+                if (!string.IsNullOrEmpty(req.Url.Query))
                 {
-                    targetUrl += req.QueryString.Value;
+                    targetUrl += req.Url.Query;
                 }
                 
-                log.LogInformation($"Proxying request to: {targetUrl}");
+                _logger.LogInformation($"Proxying request to: {targetUrl}");
                 
                 // Create the request
                 var request = new HttpRequestMessage(new HttpMethod(req.Method), targetUrl);
@@ -73,42 +85,43 @@ namespace PokemonGame.API
                 request.Headers.Add("Accept", "application/json");
                 
                 // Copy request body if it exists
-                if (req.ContentLength.HasValue && req.ContentLength > 0)
+                if (req.Body != null)
                 {
                     var body = await new StreamReader(req.Body).ReadToEndAsync();
-                    request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+                    if (!string.IsNullOrEmpty(body))
+                    {
+                        request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+                    }
                 }
                 
                 // Forward the request
-                var response = await httpClient.SendAsync(request);
+                var response = await _httpClient.SendAsync(request);
                 var responseContent = await response.Content.ReadAsStringAsync();
                 
-                log.LogInformation($"Dataverse response status: {response.StatusCode}");
+                _logger.LogInformation($"Dataverse response status: {response.StatusCode}");
                 if (!response.IsSuccessStatusCode)
                 {
-                    log.LogError($"Dataverse request failed. Status: {response.StatusCode}, Content: {responseContent}");
+                    _logger.LogError($"Dataverse request failed. Status: {response.StatusCode}, Content: {responseContent}");
                 }
                 
                 // Return the response
-                return new ContentResult
-                {
-                    Content = responseContent,
-                    ContentType = "application/json",
-                    StatusCode = (int)response.StatusCode
-                };
+                var result = req.CreateResponse(response.StatusCode);
+                result.Headers.Add("Content-Type", "application/json");
+                await result.WriteStringAsync(responseContent);
+                return result;
             }
             catch (Exception ex)
             {
-                log.LogError($"Error in DataverseProxy: {ex.Message}");
-                log.LogError($"Stack trace: {ex.StackTrace}");
-                return new ObjectResult(new { error = "Backend call failure", details = ex.Message }) 
-                { 
-                    StatusCode = 500 
-                };
+                _logger.LogError($"Error in DataverseProxy: {ex.Message}");
+                _logger.LogError($"Stack trace: {ex.StackTrace}");
+                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+                errorResponse.Headers.Add("Content-Type", "application/json");
+                await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Backend call failure", details = ex.Message }));
+                return errorResponse;
             }
         }
         
-        private static async Task<string> GetAccessTokenAsync(string clientId, string clientSecret, string tenantId, string dataverseUrl, ILogger log)
+        private async Task<string?> GetAccessTokenAsync(string clientId, string clientSecret, string tenantId, string dataverseUrl)
         {
             try
             {
@@ -128,23 +141,23 @@ namespace PokemonGame.API
                     Content = new FormUrlEncodedContent(parameters)
                 };
                 
-                var response = await httpClient.SendAsync(request);
+                var response = await _httpClient.SendAsync(request);
                 var responseContent = await response.Content.ReadAsStringAsync();
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    var tokenResponse = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                    return tokenResponse.access_token;
+                    var tokenResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
+                    return tokenResponse.GetProperty("access_token").GetString();
                 }
                 else
                 {
-                    log.LogError($"Failed to get access token: {responseContent}");
+                    _logger.LogError($"Failed to get access token: {responseContent}");
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                log.LogError($"Exception getting access token: {ex.Message}");
+                _logger.LogError($"Exception getting access token: {ex.Message}");
                 return null;
             }
         }
