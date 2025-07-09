@@ -1,0 +1,174 @@
+/* Portal Settings Component Styles */
+.portal-settings {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.settings-header h2 {
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.settings-header p {
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #3498db;
+}
+
+.error-message {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  background-color: #efe;
+  border: 1px solid #cfc;
+  color: #3c3;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.settings-section {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e1e8ed;
+}
+
+.settings-section h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.setting-item {
+  margin-bottom: 24px;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.setting-item label strong {
+  display: block;
+  color: #2c3e50;
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.setting-description {
+  display: block;
+  color: #7f8c8d;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.setting-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.number-input {
+  padding: 10px 12px;
+  border: 2px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 120px;
+  transition: border-color 0.3s ease;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.save-btn {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #229954;
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.setting-info {
+  color: #5a6c7d;
+  font-size: 14px;
+}
+
+.setting-info strong {
+  color: #2c3e50;
+}
+
+.settings-footer {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 16px;
+  margin-top: 20px;
+  border-left: 4px solid #3498db;
+}
+
+.settings-footer p {
+  margin: 0;
+  color: #5a6c7d;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .portal-settings {
+    padding: 15px;
+  }
+  
+  .settings-section {
+    padding: 16px;
+  }
+  
+  .setting-control {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .number-input {
+    width: 100%;
+    max-width: 200px;
+  }
+}
