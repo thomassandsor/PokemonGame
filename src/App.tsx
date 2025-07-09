@@ -114,33 +114,51 @@ function AppContent() {
   
   // Handle loading state - wait for MSAL to finish processing
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // If we're not doing any authentication operations, stop loading
+    if (inProgress === 'none') {
       setIsLoading(false);
-    }, 2000); // Give MSAL 2 seconds to process any redirect
-    
-    // If authentication is definitely complete, stop loading immediately
-    if (isAuthenticated || inProgress === 'none') {
-      setIsLoading(false);
-      clearTimeout(timer);
+      return;
     }
     
+    // For authentication in progress, give it more time
+    const timer = setTimeout(() => {
+      console.log('Authentication timeout reached, stopping loading state');
+      setIsLoading(false);
+    }, 5000); // Increased to 5 seconds for slower connections
+    
     return () => clearTimeout(timer);
-  }, [isAuthenticated, inProgress]);
+  }, [inProgress]);
+  
+  // Separate effect to handle immediate authentication completion
+  useEffect(() => {
+    if (isAuthenticated && accounts.length > 0) {
+      console.log('User authenticated successfully, stopping loading');
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, accounts]);
   
   // Debug logging
   React.useEffect(() => {
+    console.log('=== AUTHENTICATION STATE DEBUG ===');
     console.log('Authentication status:', isAuthenticated);
     console.log('MSAL in progress:', inProgress);
     console.log('Demo mode:', isDemoMode);
     console.log('User logged in (combined):', isUserLoggedIn);
     console.log('Number of accounts:', accounts.length);
     console.log('Loading state:', isLoading);
-    console.log('Accounts:', accounts);
+    console.log('Current URL:', window.location.href);
+    console.log('URL hash:', window.location.hash);
+    console.log('Accounts details:', accounts.map(acc => ({
+      username: acc.username,
+      name: acc.name,
+      homeAccountId: acc.homeAccountId
+    })));
     console.log('MSAL config being used:', {
       authority: process.env.REACT_APP_AUTHORITY,
       clientId: process.env.REACT_APP_CLIENT_ID,
       redirectUri: process.env.REACT_APP_REDIRECT_URI
     });
+    console.log('=====================================');
   }, [isAuthenticated, accounts, isDemoMode, isUserLoggedIn, inProgress, isLoading]);
 
   // Show loading while MSAL processes authentication

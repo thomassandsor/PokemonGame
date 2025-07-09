@@ -58,8 +58,8 @@ const LoginPage: React.FC = () => {
       
       // Force fresh registration flow
       const customLoginRequest = {
-        scopes: ["openid"],
-        prompt: "consent",  // Force consent screen
+        scopes: ["openid", "profile", "email"],
+        prompt: "select_account",  // Changed from "consent" to "select_account"
         loginHint: "",      // Clear any login hints
         extraQueryParameters: {
           "response_mode": "fragment"
@@ -88,8 +88,8 @@ const LoginPage: React.FC = () => {
         try {
           setIsProcessing(true);
           const customLoginRequest = {
-            scopes: ["openid"],
-            prompt: "consent",
+            scopes: ["openid", "profile", "email"],
+            prompt: "select_account",
             extraQueryParameters: {
               "response_mode": "fragment"
             }

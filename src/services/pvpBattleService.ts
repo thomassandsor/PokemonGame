@@ -39,9 +39,51 @@ export async function debugPortalSettings() {
   }
 }
 
+/**
+ * Debug utility to clear MSAL authentication cache
+ * This can help resolve authentication state issues
+ */
+export async function clearAuthCache() {
+  try {
+    console.log('🧹 Clearing authentication cache...');
+    
+    // Clear localStorage items related to MSAL
+    const msalKeys = Object.keys(localStorage).filter(key => 
+      key.includes('msal') || 
+      key.includes('login.windows.net') || 
+      key.includes('b2clogin.com')
+    );
+    
+    console.log('Found MSAL cache keys:', msalKeys);
+    
+    msalKeys.forEach(key => {
+      localStorage.removeItem(key);
+      console.log(`Removed: ${key}`);
+    });
+    
+    // Clear sessionStorage as well
+    const sessionMsalKeys = Object.keys(sessionStorage).filter(key => 
+      key.includes('msal') || 
+      key.includes('login.windows.net') || 
+      key.includes('b2clogin.com')
+    );
+    
+    sessionMsalKeys.forEach(key => {
+      sessionStorage.removeItem(key);
+      console.log(`Removed from session: ${key}`);
+    });
+    
+    console.log('✅ Authentication cache cleared. Please refresh the page.');
+    
+  } catch (error) {
+    console.error('❌ Error clearing auth cache:', error);
+  }
+}
+
 // Make functions available globally for console testing
 if (typeof window !== 'undefined') {
   (window as any).debugPortalSettings = debugPortalSettings;
+  (window as any).clearAuthCache = clearAuthCache;
 }
 
 export {};

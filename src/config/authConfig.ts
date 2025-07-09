@@ -49,7 +49,7 @@ export const loginRequest = {
   extraQueryParameters: {
     "response_mode": "fragment"
   },
-  prompt: "select_account" // Added to handle authentication flow better
+  prompt: "select_account" // Changed to select_account for better UX
 };
 
 // Dataverse API configuration (Service-to-Service)
