@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { useMsal } from '@azure/msal-react';
+import { MobileAuthDebugger } from '../../utils/mobileAuthDebugger';
 
 const LoginPage: React.FC = () => {
   const { instance } = useMsal();
@@ -9,14 +10,20 @@ const LoginPage: React.FC = () => {
 
   // Check if we're processing a redirect on page load
   React.useEffect(() => {
+    // Initialize mobile debugging
+    MobileAuthDebugger.getDeviceInfo();
+    MobileAuthDebugger.detectPrivateMode();
+    
     const urlParams = new URLSearchParams(window.location.search);
     const hasAuthParams = window.location.hash.includes('id_token') || 
                          window.location.hash.includes('access_token') ||
                          urlParams.has('code') || 
                          urlParams.has('error');
     
+    MobileAuthDebugger.log(`Page load - Has auth params: ${hasAuthParams}, URL: ${window.location.href}`);
+    
     if (hasAuthParams) {
-      console.log('Authentication redirect detected, processing...');
+      MobileAuthDebugger.log('Authentication redirect detected, processing...');
       setIsProcessing(true);
       
       // Clear any existing error since we're processing auth
@@ -24,8 +31,9 @@ const LoginPage: React.FC = () => {
       
       // Give MSAL time to process the redirect
       const timer = setTimeout(() => {
+        MobileAuthDebugger.log('Auth processing timeout reached');
         setIsProcessing(false);
-      }, 3000);
+      }, 5000); // Increased timeout for mobile
       
       return () => clearTimeout(timer);
     }

@@ -1,4 +1,12 @@
 // Configuration for Azure AD External Identities
+import { MobileAuthDebugger } from '../utils/mobileAuthDebugger';
+
+// Detect mobile devices
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+MobileAuthDebugger.log(`Initializing auth config - Mobile: ${isMobile}, iOS: ${isIOS}`);
+
 export const msalConfig = {
   auth: {
     clientId: process.env.REACT_APP_CLIENT_ID || "your-client-id-here", // Replace with your Azure AD App Registration Client ID
@@ -6,10 +14,12 @@ export const msalConfig = {
     knownAuthorities: [process.env.REACT_APP_KNOWN_AUTHORITY || "your-tenant.b2clogin.com"], // Replace with your B2C domain
     redirectUri: process.env.REACT_APP_REDIRECT_URI || window.location.origin,
     postLogoutRedirectUri: process.env.REACT_APP_POST_LOGOUT_REDIRECT_URI || window.location.origin,
+    navigateToLoginRequestUrl: true, // Important for mobile redirects
   },
   cache: {
-    cacheLocation: "localStorage",
-    storeAuthStateInCookie: true, // Changed to true for mobile/private browsing compatibility
+    cacheLocation: isMobile ? "localStorage" : "sessionStorage", // Use localStorage on mobile for better persistence
+    storeAuthStateInCookie: true, // Essential for mobile/private browsing compatibility
+    secureCookies: false, // Set to false for development, true for production with HTTPS
   },
   system: {
     loggerOptions: {
@@ -17,18 +27,21 @@ export const msalConfig = {
         if (containsPii) {
           return;
         }
+        const logMessage = `MSAL ${level}: ${message}`;
+        MobileAuthDebugger.log(logMessage);
+        
         switch (level) {
           case "Error":
-            console.error(message);
+            console.error(logMessage);
             return;
           case "Info":
-            console.info(message);
+            console.info(logMessage);
             return;
           case "Verbose":
-            console.debug(message);
+            console.debug(logMessage);
             return;
           case "Warning":
-            console.warn(message);
+            console.warn(logMessage);
             return;
           default:
             return;
@@ -36,10 +49,11 @@ export const msalConfig = {
       },
     },
     allowNativeBroker: false, // Disable native broker for better web compatibility
-    windowHashTimeout: 60000, // Increase timeout for slower mobile connections
-    iframeHashTimeout: 10000,
-    loadFrameTimeout: 10000,
-    asyncPopups: false // Disable async popups for better mobile compatibility
+    windowHashTimeout: isMobile ? 120000 : 60000, // Longer timeout for mobile
+    iframeHashTimeout: 15000, // Increased for mobile
+    loadFrameTimeout: 15000, // Increased for mobile
+    asyncPopups: false, // Disable async popups for better mobile compatibility
+    navigateFrameWait: isMobile ? 1000 : 500, // Wait longer on mobile
   },
 };
 
