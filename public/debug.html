@@ -71,6 +71,7 @@
         <h3>⚡ Actions</h3>
         <button onclick="clearEverything()">🧹 CLEAR ALL DATA</button>
         <button onclick="testAppInsights()">📊 TEST TELEMETRY</button>
+        <button onclick="goToMobileSafe()">🛡️ MOBILE SAFE MODE</button>
         <button onclick="goToApp()">🎮 GO TO APP</button>
         <button onclick="showMSALInfo()">🔐 MSAL INFO</button>
     </div>
@@ -284,6 +285,18 @@
             });
             
             log('✅ Application Insights test sent', 'success');
+        }
+
+        function goToMobileSafe() {
+            log('🛡️ Redirecting to Mobile Safe Mode...', 'info');
+            sendTelemetry('Mobile_Redirect_To_Safe_Mode', { 
+                fromPage: 'Emergency Debug',
+                targetUrl: '/mobile-safe.html'
+            });
+            
+            setTimeout(() => {
+                window.location.href = '/mobile-safe.html';
+            }, 1000);
         }
 
         function goToApp() {

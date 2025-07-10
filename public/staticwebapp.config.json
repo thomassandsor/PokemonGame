@@ -7,6 +7,21 @@
       }
     },
     {
+      "route": "/mobile-safe.html",
+      "serve": "/mobile-safe.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/debug.html",
+      "serve": "/debug.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/emergency-mobile-debug.html",
+      "serve": "/emergency-mobile-debug.html",
+      "statusCode": 200
+    },
+    {
       "route": "/*",
       "serve": "/index.html",
       "statusCode": 200
