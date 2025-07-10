@@ -4,19 +4,34 @@ This guide will help you debug mobile authentication issues using the comprehens
 
 ## Quick Access to Debug Tools
 
-### Method 1: Floating Debug Button (Mobile Only)
-- The debug button (🔧) appears automatically on mobile devices
+### Method 1: Floating Debug Button
+- The debug button (🔧) appears automatically when:
+  - On mobile devices
+  - Authentication parameters are present in URL
+  - Page appears to be stuck/blank with minimal content
+  - MSAL authentication data exists in storage
 - Located in bottom-right corner of the screen
 - Tap to open the mobile debug panel
 
-### Method 2: Admin Portal
+### Method 2: Keyboard Shortcut (Any Device)
+- Press **Ctrl+Shift+D** to force the debug panel to appear
+- Works even when the button is not visible
+- Useful when stuck on white screens
+
+### Method 3: Browser Console (Emergency Access)
+- Open browser developer tools (F12)
+- In console, type: `showMobileDebug()`
+- This will force the debug panel to appear
+- Type `hideMobileDebug()` to hide it
+
+### Method 4: URL Parameter (Any Device)
+- Add `?debug=mobile` to any URL to show the floating debug button
+- Example: `https://your-app.com/login?debug=mobile`
+
+### Method 5: Admin Portal (After Login)
 1. Navigate to `/admin` after logging in
 2. Click "📱 Show Mobile Debug" button
 3. View comprehensive debug information
-
-### Method 3: URL Parameter (Any Device)
-- Add `?debug=mobile` to any URL to show the floating debug button
-- Example: `https://your-app.com/login?debug=mobile`
 
 ## Debug Features Available
 
@@ -114,17 +129,18 @@ This guide will help you debug mobile authentication issues using the comprehens
 
 ### Immediate Debug Steps:
 
-#### Step 1: Check Debug Logs During Authentication
-1. Open the floating debug button (🔧) before attempting login
-2. Clear all logs using "Clear Logs" button
-3. Start the login process
-4. **DO NOT CLOSE** the debug panel during authentication
-5. Monitor logs in real-time during the authentication flow
-6. Look for specific error patterns:
-   - Navigation errors after successful authentication
-   - MSAL redirect handling failures
-   - Token storage issues
-   - JavaScript errors during redirect processing
+#### Step 1: Access Debug Panel When Stuck on White Screen
+**CRITICAL**: The debug button should now be visible even on white screens. If not:
+
+1. **First Try**: Look for the floating debug button (🔧) - it should appear automatically when authentication issues are detected
+2. **Second Try**: Press **Ctrl+Shift+D** on your keyboard to force the debug panel to appear
+3. **Third Try**: Open browser developer tools (if available) and type `showMobileDebug()` in the console
+4. **Last Resort**: Add `?debug=mobile` to the current URL and refresh
+
+#### Step 2: Use the Diagnose Button
+1. Once debug panel is open, click **"🔍 Diagnose White Screen"** button
+2. Look for the red alert box that shows the specific cause
+3. The diagnosis will tell you exactly what's failing
 
 #### Step 2: Check MSAL Authentication State
 1. After getting stuck on white screen, open debug panel
