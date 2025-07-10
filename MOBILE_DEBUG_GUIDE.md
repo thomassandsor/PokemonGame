@@ -115,6 +115,39 @@ This guide will help you debug mobile authentication issues using the comprehens
 3. Look for popup blocking issues
 4. Monitor for iframe loading errors
 
+## EMERGENCY ACCESS - If Stuck in Login Loop
+
+### NEW: Emergency Console Commands
+
+If you're stuck in an infinite login loop and can't access the normal debug tools, you can use these emergency commands:
+
+**Open Browser Developer Tools (F12) and in the Console tab, type:**
+
+```javascript
+// Emergency debug access - shows full debug overlay
+emergencyDebug()
+
+// Emergency stop - clears auth state and redirects to login
+emergencyStop()
+
+// Nuclear option - clears ALL authentication data
+clearAllAuth()
+```
+
+These commands are available **immediately** when the page loads, even during login loops.
+
+### Application Insights Logging
+
+The app now automatically sends detailed logs to **Azure Application Insights** for remote debugging:
+
+- **All authentication events** are logged with timing information
+- **MSAL initialization attempts** and failures are tracked
+- **White screen issues** are automatically detected and logged
+- **Emergency tool usage** is tracked for analysis
+- **Device and browser information** is included with all logs
+
+This means even if you can't access the browser console on mobile, all the debug information is being captured in the cloud for analysis.
+
 ## Critical Mobile Issue: White Screen After Authentication
 
 ### Root Cause Identified: MSAL Initialization Loop

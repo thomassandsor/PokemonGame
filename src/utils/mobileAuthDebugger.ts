@@ -1,4 +1,6 @@
 // Mobile authentication debugging utility
+import { appInsightsLogger } from './appInsightsLogger';
+
 export class MobileAuthDebugger {
   private static logs: string[] = [];
 
@@ -11,6 +13,13 @@ export class MobileAuthDebugger {
     
     // Also log to console
     console.log(logEntry, data || '');
+    
+    // Send to Application Insights
+    appInsightsLogger.trackTrace(`Mobile Debug: ${message}`, 1, {
+      debugData: data,
+      isMobile: true,
+      debugContext: 'MobileAuthDebugger'
+    });
     
     // Store in localStorage for persistence across redirects
     try {
@@ -365,6 +374,128 @@ ${logs.join('\n')}
     
     this.log('Authentication loop diagnosis', result);
     return result;
+  }
+
+  // Emergency access methods for login loop situations
+  static emergencyStop() {
+    // Track emergency stop usage
+    appInsightsLogger.trackEvent('Emergency_Stop_Triggered', {
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+      reason: 'User triggered emergency stop'
+    });
+    
+    // Stop all MSAL operations
+    try {
+      // Clear all authentication state
+      localStorage.removeItem('msal.token.keys');
+      localStorage.removeItem('msal.account.keys');
+      localStorage.removeItem('msal.cache.keys');
+      sessionStorage.clear();
+      
+      // Clear any ongoing redirects
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+      // Force redirect to login page
+      window.location.href = '/login';
+    } catch (e) {
+      console.error('Emergency stop failed:', e);
+      appInsightsLogger.trackException(e as Error, { context: 'Emergency_Stop_Failed' });
+    }
+  }
+
+  static emergencyDebugAccess() {
+    // Create emergency debug overlay even during login loops
+    const overlay = document.createElement('div');
+    overlay.id = 'emergency-debug-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      z-index: 999999;
+      overflow: auto;
+      padding: 20px;
+      font-family: monospace;
+      font-size: 12px;
+    `;
+    
+    const content = `
+      <h2>EMERGENCY DEBUG ACCESS</h2>
+      <p>Login loop detected. Current state:</p>
+      <pre>${JSON.stringify(this.getDeviceInfo(), null, 2)}</pre>
+      <h3>Recent Logs:</h3>
+      <pre>${this.getLogs().slice(-20).join('\n')}</pre>
+      <h3>MSAL State:</h3>
+      <pre>LocalStorage MSAL Keys: ${Object.keys(localStorage).filter(k => k.includes('msal')).length}</pre>
+      <h3>Emergency Actions:</h3>
+      <button onclick="window.mobileAuthDebugger.emergencyStop()" style="margin: 10px; padding: 10px; font-size: 14px;">
+        🚨 STOP LOGIN LOOP
+      </button>
+      <button onclick="window.mobileAuthDebugger.clearAllAuth()" style="margin: 10px; padding: 10px; font-size: 14px;">
+        🧹 CLEAR ALL AUTH
+      </button>
+      <button onclick="document.getElementById('emergency-debug-overlay').remove()" style="margin: 10px; padding: 10px; font-size: 14px;">
+        ❌ CLOSE
+      </button>
+    `;
+    
+    overlay.innerHTML = content;
+    document.body.appendChild(overlay);
+    
+    // Make debugger globally accessible
+    (window as any).mobileAuthDebugger = this;
+  }
+
+  static clearAllAuth() {
+    // Track clear all auth usage
+    appInsightsLogger.trackEvent('Clear_All_Auth_Triggered', {
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString(),
+      reason: 'User triggered clear all auth'
+    });
+    
+    // Nuclear option - clear everything
+    try {
+      // Clear all localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('msal') || key.includes('auth')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Clear all sessionStorage
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.includes('msal') || key.includes('auth')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+      
+      // Clear global MSAL instance
+      (window as any)._pokemonGameMsalInstance = null;
+      (window as any)._pokemonGameMsalInitializing = false;
+      
+      // Clear cookies
+      document.cookie.split(";").forEach(c => {
+        const eqPos = c.indexOf("=");
+        const name = eqPos > -1 ? c.substr(0, eqPos) : c;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      });
+      
+      alert('All authentication data cleared. Redirecting to login...');
+      window.location.href = '/login';
+    } catch (e) {
+      console.error('Clear all auth failed:', e);
+      appInsightsLogger.trackException(e as Error, { context: 'Clear_All_Auth_Failed' });
+      alert('Failed to clear auth data. Try manually clearing browser data.');
+    }
   }
 }
 
