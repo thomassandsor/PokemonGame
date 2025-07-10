@@ -5,6 +5,7 @@ import { MsalProvider } from '@azure/msal-react';
 import { msalConfig, eventCallback } from './config/authConfig';
 import { MobileAuthDebugger } from './utils/mobileAuthDebugger';
 import { appInsightsLogger } from './utils/appInsightsLogger';
+import { SmartNotificationSystem } from './utils/smartDiagnostics';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
@@ -21,11 +22,20 @@ appInsightsLogger.trackEvent('App_Start', {
 (window as any).emergencyStop = () => MobileAuthDebugger.emergencyStop();
 (window as any).clearAllAuth = () => MobileAuthDebugger.clearAllAuth();
 
+// Smart diagnostic access - available immediately
+(window as any).showAuthDiagnosis = () => SmartNotificationSystem.showAuthenticationStatus();
+(window as any).showWhiteScreenDiagnosis = () => SmartNotificationSystem.showWhiteScreenDiagnosis();
+(window as any).showLoginLoopDiagnosis = () => SmartNotificationSystem.showLoginLoopDiagnosis();
+
 // Log that emergency access is available
 console.log('🚨 EMERGENCY ACCESS AVAILABLE:');
 console.log('- Type: emergencyDebug() to access debug tools');
 console.log('- Type: emergencyStop() to stop login loop');
 console.log('- Type: clearAllAuth() to clear all auth data');
+console.log('🔍 SMART DIAGNOSTICS AVAILABLE:');
+console.log('- Type: showAuthDiagnosis() to see current auth status');
+console.log('- Type: showWhiteScreenDiagnosis() to diagnose white screen');
+console.log('- Type: showLoginLoopDiagnosis() to diagnose login loops');
 
 // Global singleton with window-level protection
 const MSAL_INSTANCE_KEY = '_pokemonGameMsalInstance';
@@ -78,18 +88,42 @@ const msalInstanceSingleton = getMsalInstance();
 const INIT_ATTEMPT_KEY = '_pokemonGameInitAttempts';
 let initAttempts = parseInt(sessionStorage.getItem(INIT_ATTEMPT_KEY) || '0');
 
-if (initAttempts > 3) {
-  console.error('🚨 INITIALIZATION LOOP DETECTED! Clearing auth state...');
+// Check if this is a redirect from authentication
+const isAuthRedirect = window.location.hash.includes('id_token') || 
+                      window.location.search.includes('code') ||
+                      window.location.search.includes('state');
+
+// If this is an auth redirect, be more lenient with attempt counting
+const maxAttempts = isAuthRedirect ? 12 : 8;
+
+console.log(`🔍 Init attempt check: ${initAttempts} (max: ${maxAttempts}, isAuthRedirect: ${isAuthRedirect})`);
+
+if (initAttempts > maxAttempts) {
+  console.error('🚨 INITIALIZATION LOOP DETECTED! Too many attempts:', initAttempts);
   appInsightsLogger.trackEvent('MSAL_Initialization_Loop', {
     attempts: initAttempts,
     url: window.location.href,
     userAgent: navigator.userAgent,
     timestamp: new Date().toISOString()
   });
-  MobileAuthDebugger.clearAllAuth();
-  sessionStorage.removeItem(INIT_ATTEMPT_KEY);
-  // Don't proceed with initialization
-  throw new Error('Too many initialization attempts - clearing auth state');
+  
+  // Show user a smart notification about the loop detection
+  MobileAuthDebugger.showSmartNotification('warning', 'Login Loop Detected', 
+    `Authentication has been attempted ${initAttempts} times. This usually indicates an infinite loop.`, 
+    'Emergency tools are available in browser console');
+  
+  // Auto-trigger diagnostic display
+  setTimeout(() => {
+    SmartNotificationSystem.showLoginLoopDiagnosis();
+  }, 2000);
+  
+  // Automatically clear auth data after showing diagnosis
+  setTimeout(() => {
+    console.log('Auto-clearing auth data due to loop detection');
+    MobileAuthDebugger.clearAllAuth();
+  }, 5000);
+  
+  throw new Error('Too many initialization attempts - auto-recovery initiated');
 }
 
 // Increment attempt counter
@@ -141,6 +175,12 @@ msalInstanceSingleton.initialize().then(() => {
   
   // Reset the initialization flag since we succeeded
   window[MSAL_INIT_KEY] = false;
+  
+  // Reset attempt counter on successful initialization
+  if (initAttempts > 1) {
+    console.log(`🔄 Resetting attempt counter after successful init (was ${initAttempts})`);
+    sessionStorage.removeItem(INIT_ATTEMPT_KEY);
+  }
   
   console.log('🔄 Starting redirect promise handling...');
   

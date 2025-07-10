@@ -388,6 +388,11 @@ ${logs.join('\n')}
     
     // Stop all MSAL operations
     try {
+      // Show notification about what we're doing
+      this.showSmartNotification('info', 'Emergency Stop Activated', 
+        'Clearing authentication state and stopping login loop...', 
+        'This should break the infinite loop');
+      
       // Clear all authentication state
       localStorage.removeItem('msal.token.keys');
       localStorage.removeItem('msal.account.keys');
@@ -399,11 +404,17 @@ ${logs.join('\n')}
         window.history.replaceState({}, document.title, window.location.pathname);
       }
       
-      // Force redirect to login page
-      window.location.href = '/login';
+      // Delay redirect to let user see the notification
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1500);
     } catch (e) {
       console.error('Emergency stop failed:', e);
       appInsightsLogger.trackException(e as Error, { context: 'Emergency_Stop_Failed' });
+      
+      this.showSmartNotification('error', 'Emergency Stop Failed', 
+        'Could not stop the authentication loop.', 
+        'Try manually clearing browser data');
     }
   }
 
@@ -489,13 +500,78 @@ ${logs.join('\n')}
         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
       });
       
-      alert('All authentication data cleared. Redirecting to login...');
-      window.location.href = '/login';
+      // Show smart notification instead of alert
+      this.showSmartNotification('success', 'Authentication Reset Complete', 
+        'All authentication data has been cleared. Redirecting to login page...', 
+        'This should resolve most authentication issues');
+      
+      // Delay redirect to let user see the notification
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
     } catch (e) {
       console.error('Clear all auth failed:', e);
       appInsightsLogger.trackException(e as Error, { context: 'Clear_All_Auth_Failed' });
-      alert('Failed to clear auth data. Try manually clearing browser data.');
+      
+      this.showSmartNotification('error', 'Reset Failed', 
+        'Failed to clear all authentication data.', 
+        'Try manually clearing browser data in settings');
     }
+  }
+
+  static showSmartNotification(severity: 'success' | 'info' | 'warning' | 'error', title: string, message: string, action?: string) {
+    // Create a smart notification that's visible even during auth issues
+    const notification = document.createElement('div');
+    
+    const colors = {
+      success: { bg: '#d4edda', border: '#c3e6cb', text: '#155724' },
+      info: { bg: '#d1ecf1', border: '#bee5eb', text: '#0c5460' },
+      warning: { bg: '#fff3cd', border: '#ffeaa7', text: '#856404' },
+      error: { bg: '#f8d7da', border: '#f5c6cb', text: '#721c24' }
+    };
+    
+    const color = colors[severity];
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: ${color.bg};
+      border: 2px solid ${color.border};
+      color: ${color.text};
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 9999999;
+      max-width: 90%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      text-align: center;
+    `;
+    
+    const icon = severity === 'error' ? '🚨' : 
+                 severity === 'warning' ? '⚠️' : 
+                 severity === 'success' ? '✅' : 'ℹ️';
+    
+    notification.innerHTML = `
+      <div style="font-size: 24px; margin-bottom: 10px;">${icon}</div>
+      <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">${title}</div>
+      <div style="font-size: 16px; margin-bottom: ${action ? '15px' : '0'};">${message}</div>
+      ${action ? `<div style="font-size: 14px; font-style: italic; opacity: 0.8;">💡 ${action}</div>` : ''}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after a delay (longer for errors)
+    const delay = severity === 'error' ? 5000 : severity === 'warning' ? 4000 : 3000;
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, delay);
+    
+    return notification;
   }
 }
 

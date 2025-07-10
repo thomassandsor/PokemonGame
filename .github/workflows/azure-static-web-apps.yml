@@ -35,6 +35,7 @@ jobs:
           REACT_APP_KNOWN_AUTHORITY: ${{ vars.REACT_APP_KNOWN_AUTHORITY }}
           REACT_APP_REDIRECT_URI: ${{ vars.REACT_APP_REDIRECT_URI }}
           REACT_APP_POST_LOGOUT_REDIRECT_URI: ${{ vars.REACT_APP_POST_LOGOUT_REDIRECT_URI }}
+          REACT_APP_APPINSIGHTS_CONNECTION_STRING: ${{ secrets.REACT_APP_APPINSIGHTS_CONNECTION_STRING }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
