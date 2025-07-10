@@ -72,7 +72,6 @@ msalInstanceSingleton.initialize().then(() => {
   window[MSAL_INIT_KEY] = false;
   
   console.log('🔄 Starting redirect promise handling...');
-  const redirectStartTime = Date.now();
   
   return msalInstanceSingleton.handleRedirectPromise();
 }).then((response: any) => {
