@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Accordion, Badge, Row, Col, Alert } from 'react-bootstrap';
+import { Card, Button, Accordion, Badge, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { MobileAuthDebugger } from '../../utils/mobileAuthDebugger';
+import { ApiHealthMonitor } from '../../utils/apiHealthMonitor';
 import { useMsal } from '@azure/msal-react';
 
 interface DeviceInfo {
@@ -23,6 +24,8 @@ const MobileDebugPanel: React.FC = () => {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [isPrivateMode, setIsPrivateMode] = useState<boolean>(false);
+  const [apiHealth, setApiHealth] = useState<any>(null);
+  const [testingApi, setTestingApi] = useState<boolean>(false);
 
   useEffect(() => {
     // Initialize device info
@@ -74,6 +77,20 @@ const MobileDebugPanel: React.FC = () => {
   const handleLogAuthState = () => {
     MobileAuthDebugger.logAuthState(instance, accounts);
     handleRefreshLogs();
+  };
+
+  const handleTestApiHealth = async () => {
+    setTestingApi(true);
+    try {
+      const result = await ApiHealthMonitor.testApiConnectivity();
+      setApiHealth(result);
+      MobileAuthDebugger.log('API connectivity test completed', result);
+    } catch (error) {
+      MobileAuthDebugger.log('API connectivity test failed', error);
+    } finally {
+      setTestingApi(false);
+      handleRefreshLogs();
+    }
   };
 
   const getDeviceTypeDisplay = () => {
@@ -159,6 +176,55 @@ const MobileDebugPanel: React.FC = () => {
           </Accordion.Item>
 
           <Accordion.Item eventKey="2">
+            <Accordion.Header>API Health & Connectivity</Accordion.Header>
+            <Accordion.Body>
+              <div className="mb-3">
+                <Button 
+                  variant="outline-info" 
+                  onClick={handleTestApiHealth} 
+                  disabled={testingApi}
+                  className="me-2"
+                >
+                  {testingApi ? (
+                    <>
+                      <Spinner size="sm" className="me-2" />
+                      Testing...
+                    </>
+                  ) : (
+                    'Test API Health'
+                  )}
+                </Button>
+              </div>
+              
+              {apiHealth && (
+                <div>
+                  <Alert variant={apiHealth.health.isHealthy ? "success" : "danger"}>
+                    <strong>API Status:</strong> {apiHealth.health.status} 
+                    ({apiHealth.health.responseTime}ms)
+                    {apiHealth.health.error && (
+                      <><br/><small>Error: {apiHealth.health.error}</small></>
+                    )}
+                  </Alert>
+                  
+                  <Row>
+                    <Col md={6}>
+                      <strong>Network:</strong> {apiHealth.network.online ? '✅ Online' : '❌ Offline'}<br/>
+                      <strong>Connection:</strong> {apiHealth.network.effectiveType || 'Unknown'}<br/>
+                      <strong>Response Time:</strong> {apiHealth.health.responseTime}ms<br/>
+                    </Col>
+                    <Col md={6}>
+                      <strong>API URL:</strong><br/>
+                      <code style={{ fontSize: '10px', wordBreak: 'break-all' }}>
+                        {apiHealth.environment.apiBaseUrl}
+                      </code>
+                    </Col>
+                  </Row>
+                </div>
+              )}
+            </Accordion.Body>
+          </Accordion.Item>
+
+          <Accordion.Item eventKey="3">
             <Accordion.Header>Debug Logs ({logs.length})</Accordion.Header>
             <Accordion.Body>
               <div className="mb-3">
@@ -193,7 +259,7 @@ const MobileDebugPanel: React.FC = () => {
             </Accordion.Body>
           </Accordion.Item>
 
-          <Accordion.Item eventKey="3">
+          <Accordion.Item eventKey="4">
             <Accordion.Header>Environment Information</Accordion.Header>
             <Accordion.Body>
               <Row>
