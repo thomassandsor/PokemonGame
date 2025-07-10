@@ -2,6 +2,46 @@
 
 This guide will help you debug mobile authentication issues using the comprehensive debugging tools added to the Pokémon Game.
 
+## 🚨 EMERGENCY ACCESS FOR iOS (NO DEV TOOLS NEEDED)
+
+If you're stuck in an authentication loop on iOS/Safari and can't access dev tools, use these special URLs:
+
+### Emergency URLs (Copy/Paste or Bookmark These)
+
+Replace `YOUR_APP_URL` with your actual Pokémon Game URL:
+
+**Emergency Logout (Clears all auth data):**
+```
+YOUR_APP_URL?emergency_logout=true
+```
+
+**Clear All Data (Nuclear option):**
+```
+YOUR_APP_URL?emergency_clear_all=true
+```
+
+**Force Restart (Clean restart):**
+```
+YOUR_APP_URL?emergency_restart=true
+```
+
+**Show Debug Info:**
+```
+YOUR_APP_URL?emergency_debug=true
+```
+
+**Go Home (Clean slate):**
+```
+YOUR_APP_URL?emergency_home=true
+```
+
+### How to Use Emergency URLs on iOS:
+1. Copy one of the URLs above
+2. Replace `YOUR_APP_URL` with the actual app URL
+3. Paste into Safari address bar
+4. Follow the on-screen instructions
+5. **Important:** After emergency logout, close ALL browser tabs and clear Safari cache before trying again
+
 ## Quick Access to Debug Tools
 
 ### Method 1: Floating Debug Button

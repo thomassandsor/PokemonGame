@@ -6,11 +6,16 @@ import { msalConfig, eventCallback } from './config/authConfig';
 import { MobileAuthDebugger } from './utils/mobileAuthDebugger';
 import { appInsightsLogger } from './utils/appInsightsLogger';
 import { SmartNotificationSystem } from './utils/smartDiagnostics';
+import { IOSEmergencyReset } from './utils/iosEmergencyReset';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
-// Initialize Application Insights first
+// iOS Emergency Reset System - handles URL-based emergency actions FIRST
+// This runs before anything else to catch emergency URLs
+IOSEmergencyReset.init();
+
+// Initialize Application Insights
 appInsightsLogger.trackEvent('App_Start', {
   url: window.location.href,
   timestamp: new Date().toISOString(),

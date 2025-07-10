@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pokemon Game - Application Insights Quick Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .button { background: #007ACC; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #005a9e; }
+        .status { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; margin: 10px 0; min-height: 100px; font-family: monospace; font-size: 12px; overflow-y: auto; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+    <script type="text/javascript">
+        !function(T,l,y){var S=T.location,k="script",D="instrumentationKey",C="ingestionendpoint",I="disableExceptionTracking",E="ai.device.",b="toLowerCase",w="crossOrigin",N="POST",e="appInsightsSDK",t=y.name||"appInsights";(y.name||T[e])&&(T[e]=t);var n=T[t]||function(d){var g=!1,f=!1,m={initialize:!0,queue:[],sv:"5",version:2,config:d};function v(e,t){var n={},a="Browser";return n[E+"id"]=a[b](),n[E+"type"]=a,n["ai.operation.name"]=S&&S.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(m.sv||m.version),{time:function(){var e=new Date;function t(e){var t=""+e;return 1===t.length&&(t="0"+t),t}return e.getUTCFullYear()+"-"+t(1+e.getUTCMonth())+"-"+t(e.getUTCDate())+"T"+t(e.getUTCHours())+":"+t(e.getUTCMinutes())+":"+t(e.getUTCSeconds())+"."+(e.getUTCMilliseconds()/1e3).toFixed(3).slice(2,5)+"Z"}(),iKey:e,name:"Microsoft.ApplicationInsights."+t.replace(/-/g,"")+"."+n["ai.operation.name"].replace(/\s/g,""),sampleRate:100,tags:n,data:{baseData:{ver:2}}}}var h=d.url||y.src;if(h){function a(e){var t,n,a,i,r,o,s,c,u,p,l;g=!0,m.queue=[],f||(f=!0,t=h,s=function(){var e={},t=d.connectionString;if(t)for(var n=t.split(";"),a=0;a<n.length;a++){var i=n[a].split("=");2===i.length&&(e[i[0][b]()]=i[1])}if(!e[C]){var r=e.endpointsuffix,o=r?e.location:null;e[C]="https://"+(o?o+".":"")+"dc."+(r||"services.visualstudio.com")}return e}(),c=s[D]||d[D]||"",u=s[C],p=u?u+"/v2/track":d.endpointUrl,(l=[]).push((n="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",a=t,i=p,(o=(r=v(c,"Exception")).data).baseType="ExceptionData",o.baseData.exceptions=[{typeName:"SDKLoadFailed",message:n.replace(/\./g,"-"),hasFullStack:!1,stack:n+"\nSnippet failed to load ["+a+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(S&&S.pathname||"_unknown_")+"\nEndpoint: "+i,parsedStack:[]}],r)),l.push(function(e,t,n,a){var i=v(c,"Message"),r=i.data;r.baseType="MessageData";var o=r.baseData;return o.message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+t+")").replace(/\"/g,"")+'"',o.properties={endpoint:a},i}(0,t,0,p)),function(e,t){if(JSON){var n=T.fetch;if(n&&!y.useXhr)n(t,{method:N,body:JSON.stringify(e),mode:"cors"});else if(XMLHttpRequest){var a=new XMLHttpRequest;a.open(N,t),a.setRequestHeader("Content-type","application/json"),a.send(JSON.stringify(e))}}}(l,p))}function i(e,t){f||setTimeout(function(){!t&&m.core||a()},500)}var e=function(){var n=l.createElement(k);n.src=h;var e=y[w];return!e&&""!==e||"undefined"==n[w]||(n[w]=e),n.onload=i,n.onerror=a,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||i(0,t)},n}();y.ld<0?l.getElementsByTagName("head")[0].appendChild(e):setTimeout(function(){l.getElementsByTagName(k)[0].parentNode.insertBefore(e,l.getElementsByTagName(k)[0])},y.ld||0)}try{m.cookie=l.cookie}catch(p){}function t(e){for(;e.length;)!function(t){m[t]=function(){var e=arguments;g||m.queue.push(function(){m[t].apply(m,e)})}}(e.pop())}var n="track",r="TrackPage",o="TrackEvent";t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+r,"stop"+r,"start"+o,"stop"+o,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),m.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4};var s=(d.extensionConfig||{}).ApplicationInsightsAnalytics||{};if(!0!==d[I]&&!0!==s[I]){var c="onerror";t(["_"+c]);var u=T[c];T[c]=function(e,t,n,a,i){var r=u&&u(e,t,n,a,i);return!0!==r&&m["_"+c]({message:e,url:t,lineNumber:n,columnNumber:a,error:i}),r},d.autoExceptionInstrumented=!0}return m}(y.cfg);function a(){y.onInit&&y.onInit(n)}(T[t]=n).queue&&0===n.queue.length?(n.queue.push(a),n.trackPageView({})):a()}(window,document,{
+            src: "https://js.monitor.azure.com/scripts/b/ai.2.min.js",
+            cfg: {
+                connectionString: "InstrumentationKey=a5e49ae4-0936-46c2-a6b6-b237830466dd;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=29d06d0b-7c8b-4cae-9e84-dc9cc00bec96",
+                enableAutoRouteTracking: true,
+                enableDebug: true,
+                samplingPercentage: 100
+            }
+        });
+
+        // Set up user context
+        appInsights.setAuthenticatedUserContext(`test_user_${Date.now()}`, undefined, true);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Pokemon Game - Application Insights Test</h1>
+        <p>This page tests Application Insights telemetry directly using the same configuration as the production app.</p>
+        
+        <div>
+            <button class="button" onclick="sendPageView()">📄 Send Page View</button>
+            <button class="button" onclick="sendEvent()">📊 Send Custom Event</button>
+            <button class="button" onclick="sendTrace()">📝 Send Trace</button>
+            <button class="button" onclick="sendException()">❌ Send Exception</button>
+            <button class="button" onclick="sendMetric()">📈 Send Metric</button>
+            <button class="button" onclick="flushTelemetry()">🚀 Flush All</button>
+        </div>
+        
+        <div>
+            <button class="button" onclick="simulateMobileAuth()">📱 Simulate Mobile Auth Flow</button>
+            <button class="button" onclick="simulateWhiteScreen()">⬜ Simulate White Screen Issue</button>
+            <button class="button" onclick="testNetworkCall()">🌐 Test Network Call</button>
+            <button class="button" onclick="clearStatus()">🧹 Clear Status</button>
+        </div>
+
+        <h3>Status Log:</h3>
+        <div id="status" class="status"></div>
+        
+        <h3>Device & Browser Info:</h3>
+        <div id="deviceInfo" class="status"></div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const deviceInfoDiv = document.getElementById('deviceInfo');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            statusDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+            console.log(`[AppInsights Test] ${message}`);
+        }
+
+        function sendPageView() {
+            try {
+                appInsights.trackPageView({ 
+                    name: 'ApplicationInsightsTestPage',
+                    uri: window.location.href,
+                    properties: {
+                        testType: 'Manual Test - Page View',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page'
+                    }
+                });
+                log('✅ Page view sent successfully', 'success');
+            } catch (error) {
+                log(`❌ Failed to send page view: ${error.message}`, 'error');
+            }
+        }
+
+        function sendEvent() {
+            try {
+                appInsights.trackEvent({ 
+                    name: 'TestEvent_QuickTest', 
+                    properties: { 
+                        testType: 'Manual Test - Custom Event',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        buttonClicked: 'Send Custom Event',
+                        source: 'Quick Test Page',
+                        sessionId: `session_${Date.now()}`
+                    }
+                });
+                log('✅ Custom event sent successfully', 'success');
+            } catch (error) {
+                log(`❌ Failed to send event: ${error.message}`, 'error');
+            }
+        }
+
+        function sendTrace() {
+            try {
+                appInsights.trackTrace({ 
+                    message: 'Test trace from Pokemon Game Application Insights quick test page',
+                    severityLevel: 1, // Information
+                    properties: {
+                        testType: 'Manual Test - Trace',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page',
+                        traceLevel: 'Information'
+                    }
+                });
+                log('✅ Trace sent successfully', 'success');
+            } catch (error) {
+                log(`❌ Failed to send trace: ${error.message}`, 'error');
+            }
+        }
+
+        function sendException() {
+            try {
+                const testError = new Error('Test exception from Pokemon Game Application Insights quick test');
+                testError.stack = `Test exception stack trace
+                    at sendException (test-page:line 123)
+                    at HTMLButtonElement.onclick (test-page:line 456)`;
+                
+                appInsights.trackException({ 
+                    exception: testError,
+                    severityLevel: 2, // Warning
+                    properties: {
+                        testType: 'Manual Test - Exception',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page',
+                        errorType: 'Test Error'
+                    }
+                });
+                log('✅ Exception sent successfully', 'success');
+            } catch (error) {
+                log(`❌ Failed to send exception: ${error.message}`, 'error');
+            }
+        }
+
+        function sendMetric() {
+            try {
+                appInsights.trackMetric({ 
+                    name: 'TestMetric_LoadTime',
+                    average: Math.random() * 1000 + 500, // Random value between 500-1500
+                    properties: {
+                        testType: 'Manual Test - Metric',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page',
+                        metricType: 'Synthetic Load Time'
+                    }
+                });
+                log('✅ Metric sent successfully', 'success');
+            } catch (error) {
+                log(`❌ Failed to send metric: ${error.message}`, 'error');
+            }
+        }
+
+        function flushTelemetry() {
+            try {
+                appInsights.flush();
+                log('✅ Telemetry flushed - all pending data should be sent immediately', 'success');
+            } catch (error) {
+                log(`❌ Failed to flush telemetry: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateMobileAuth() {
+            try {
+                // Simulate mobile authentication events
+                appInsights.trackEvent({ 
+                    name: 'Mobile_Auth_Simulation',
+                    properties: {
+                        authState: 'login_started',
+                        isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page - Mobile Auth Simulation'
+                    }
+                });
+
+                // Simulate potential auth issue
+                setTimeout(() => {
+                    appInsights.trackEvent({ 
+                        name: 'Mobile_Auth_Issue_Simulation',
+                        properties: {
+                            issue: 'redirect_loop_detected',
+                            attempts: 3,
+                            isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
+                            userAgent: navigator.userAgent,
+                            timestamp: new Date().toISOString(),
+                            source: 'Quick Test Page - Mobile Auth Issue Simulation'
+                        }
+                    });
+                    log('📱 Mobile auth issue simulation sent', 'info');
+                }, 1000);
+
+                log('📱 Mobile auth simulation started', 'info');
+            } catch (error) {
+                log(`❌ Failed to simulate mobile auth: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateWhiteScreen() {
+            try {
+                appInsights.trackEvent({ 
+                    name: 'White_Screen_Issue_Simulation',
+                    properties: {
+                        issue: 'white_screen_detected',
+                        pageState: 'blank',
+                        msalState: 'unknown',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page - White Screen Simulation'
+                    }
+                });
+
+                appInsights.trackTrace({ 
+                    message: 'Simulated white screen issue - user stuck on blank page after authentication',
+                    severityLevel: 3, // Error
+                    properties: {
+                        issue: 'white_screen',
+                        userAgent: navigator.userAgent,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page - White Screen Simulation'
+                    }
+                });
+
+                log('⬜ White screen issue simulation sent', 'info');
+            } catch (error) {
+                log(`❌ Failed to simulate white screen: ${error.message}`, 'error');
+            }
+        }
+
+        function testNetworkCall() {
+            try {
+                log('🌐 Testing network call...', 'info');
+                
+                fetch('https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/health')
+                    .then(response => {
+                        appInsights.trackEvent({ 
+                            name: 'Network_Test_Success',
+                            properties: {
+                                endpoint: 'health',
+                                status: response.status,
+                                statusText: response.statusText,
+                                userAgent: navigator.userAgent,
+                                timestamp: new Date().toISOString(),
+                                source: 'Quick Test Page - Network Test'
+                            }
+                        });
+                        log(`✅ Network test successful: ${response.status} ${response.statusText}`, 'success');
+                    })
+                    .catch(error => {
+                        appInsights.trackException({ 
+                            exception: error,
+                            properties: {
+                                testType: 'Network Test',
+                                endpoint: 'health',
+                                userAgent: navigator.userAgent,
+                                timestamp: new Date().toISOString(),
+                                source: 'Quick Test Page - Network Test Error'
+                            }
+                        });
+                        log(`❌ Network test failed: ${error.message}`, 'error');
+                    });
+            } catch (error) {
+                log(`❌ Failed to initiate network test: ${error.message}`, 'error');
+            }
+        }
+
+        function clearStatus() {
+            statusDiv.innerHTML = '';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display device info
+            const deviceInfo = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                cookieEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                screenResolution: `${screen.width}x${screen.height}`,
+                windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+            };
+
+            deviceInfoDiv.innerHTML = Object.entries(deviceInfo)
+                .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+                .join('<br>');
+
+            log('🎮 Pokemon Game Application Insights Test Page loaded', 'success');
+            
+            // Auto-send initial page view
+            setTimeout(() => {
+                sendPageView();
+                
+                // Send an initial test event
+                appInsights.trackEvent({ 
+                    name: 'Test_Page_Initialized',
+                    properties: {
+                        ...deviceInfo,
+                        timestamp: new Date().toISOString(),
+                        source: 'Quick Test Page - Auto Initialize'
+                    }
+                });
+                log('🚀 Initial telemetry sent automatically', 'info');
+            }, 1000);
+        });
+
+        // Track unload
+        window.addEventListener('beforeunload', function() {
+            appInsights.trackEvent({ 
+                name: 'Test_Page_Unload',
+                properties: {
+                    timestamp: new Date().toISOString(),
+                    source: 'Quick Test Page - Unload'
+                }
+            });
+            appInsights.flush();
+        });
+    </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ class AppInsightsLogger {
 
   initialize(connectionString?: string) {
     // Don't initialize in development unless explicitly configured
-    if (process.env.NODE_ENV === 'development' && !connectionString) {
+    if (process.env.NODE_ENV === 'development' && !connectionString && !process.env.REACT_APP_APPINSIGHTS_CONNECTION_STRING) {
       console.log('🔍 AppInsights: Skipping initialization in development (no connection string)');
       return;
     }
