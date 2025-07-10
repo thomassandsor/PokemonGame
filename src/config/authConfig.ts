@@ -7,13 +7,35 @@ const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 MobileAuthDebugger.log(`Initializing auth config - Mobile: ${isMobile}, iOS: ${isIOS}`);
 
+// Smart redirect URI detection
+function getRedirectUri(): string {
+  // If environment variable is set and not localhost, use it
+  const envRedirectUri = process.env.REACT_APP_REDIRECT_URI;
+  if (envRedirectUri && !envRedirectUri.includes('localhost')) {
+    MobileAuthDebugger.log(`Using environment redirect URI: ${envRedirectUri}`);
+    return envRedirectUri;
+  }
+  
+  // For production domains, use the current origin
+  const currentOrigin = window.location.origin;
+  if (currentOrigin.includes('azurestaticapps.net') || currentOrigin.includes('github.io')) {
+    MobileAuthDebugger.log(`Using production redirect URI: ${currentOrigin}`);
+    return currentOrigin;
+  }
+  
+  // Fall back to localhost for development
+  const fallbackUri = 'http://localhost:3000';
+  MobileAuthDebugger.log(`Using fallback redirect URI: ${fallbackUri}`);
+  return fallbackUri;
+}
+
 export const msalConfig = {
   auth: {
     clientId: process.env.REACT_APP_CLIENT_ID || "your-client-id-here", // Replace with your Azure AD App Registration Client ID
     authority: process.env.REACT_APP_AUTHORITY || "https://your-tenant.b2clogin.com/your-tenant.onmicrosoft.com/B2C_1_signupsignin", // Replace with your B2C authority
     knownAuthorities: [process.env.REACT_APP_KNOWN_AUTHORITY || "your-tenant.b2clogin.com"], // Replace with your B2C domain
-    redirectUri: process.env.REACT_APP_REDIRECT_URI || window.location.origin,
-    postLogoutRedirectUri: process.env.REACT_APP_POST_LOGOUT_REDIRECT_URI || window.location.origin,
+    redirectUri: getRedirectUri(),
+    postLogoutRedirectUri: getRedirectUri(),
     navigateToLoginRequestUrl: true, // Important for mobile redirects
   },
   cache: {
