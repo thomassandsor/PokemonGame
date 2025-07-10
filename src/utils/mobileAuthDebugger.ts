@@ -158,6 +158,66 @@ ${logs.join('\n')}
     overlay.appendChild(content);
     document.body.appendChild(overlay);
   }
+
+  static logMsalEvent(eventType: string, eventData: any) {
+    this.log(`MSAL Event: ${eventType}`, eventData);
+  }
+
+  static logAuthState(instance: any, accounts: any[]) {
+    const authState = {
+      hasActiveAccount: !!instance.getActiveAccount(),
+      accountCount: accounts.length,
+      accounts: accounts.map(acc => ({
+        username: acc.username,
+        homeAccountId: acc.homeAccountId,
+        localAccountId: acc.localAccountId
+      })),
+      cacheState: this.getCacheState()
+    };
+    this.log('Current Auth State', authState);
+    return authState;
+  }
+
+  private static getCacheState() {
+    try {
+      const localStorage = window.localStorage;
+      const sessionStorage = window.sessionStorage;
+      
+      const cacheKeys = {
+        localStorage: Object.keys(localStorage).filter(key => 
+          key.includes('msal') || key.includes('authority') || key.includes('token')
+        ),
+        sessionStorage: Object.keys(sessionStorage).filter(key => 
+          key.includes('msal') || key.includes('authority') || key.includes('token')
+        )
+      };
+      
+      return {
+        localStorageKeys: cacheKeys.localStorage,
+        sessionStorageKeys: cacheKeys.sessionStorage,
+        localStorageCount: cacheKeys.localStorage.length,
+        sessionStorageCount: cacheKeys.sessionStorage.length
+      };
+    } catch (e) {
+      return { error: 'Cannot access storage' };
+    }
+  }
+
+  static clearAuthCache() {
+    try {
+      // Clear MSAL cache from both storages
+      const storages = [localStorage, sessionStorage];
+      storages.forEach(storage => {
+        const keysToDelete = Object.keys(storage).filter(key => 
+          key.includes('msal') || key.includes('authority') || key.includes('token')
+        );
+        keysToDelete.forEach(key => storage.removeItem(key));
+      });
+      this.log('Auth cache cleared successfully');
+    } catch (e) {
+      this.log('Failed to clear auth cache', e);
+    }
+  }
 }
 
 // Make it available globally for easy access in mobile browser console

@@ -74,3 +74,16 @@ export const dataverseConfig = {
   clientSecret: process.env.REACT_APP_DATAVERSE_CLIENT_SECRET || "your-dataverse-client-secret",
   scope: process.env.REACT_APP_DATAVERSE_SCOPE || "https://your-environment.crm.dynamics.com/.default",
 };
+
+// Event callback to capture MSAL events for debugging
+export const eventCallback = (message: any) => {
+  MobileAuthDebugger.logMsalEvent(message.eventType, {
+    error: message.error,
+    result: message.result ? {
+      account: message.result.account?.username,
+      accessToken: message.result.accessToken ? 'Present' : 'Missing',
+      scopes: message.result.scopes
+    } : null,
+    timestamp: new Date().toISOString()
+  });
+};

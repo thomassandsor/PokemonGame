@@ -238,3 +238,16 @@
     align-items: stretch;
   }
 }
+
+.mobile-debug-section {
+  margin-top: 20px;
+  border-top: 2px solid #dee2e6;
+  padding-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .mobile-debug-section {
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+}

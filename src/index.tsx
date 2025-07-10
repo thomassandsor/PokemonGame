@@ -2,12 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
-import { msalConfig } from './config/authConfig';
+import { msalConfig, eventCallback } from './config/authConfig';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 
 const msalInstance = new PublicClientApplication(msalConfig);
+
+// Add event callback for debugging
+msalInstance.addEventCallback(eventCallback);
 
 // Initialize MSAL and handle redirects
 msalInstance.initialize().then(() => {

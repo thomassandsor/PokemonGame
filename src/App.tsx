@@ -14,6 +14,7 @@ import EvolutionLab from './components/EvolutionLab/EvolutionLab';
 import PokemonBrowser from './components/PokemonBrowser/PokemonBrowser';
 import Layout from './components/Layout/Layout';
 import { DemoProvider, useDemoMode } from './contexts/DemoContext';
+import FloatingMobileDebug from './components/Debug/FloatingMobileDebug';
 import './App.css';
 
 // Wrapper components to provide required props
@@ -221,6 +222,7 @@ function AppContent() {
             element={<Navigate to={isUserLoggedIn ? "/my-page" : "/login"} />} 
           />
         </Routes>
+        <FloatingMobileDebug />
       </Layout>
     </Router>
   );

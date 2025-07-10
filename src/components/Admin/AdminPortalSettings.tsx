@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PortalSettingsService, TypedPortalSetting } from '../../services/portalSettingsService';
+import MobileDebugPanel from '../Debug/MobileDebugPanel';
 import './AdminPortalSettings.css';
 
 interface AdminPortalSettingsProps {
@@ -24,6 +25,7 @@ export default function AdminPortalSettings({ onClose }: AdminPortalSettingsProp
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [showMobileDebug, setShowMobileDebug] = useState(false);
 
   // Load all settings on mount
   useEffect(() => {
@@ -166,6 +168,13 @@ export default function AdminPortalSettings({ onClose }: AdminPortalSettingsProp
         </button>
         
         <button 
+          onClick={() => setShowMobileDebug(!showMobileDebug)}
+          className="debug-btn"
+        >
+          📱 {showMobileDebug ? 'Hide' : 'Show'} Mobile Debug
+        </button>
+        
+        <button 
           onClick={() => {
             // Import the debug function for testing
             import('../../services/pvpBattleService').then(module => {
@@ -177,6 +186,12 @@ export default function AdminPortalSettings({ onClose }: AdminPortalSettingsProp
           🔍 Debug Settings
         </button>
       </div>
+
+      {showMobileDebug && (
+        <div className="mobile-debug-section">
+          <MobileDebugPanel />
+        </div>
+      )}
     </div>
   );
 }
