@@ -100,40 +100,126 @@ This guide will help you debug mobile authentication issues using the comprehens
 3. Look for popup blocking issues
 4. Monitor for iframe loading errors
 
-## Testing Different Scenarios
+## Critical Mobile Issue: White Screen After Authentication
 
-### Test Private/Incognito Mode
-1. Open browser in private mode
-2. Navigate to app with `?debug=mobile`
-3. Monitor private mode detection
-4. Test authentication flow
+### Issue: Stuck on White Screen After Login
+**Symptoms**: 
+- Login process starts successfully
+- User completes authentication with Microsoft
+- Browser shows white/blank screen instead of redirecting to app
+- Page appears to be loading indefinitely
+- Debug tools may still be accessible
 
-### Test Different Mobile Browsers
-1. Safari on iOS
-2. Chrome on Android
-3. Edge on mobile
-4. In-app browsers (Facebook, Instagram, etc.)
+**This is the most common mobile authentication issue - here's how to debug it:**
 
-### Test Network Conditions
-1. Test on cellular data
-2. Test on WiFi
-3. Test with slow connection
-4. Test with intermittent connectivity
+### Immediate Debug Steps:
 
-## Debug Log Analysis
+#### Step 1: Check Debug Logs During Authentication
+1. Open the floating debug button (🔧) before attempting login
+2. Clear all logs using "Clear Logs" button
+3. Start the login process
+4. **DO NOT CLOSE** the debug panel during authentication
+5. Monitor logs in real-time during the authentication flow
+6. Look for specific error patterns:
+   - Navigation errors after successful authentication
+   - MSAL redirect handling failures
+   - Token storage issues
+   - JavaScript errors during redirect processing
 
-### Key Log Patterns to Look For
-- `MSAL Event:` - MSAL library events
-- `Device Info` - Initial device detection
-- `Auth State` - Current authentication status
-- `Page load` - Navigation and redirect handling
-- `Private mode detected` - Incognito mode status
+#### Step 2: Check MSAL Authentication State
+1. After getting stuck on white screen, open debug panel
+2. Click "Log Auth State" button
+3. Check if:
+   - Accounts are being stored (should show > 0 accounts)
+   - Active account is set
+   - Tokens are present in cache
+4. If accounts exist but page is still white, this indicates a navigation/redirect issue
 
-### Error Patterns
-- `BrowserAuthError` - Browser-specific auth issues
-- `InteractionRequiredAuthError` - User interaction needed
-- `ClientAuthError` - Configuration issues
-- `ServerError` - Azure AD service issues
+#### Step 3: Monitor Browser Console
+1. Open browser developer tools (if available on mobile)
+2. Check Console tab for JavaScript errors
+3. Look for errors related to:
+   - Navigation failures
+   - React routing issues
+   - MSAL redirect promise handling
+   - Cross-origin or CORS errors
+
+#### Step 4: Test Manual Navigation
+1. While stuck on white screen, manually navigate to `/my-page`
+2. If this works, the issue is redirect handling after authentication
+3. If this doesn't work, the issue is authentication state persistence
+
+### Advanced Debugging for White Screen Issue:
+
+#### Test Different Authentication Methods:
+1. **Clear Cache Completely**:
+   - Use "Clear Auth Cache" in debug panel
+   - Clear browser cache manually
+   - Close and reopen browser
+   - Try authentication again
+
+2. **Test Different Browser Modes**:
+   - Regular browsing mode
+   - Private/Incognito mode (note: may have different behavior)
+   - Different mobile browsers (Safari, Chrome, Edge)
+
+3. **Monitor Redirect Flow**:
+   - Watch URL changes during authentication
+   - Note if URL contains authentication parameters after login
+   - Check if redirect URI matches current domain
+
+#### Common Causes and Solutions:
+
+**Cause 1: MSAL Redirect Promise Not Handled**
+- **Symptoms**: Authentication succeeds but app doesn't navigate
+- **Solution**: Check that `msalInstance.handleRedirectPromise()` is completing
+- **Debug**: Look for "Redirect response received" in logs
+
+**Cause 2: React Router Navigation Issues**
+- **Symptoms**: Authentication succeeds but routing fails
+- **Solution**: Check React Router configuration and protected routes
+- **Debug**: Manually test navigation to protected routes
+
+**Cause 3: Token Storage Issues on Mobile**
+- **Symptoms**: Authentication appears to succeed but tokens aren't persisted
+- **Solution**: Verify localStorage/sessionStorage availability
+- **Debug**: Check storage availability in Device Information section
+
+**Cause 4: Private Mode Interference**
+- **Symptoms**: Works in normal mode but fails in private browsing
+- **Solution**: Enhanced private mode handling may be needed
+- **Debug**: Compare behavior between normal and private modes
+
+**Cause 5: Network/Timing Issues**
+- **Symptoms**: Intermittent failures, especially on slower connections
+- **Solution**: May need longer timeouts or retry logic
+- **Debug**: Check response times in API health section
+
+#### Specific Mobile Browser Issues:
+
+**Safari iOS**:
+- May have stricter popup blocking
+- LocalStorage behavior differs in private mode
+- Cross-origin restrictions may apply
+
+**Chrome Android**:
+- Generally more permissive
+- Better debugging tools available
+- May handle redirects differently
+
+**In-App Browsers** (Facebook, Instagram, etc.):
+- Limited JavaScript capabilities
+- May block certain authentication flows
+- Often require fallback authentication methods
+
+### Recovery Steps:
+
+If stuck on white screen:
+1. **Don't refresh immediately** - capture debug logs first
+2. Use debug panel to export current state
+3. Try manual navigation to `/login` or `/my-page`
+4. If manual navigation works, clear auth cache and retry
+5. If nothing works, clear all browser data and start fresh
 
 ## Support Information
 

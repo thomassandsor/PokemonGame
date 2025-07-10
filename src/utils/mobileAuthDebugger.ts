@@ -218,6 +218,90 @@ ${logs.join('\n')}
       this.log('Failed to clear auth cache', e);
     }
   }
+
+  static detectWhiteScreenIssue(): { 
+    hasAuthParams: boolean; 
+    hasAccounts: boolean; 
+    isStuck: boolean; 
+    possibleCause: string;
+  } {
+    // Check if we're in a potential white screen scenario
+    const hasAuthParams = window.location.hash.includes('id_token') ||
+                         window.location.hash.includes('access_token') ||
+                         window.location.search.includes('code') ||
+                         window.location.search.includes('error');
+    
+    // Check if we have authentication data in storage
+    const hasStoredAccounts = this.checkStoredAccounts();
+    
+    // Check if we're on a blank page with auth data
+    const isBlankPage = document.body.children.length <= 2; // Minimal content
+    const isStuck = hasAuthParams && isBlankPage;
+    
+    let possibleCause = 'Unknown';
+    if (isStuck) {
+      if (!hasStoredAccounts) {
+        possibleCause = 'Authentication data not stored';
+      } else {
+        possibleCause = 'Navigation/redirect handling issue';
+      }
+    } else if (hasAuthParams && !hasStoredAccounts) {
+      possibleCause = 'MSAL redirect promise not handled';
+    }
+    
+    const result = {
+      hasAuthParams,
+      hasAccounts: hasStoredAccounts,
+      isStuck,
+      possibleCause
+    };
+    
+    this.log('White screen issue detection', result);
+    return result;
+  }
+
+  private static checkStoredAccounts(): boolean {
+    try {
+      // Check both localStorage and sessionStorage for MSAL account data
+      const storages = [localStorage, sessionStorage];
+      for (const storage of storages) {
+        const keys = Object.keys(storage);
+        const hasAccountData = keys.some(key => 
+          key.includes('msal') && key.includes('account')
+        );
+        if (hasAccountData) return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static checkNavigationState(): {
+    currentPath: string;
+    expectedPath: string;
+    hasAuthRedirect: boolean;
+    shouldRedirect: boolean;
+  } {
+    const currentPath = window.location.pathname;
+    const hasAuthParams = window.location.hash.includes('id_token') ||
+                         window.location.hash.includes('access_token') ||
+                         window.location.search.includes('code');
+    
+    // Expected behavior: if we have auth params, we should be on /login or root
+    const expectedPath = hasAuthParams ? '/login' : '/my-page';
+    const shouldRedirect = hasAuthParams && currentPath !== '/login' && currentPath !== '/';
+    
+    const result = {
+      currentPath,
+      expectedPath,
+      hasAuthRedirect: hasAuthParams,
+      shouldRedirect
+    };
+    
+    this.log('Navigation state check', result);
+    return result;
+  }
 }
 
 // Make it available globally for easy access in mobile browser console

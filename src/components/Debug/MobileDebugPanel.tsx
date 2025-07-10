@@ -26,6 +26,7 @@ const MobileDebugPanel: React.FC = () => {
   const [isPrivateMode, setIsPrivateMode] = useState<boolean>(false);
   const [apiHealth, setApiHealth] = useState<any>(null);
   const [testingApi, setTestingApi] = useState<boolean>(false);
+  const [whiteScreenDiagnosis, setWhiteScreenDiagnosis] = useState<any>(null);
 
   useEffect(() => {
     // Initialize device info
@@ -37,6 +38,10 @@ const MobileDebugPanel: React.FC = () => {
 
     // Load existing logs
     setLogs(MobileAuthDebugger.getLogs());
+
+    // Check for white screen issue on mount
+    const whiteScreenCheck = MobileAuthDebugger.detectWhiteScreenIssue();
+    setWhiteScreenDiagnosis(whiteScreenCheck);
 
     // Update device info with private mode
     if (info) {
@@ -91,6 +96,14 @@ const MobileDebugPanel: React.FC = () => {
       setTestingApi(false);
       handleRefreshLogs();
     }
+  };
+
+  const handleDiagnoseWhiteScreen = () => {
+    const diagnosis = MobileAuthDebugger.detectWhiteScreenIssue();
+    const navigation = MobileAuthDebugger.checkNavigationState();
+    setWhiteScreenDiagnosis({ ...diagnosis, navigation });
+    MobileAuthDebugger.log('White screen diagnosis completed', { diagnosis, navigation });
+    handleRefreshLogs();
   };
 
   const getDeviceTypeDisplay = () => {
@@ -165,11 +178,29 @@ const MobileDebugPanel: React.FC = () => {
                   <Button variant="outline-warning" onClick={handleClearAuthCache} className="mb-2">
                     Clear Auth Cache
                   </Button>
+                  <Button variant="outline-danger" onClick={handleDiagnoseWhiteScreen} className="mb-2">
+                    🔍 Diagnose White Screen
+                  </Button>
                 </Col>
               </Row>
               {accounts.length > 0 && (
                 <Alert variant="success" className="mt-3">
                   <strong>Authenticated as:</strong> {accounts[0].username}
+                </Alert>
+              )}
+              
+              {whiteScreenDiagnosis && whiteScreenDiagnosis.isStuck && (
+                <Alert variant="danger" className="mt-3">
+                  <strong>⚠️ White Screen Issue Detected!</strong><br/>
+                  <strong>Cause:</strong> {whiteScreenDiagnosis.possibleCause}<br/>
+                  <strong>Has Auth Params:</strong> {whiteScreenDiagnosis.hasAuthParams ? '✅' : '❌'}<br/>
+                  <strong>Has Stored Accounts:</strong> {whiteScreenDiagnosis.hasAccounts ? '✅' : '❌'}<br/>
+                  {whiteScreenDiagnosis.navigation && (
+                    <>
+                      <strong>Current Path:</strong> {whiteScreenDiagnosis.navigation.currentPath}<br/>
+                      <strong>Expected Path:</strong> {whiteScreenDiagnosis.navigation.expectedPath}
+                    </>
+                  )}
                 </Alert>
               )}
             </Accordion.Body>

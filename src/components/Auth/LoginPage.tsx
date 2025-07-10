@@ -22,6 +22,13 @@ const LoginPage: React.FC = () => {
     
     MobileAuthDebugger.log(`Page load - Has auth params: ${hasAuthParams}, URL: ${window.location.href}`);
     
+    // Check for white screen issue
+    const whiteScreenCheck = MobileAuthDebugger.detectWhiteScreenIssue();
+    if (whiteScreenCheck.isStuck) {
+      MobileAuthDebugger.log('⚠️ WHITE SCREEN ISSUE DETECTED on LoginPage!', whiteScreenCheck);
+      setError(`Authentication stuck: ${whiteScreenCheck.possibleCause}. Please use debug panel for more info.`);
+    }
+    
     if (hasAuthParams) {
       MobileAuthDebugger.log('Authentication redirect detected, processing...');
       setIsProcessing(true);
@@ -31,7 +38,12 @@ const LoginPage: React.FC = () => {
       
       // Give MSAL time to process the redirect
       const timer = setTimeout(() => {
-        MobileAuthDebugger.log('Auth processing timeout reached');
+        MobileAuthDebugger.log('Auth processing timeout reached - checking for white screen issue');
+        const timeoutCheck = MobileAuthDebugger.detectWhiteScreenIssue();
+        if (timeoutCheck.isStuck) {
+          MobileAuthDebugger.log('⚠️ WHITE SCREEN CONFIRMED after timeout', timeoutCheck);
+          setError(`Authentication timeout: ${timeoutCheck.possibleCause}. Try clearing cache or using a different browser.`);
+        }
         setIsProcessing(false);
       }, 5000); // Increased timeout for mobile
       
