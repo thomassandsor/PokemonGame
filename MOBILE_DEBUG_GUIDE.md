@@ -117,17 +117,113 @@ This guide will help you debug mobile authentication issues using the comprehens
 
 ## Critical Mobile Issue: White Screen After Authentication
 
+### Root Cause Identified: MSAL Initialization Loop
+
+**The Problem**: The logs you provided show the exact cause of the white screen issue:
+```
+MSAL 2: Info - initialize has already been called, exiting early.
+[Multiple rapid-fire initializations within milliseconds]
+```
+
+This indicates that MSAL is being initialized multiple times in rapid succession, causing an infinite loop that prevents the app from properly loading after authentication.
+
 ### Issue: Stuck on White Screen After Login
 **Symptoms**: 
 - Login process starts successfully
 - User completes authentication with Microsoft
 - Browser shows white/blank screen instead of redirecting to app
 - Page appears to be loading indefinitely
+- Debug console shows repeated "initialize has already been called" messages
 - Debug tools may still be accessible
 
-**This is the most common mobile authentication issue - here's how to debug it:**
+**Root Cause**: Multiple MSAL instance initialization attempts, especially on mobile devices where React.StrictMode and component re-rendering can trigger multiple initializations.
 
-### Immediate Debug Steps:
+### Latest Fix Applied
+
+The app now uses a **window-level singleton pattern** to prevent multiple MSAL initializations:
+
+1. **Global Instance Storage**: MSAL instance is stored on the window object
+2. **Initialization Guard**: Prevents multiple initialization attempts
+3. **Timing Tracking**: Logs initialization and redirect timing to help debug
+4. **Double-Mount Prevention**: Prevents React.StrictMode from causing issues
+
+### Technical Details of the Fix
+
+The fix involves several key changes to prevent MSAL initialization loops:
+
+1. **Window-Level Singleton Pattern**:
+   ```javascript
+   // Instead of module-level variables that can be reset
+   const MSAL_INSTANCE_KEY = '_pokemonGameMsalInstance';
+   window[MSAL_INSTANCE_KEY] = msalInstance;
+   ```
+
+2. **Initialization Guard**:
+   ```javascript
+   if (window[MSAL_INIT_KEY]) {
+     throw new Error('MSAL is already initializing - preventing duplicate initialization');
+   }
+   ```
+
+3. **Timing and Debug Logging**:
+   - Tracks initialization and redirect timing
+   - Logs detailed authentication flow information
+   - Provides clear success/failure indicators
+
+4. **React.StrictMode Protection**:
+   - Prevents double-mounting of the React app
+   - Checks for existing DOM children before rendering
+
+5. **Mobile-Specific Timeout Handling**:
+   - Shorter authentication timeouts (5s mobile, 3s desktop)
+   - Prevents 30-second authentication hangs
+
+### New Debug Information to Look For
+
+When checking the logs, look for these new messages:
+
+**Good Signs (Fixed)**:
+```
+🔄 Starting MSAL initialization sequence...
+🆕 Creating new global MSAL instance
+✅ MSAL initialized successfully in XXXms
+✅ Redirect promise handled in XXXms total
+📱 MOBILE DEBUG: Redirect successful, user should be logged in
+```
+
+**Bad Signs (Still Issues)**:
+```
+⚠️ Root element already has children, skipping render to prevent double-mount
+⏳ MSAL is already initializing globally, throwing error to prevent loop
+```
+
+### This is the most common mobile authentication issue - here's how to debug it:
+
+### If the Initialization Loop Issue Persists
+
+If you still see repeated initialization messages after the fix:
+
+1. **Clear All Browser Data**: 
+   - Clear cookies, cache, and stored data
+   - Close all browser tabs
+   - Restart the browser completely
+
+2. **Check for Module Hot-Reloading Issues**:
+   - If in development mode, try a production build
+   - Disable browser extensions that might interfere
+   - Try a different browser or incognito mode
+
+3. **Force Single Instance**:
+   - Look for the message "🔄 Reusing existing global MSAL instance"
+   - This means the singleton is working correctly
+
+4. **Monitor Initialization Timing**:
+   - Look for initialization times in the logs
+   - If you see multiple "Starting MSAL initialization sequence..." messages, the issue persists
+
+5. **Check React.StrictMode Impact**:
+   - The app should now handle StrictMode properly
+   - Look for "Root element already has children" messages
 
 #### Step 1: Access Debug Panel When Stuck on White Screen
 **CRITICAL**: The debug button should now be visible even on white screens. If not:

@@ -282,24 +282,88 @@ ${logs.join('\n')}
     expectedPath: string;
     hasAuthRedirect: boolean;
     shouldRedirect: boolean;
+    inProgressState: string;
+    isLoading: boolean;
   } {
     const currentPath = window.location.pathname;
     const hasAuthParams = window.location.hash.includes('id_token') ||
                          window.location.hash.includes('access_token') ||
                          window.location.search.includes('code');
     
+    // Check MSAL instance state (if available globally)
+    const msalInstance = (window as any).msalInstance;
+    let inProgressState = 'unknown';
+    
+    if (msalInstance) {
+      // Try to get the current state from MSAL
+      inProgressState = 'available';
+    }
+    
     // Expected behavior: if we have auth params, we should be on /login or root
     const expectedPath = hasAuthParams ? '/login' : '/my-page';
     const shouldRedirect = hasAuthParams && currentPath !== '/login' && currentPath !== '/';
+    
+    // Check if we're stuck in loading state
+    const isLoading = document.body.innerHTML.includes('Processing authentication');
     
     const result = {
       currentPath,
       expectedPath,
       hasAuthRedirect: hasAuthParams,
-      shouldRedirect
+      shouldRedirect,
+      inProgressState,
+      isLoading
     };
     
     this.log('Navigation state check', result);
+    return result;
+  }
+
+  static diagnoseAuthenticationLoop(): {
+    isStuckInLoop: boolean;
+    loopType: string;
+    recommendations: string[];
+  } {
+    const navigation = this.checkNavigationState();
+    const whiteScreen = this.detectWhiteScreenIssue();
+    const hasStoredAccounts = this.checkStoredAccounts();
+    
+    let isStuckInLoop = false;
+    let loopType = 'none';
+    const recommendations: string[] = [];
+    
+    // Detect different types of loops
+    if (navigation.isLoading && navigation.hasAuthRedirect) {
+      isStuckInLoop = true;
+      loopType = 'processing_loop';
+      recommendations.push('Clear auth parameters from URL');
+      recommendations.push('Force stop loading state');
+      recommendations.push('Check MSAL inProgress state');
+    }
+    
+    if (whiteScreen.hasAuthParams && !hasStoredAccounts) {
+      isStuckInLoop = true;
+      loopType = 'redirect_not_processed';
+      recommendations.push('MSAL redirect promise may not be completing');
+      recommendations.push('Check network connectivity');
+      recommendations.push('Try clearing all browser cache');
+    }
+    
+    if (hasStoredAccounts && navigation.hasAuthRedirect) {
+      isStuckInLoop = true;
+      loopType = 'auth_params_not_cleared';
+      recommendations.push('Authentication succeeded but URL not cleaned');
+      recommendations.push('Manually navigate to clean URL');
+      recommendations.push('Clear auth cache and restart');
+    }
+    
+    const result = {
+      isStuckInLoop,
+      loopType,
+      recommendations
+    };
+    
+    this.log('Authentication loop diagnosis', result);
     return result;
   }
 }

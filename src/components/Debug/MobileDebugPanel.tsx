@@ -101,8 +101,9 @@ const MobileDebugPanel: React.FC = () => {
   const handleDiagnoseWhiteScreen = () => {
     const diagnosis = MobileAuthDebugger.detectWhiteScreenIssue();
     const navigation = MobileAuthDebugger.checkNavigationState();
-    setWhiteScreenDiagnosis({ ...diagnosis, navigation });
-    MobileAuthDebugger.log('White screen diagnosis completed', { diagnosis, navigation });
+    const authLoop = MobileAuthDebugger.diagnoseAuthenticationLoop();
+    setWhiteScreenDiagnosis({ ...diagnosis, navigation, authLoop });
+    MobileAuthDebugger.log('Complete mobile diagnosis', { diagnosis, navigation, authLoop });
     handleRefreshLogs();
   };
 
@@ -198,9 +199,23 @@ const MobileDebugPanel: React.FC = () => {
                   {whiteScreenDiagnosis.navigation && (
                     <>
                       <strong>Current Path:</strong> {whiteScreenDiagnosis.navigation.currentPath}<br/>
-                      <strong>Expected Path:</strong> {whiteScreenDiagnosis.navigation.expectedPath}
+                      <strong>Expected Path:</strong> {whiteScreenDiagnosis.navigation.expectedPath}<br/>
+                      <strong>Is Loading:</strong> {whiteScreenDiagnosis.navigation.isLoading ? '⚠️ YES' : '✅ No'}
                     </>
                   )}
+                </Alert>
+              )}
+
+              {whiteScreenDiagnosis && whiteScreenDiagnosis.authLoop && whiteScreenDiagnosis.authLoop.isStuckInLoop && (
+                <Alert variant="warning" className="mt-3">
+                  <strong>🔄 Authentication Loop Detected!</strong><br/>
+                  <strong>Loop Type:</strong> {whiteScreenDiagnosis.authLoop.loopType}<br/>
+                  <strong>Recommendations:</strong>
+                  <ul className="mb-0 mt-2">
+                    {whiteScreenDiagnosis.authLoop.recommendations.map((rec: string, index: number) => (
+                      <li key={index}>{rec}</li>
+                    ))}
+                  </ul>
                 </Alert>
               )}
             </Accordion.Body>

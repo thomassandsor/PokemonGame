@@ -116,20 +116,35 @@ function AppContent() {
   
   // Handle loading state - wait for MSAL to finish processing
   useEffect(() => {
+    console.log('🔄 Loading state check - inProgress:', inProgress);
+    
     // If we're not doing any authentication operations, stop loading
     if (inProgress === 'none') {
+      console.log('✅ MSAL not in progress, stopping loading');
       setIsLoading(false);
       return;
     }
     
-    // For authentication in progress, give it more time
+    // For authentication in progress, give it more time but with mobile-specific handling
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const timeout = isMobile ? 5000 : 3000; // Much shorter timeout to prevent 30-second hangs
+    
+    console.log(`⏱️ Authentication in progress (${inProgress}), waiting ${timeout}ms...`);
+    console.log('🔍 Mobile device detected:', isMobile);
+    
     const timer = setTimeout(() => {
-      console.log('Authentication timeout reached, stopping loading state');
+      console.warn(`🚨 AUTHENTICATION TIMEOUT after ${timeout}ms - likely MSAL initialization loop!`);
+      console.log('Current inProgress state:', inProgress);
+      console.log('Current accounts:', accounts.length);
+      console.log('Current authenticated status:', isAuthenticated);
+      console.log('🔧 This matches the initialization loop issue from mobile logs');
+      
+      // Force stop loading even if inProgress is not 'none'
       setIsLoading(false);
-    }, 5000); // Increased to 5 seconds for slower connections
+    }, timeout);
     
     return () => clearTimeout(timer);
-  }, [inProgress]);
+  }, [inProgress, accounts.length, isAuthenticated]);
   
   // Separate effect to handle immediate authentication completion
   useEffect(() => {
@@ -164,17 +179,31 @@ function AppContent() {
   }, [isAuthenticated, accounts, isDemoMode, isUserLoggedIn, inProgress, isLoading]);
 
   // Show loading while MSAL processes authentication
-  if (isLoading || inProgress !== 'none') {
+  if (isLoading && inProgress !== 'none') {
+    const loadingMessage = `Processing authentication... (${inProgress})`;
+    console.log('🔄 Showing loading screen:', loadingMessage);
+    
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
         <div className="text-center">
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="mt-3">Processing authentication...</p>
+          <p className="mt-3">{loadingMessage}</p>
+          <small className="text-muted">
+            If this takes too long, try refreshing the page or clearing your browser cache.
+          </small>
         </div>
+        {/* Add debug button even during loading */}
+        <FloatingMobileDebug />
       </div>
     );
+  }
+
+  // If we have accounts but still loading, force proceed
+  if (isLoading && accounts.length > 0) {
+    console.log('✅ Forcing proceed - have accounts but still loading');
+    setIsLoading(false);
   }
 
   return (
