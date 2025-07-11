@@ -1,0 +1,175 @@
+/* Simple My Pokemon Page Styles */
+
+.trainer-info {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.trainer-card {
+    background: var(--pokemon-blue);
+    border: 2px solid var(--pokemon-yellow);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+}
+
+.trainer-avatar {
+    width: 60px;
+    height: 60px;
+    background: var(--pokemon-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid white;
+    color: black;
+}
+
+.trainer-details h2 {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.trainer-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.stat-icon {
+    font-size: 14px;
+}
+
+.content-area {
+    flex: 1;
+    padding: 0 20px 20px;
+}
+
+.pokemon-card {
+    position: relative;
+}
+
+.pokemon-caught-indicator {
+    background: var(--pokemon-green);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-align: center;
+    margin-top: 8px;
+}
+
+.pokemon-level {
+    background: var(--pokemon-green);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* Modal Details */
+.detail-item {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 203, 5, 0.2);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.modal-pokemon-image {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.pokemon-detail-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.pokemon-image-section {
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+}
+
+.pokemon-info-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .trainer-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .trainer-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .trainer-details h2 {
+        font-size: 14px;
+    }
+    
+    .trainer-stats {
+        justify-content: center;
+        gap: 12px;
+    }
+    
+    .pokemon-detail-container {
+        flex-direction: column;
+    }
+    
+    .pokemon-image-section,
+    .pokemon-info-section {
+        min-width: auto;
+    }
+    
+    .modal-pokemon-image {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .trainer-info {
+        padding: 16px;
+    }
+    
+    .content-area {
+        padding: 0 16px 16px;
+    }
+    
+    .trainer-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+}

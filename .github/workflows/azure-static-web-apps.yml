@@ -25,17 +25,9 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/" # App source code path
+          app_location: "/html-version" # HTML version source code path
           api_location: "" # No managed Functions - using standalone Functions
-          output_location: "build" # Built app content directory
-        env:
-          REACT_APP_API_BASE_URL: https://pokemongame-functions-2025.azurewebsites.net/api/dataverse
-          REACT_APP_CLIENT_ID: ${{ vars.REACT_APP_CLIENT_ID }}
-          REACT_APP_AUTHORITY: ${{ vars.REACT_APP_AUTHORITY }}
-          REACT_APP_KNOWN_AUTHORITY: ${{ vars.REACT_APP_KNOWN_AUTHORITY }}
-          REACT_APP_REDIRECT_URI: ${{ vars.REACT_APP_REDIRECT_URI }}
-          REACT_APP_POST_LOGOUT_REDIRECT_URI: ${{ vars.REACT_APP_POST_LOGOUT_REDIRECT_URI }}
-          REACT_APP_APPINSIGHTS_CONNECTION_STRING: ${{ secrets.REACT_APP_APPINSIGHTS_CONNECTION_STRING }}
+          output_location: "" # No build step needed for HTML
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

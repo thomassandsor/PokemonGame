@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .login-prompt {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+        }
+        #loginButton {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        #loginButton:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Pokemon Game</h1>
+            <p>Catch, train, and battle with your Pokemon!</p>
+        </div>
+
+        <div id="userInfo" class="user-info" style="display: none;">
+            <h2>Welcome, <span id="userName"></span>!</h2>
+            <p>Email: <span id="userEmail"></span></p>
+            <button onclick="logout()" class="nav-button">Logout</button>
+        </div>
+
+        <div class="nav-buttons" id="navButtons" style="display: none;">
+            <a href="my-pokemon.html" class="nav-button">My Pokemon</a>
+            <a href="catch-pokemon.html" class="nav-button">Catch Pokemon</a>
+            <a href="battle.html" class="nav-button">Battle</a>
+        </div>
+
+        <div id="loginPrompt" class="login-prompt">
+            <h2>Please Login to Continue</h2>
+            <p>You need to login to access your Pokemon collection and game features.</p>
+            <button id="loginButton" onclick="login()">Login with Microsoft</button>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        console.log('INDEX: Page loaded, checking authentication...');
+
+        // Check for authentication parameters in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const email = urlParams.get('email');
+        const name = urlParams.get('name');
+
+        if (token && email) {
+            console.log('INDEX: Authentication data found in URL, setting up user session...');
+            
+            // Store authentication data
+            AuthService.setAuthenticatedUser({
+                token: token,
+                email: email,
+                name: name || email
+            });
+
+            // Clean up URL parameters
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            
+            showUserInterface();
+        } else {
+            // Check if user is already authenticated from previous session
+            AuthService.restoreAuthFromSession()
+                .then(() => {
+                    if (AuthService.isAuthenticated()) {
+                        console.log('INDEX: User already authenticated from session');
+                        showUserInterface();
+                    } else {
+                        console.log('INDEX: No authentication found, showing login prompt');
+                        showLoginPrompt();
+                    }
+                })
+                .catch(error => {
+                    console.error('INDEX: Error restoring auth session:', error);
+                    showLoginPrompt();
+                });
+        }
+
+        function showUserInterface() {
+            const user = AuthService.getCurrentUser();
+            if (user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('navButtons').style.display = 'flex';
+                document.getElementById('loginPrompt').style.display = 'none';
+            }
+        }
+
+        function showLoginPrompt() {
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('navButtons').style.display = 'none';
+            document.getElementById('loginPrompt').style.display = 'block';
+        }
+
+        function login() {
+            console.log('INDEX: Starting login process...');
+            const loginUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin';
+            console.log('INDEX: Redirecting to login URL:', loginUrl);
+            window.location.href = loginUrl;
+        }
+
+        function logout() {
+            console.log('INDEX: Logging out user...');
+            AuthService.logout();
+            showLoginPrompt();
+        }
+    </script>
+</body>
+</html>
