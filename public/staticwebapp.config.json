@@ -7,6 +7,11 @@
       }
     },
     {
+      "route": "/login.html",
+      "serve": "/login.html",
+      "statusCode": 200
+    },
+    {
       "route": "/game.html",
       "serve": "/game.html",
       "statusCode": 200
@@ -27,8 +32,28 @@
       "statusCode": 200
     },
     {
+      "route": "/api/GoogleLogin",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/GoogleCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/MicrosoftLogin",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/MicrosoftCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/WhoAmI",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/*",
-      "serve": "/index.html",
+      "serve": "/game.html",
       "statusCode": 200
     }
   ],

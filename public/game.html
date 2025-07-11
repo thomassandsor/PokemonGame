@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Game - Mobile HTML Version</title>
+    <title>Pokemon Game - Universal HTML Version</title>
+    <meta name="description" content="Pokemon Game - Optimized for all devices">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pokemon Game">
+    <link rel="apple-touch-icon" href="/favicon.ico">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -102,6 +107,178 @@
             font-size: 14px;
         }
         .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 15px;
+        }
+        .user-info {
+            font-size: 14px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .pokemon-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .pokemon-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .pokemon-card.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+        .battle-screen {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .battle-arena {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .pokemon-battle-info {
+            text-align: center;
+            flex: 1;
+        }
+        .vs-text {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .hp-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757 0%, #ffa502 50%, #2ed573 100%);
+            transition: width 0.5s ease;
+        }
+        .moves-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .move-button {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .move-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .qr-scanner {
+            text-align: center;
+            padding: 20px;
+        }
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                padding: 15px;
+                border-radius: 0;
+            }
+            .pokemon-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .battle-arena {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .vs-text {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+            color: #ffd700;
+            font-size: 14px;
+        }
+        .status-bar {
             padding: 10px;
             margin: 10px 0;
             border-radius: 8px;
@@ -128,8 +305,28 @@
 <body>
     <div class="container">
         <h1>🎮 Pokemon Game</h1>
-        <div class="status-bar status-success">
-            ✅ Mobile HTML Version - Fully Functional
+        <div id="authStatus" class="status-bar status-success">
+            ✅ Loading user information...
+        </div>
+        
+        <div id="userSection" class="game-section" style="display: none;">
+            <h3>👤 Welcome Back!</h3>
+            <div id="userInfo">
+                <div class="pokemon-display">
+                    <div class="pokemon-sprite" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>
+                    <div class="pokemon-info">
+                        <div class="pokemon-name" id="userName">Loading...</div>
+                        <div class="pokemon-level" id="userEmail">Verifying email...</div>
+                    </div>
+                </div>
+                <div class="pokemon-display">
+                    <div class="pokemon-sprite" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); display: flex; align-items: center; justify-content: center; font-size: 24px;">📊</div>
+                    <div class="pokemon-info">
+                        <div class="pokemon-name">Game Progress</div>
+                        <div class="pokemon-level" id="userStats">Level 0 • 0 Pokemon</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="game-section">
@@ -175,9 +372,10 @@
         </div>
 
         <div class="game-section">
-            <h3>🆘 Troubleshooting</h3>
+            <h3>🆘 Authentication & Troubleshooting</h3>
             <button class="button secondary" onclick="debugTools()">🔍 Debug Tools</button>
-            <button class="button secondary" onclick="tryReactApp()">🔄 Try React App</button>
+            <button class="button secondary" onclick="showLoginPage()">� Login Page</button>
+            <button class="button secondary" onclick="logout()">🚪 Logout</button>
             <button class="button secondary" onclick="clearAllData()">🧹 Reset Everything</button>
         </div>
 
@@ -193,6 +391,10 @@
     </script>
 
     <script>
+        // Global user state
+        let currentUser = null;
+        let isAuthenticated = false;
+
         // Track page load
         if (window.appInsights) {
             appInsights.trackPageView('Pokemon Game HTML Version', window.location.href);
@@ -211,20 +413,93 @@
                     ...details,
                     source: 'HTML Game Version',
                     userAgent: navigator.userAgent,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    authenticated: isAuthenticated,
+                    userEmail: currentUser?.email || 'guest'
                 });
+            }
+        }
+
+        // Check authentication status on page load
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/api/WhoAmI', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.authenticated) {
+                        currentUser = data;
+                        isAuthenticated = true;
+                        updateUserInterface(data);
+                        trackAction('User_Authenticated', { email: data.email });
+                    } else {
+                        showGuestMode();
+                    }
+                } else {
+                    showGuestMode();
+                }
+            } catch (error) {
+                console.log('Auth check failed:', error);
+                showGuestMode();
+            }
+        }
+
+        function updateUserInterface(userData) {
+            // Update user section
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userEmail').textContent = userData.email;
+            document.getElementById('userStats').textContent = `Level ${userData.level} • ${userData.pokemonCount} Pokemon`;
+            document.getElementById('userSection').style.display = 'block';
+            
+            // Update auth status
+            document.getElementById('authStatus').innerHTML = '✅ Authenticated via Social Login';
+            document.getElementById('authStatus').className = 'status-bar status-success';
+        }
+
+        function showGuestMode() {
+            // Check if we have OAuth parameters in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const email = urlParams.get('email');
+            const name = urlParams.get('name');
+            const error = urlParams.get('error');
+
+            if (error) {
+                document.getElementById('authStatus').innerHTML = `❌ Login Error: ${error}`;
+                document.getElementById('authStatus').className = 'status-bar error';
+                trackAction('Authentication_Error', { error: error });
+            } else if (token && email) {
+                // OAuth redirect successful - clean URL and check auth again
+                window.history.replaceState({}, document.title, window.location.pathname);
+                checkAuthStatus();
+                return;
+            } else {
+                // Guest mode
+                document.getElementById('authStatus').innerHTML = '👤 Playing as Guest - <a href="/login.html" style="color: #ffd700;">Login for full features</a>';
+                document.getElementById('authStatus').className = 'status-bar status-info';
+                trackAction('Guest_Mode_Active');
             }
         }
 
         // Game Functions
         function startBattle() {
             trackAction('Start_Battle');
-            alert('🥊 Battle System Loading...\n\nIn the full React app, this would open the battle arena where you can:\n• Choose your Pokemon team\n• Fight against AI or other players\n• Gain experience and level up\n• Earn rewards');
+            if (isAuthenticated) {
+                alert('🥊 Battle System Loading...\n\nAuthenticated battle features:\n• Your Pokemon team\n• Ranked battles\n• Experience tracking\n• Rewards saved to your account');
+            } else {
+                alert('🥊 Battle System (Guest Mode)...\n\nGuest battle features:\n• Practice battles only\n• No progression saved\n• Login to unlock full features');
+            }
         }
 
         function scanPokemon() {
             trackAction('Scan_Pokemon');
-            alert('📱 QR Scanner Active...\n\nThis would activate your camera to:\n• Scan Pokemon QR codes\n• Add new Pokemon to your collection\n• Import from trading cards\n• Connect with other players');
+            if (isAuthenticated) {
+                alert('📱 QR Scanner Active...\n\nAuthenticated features:\n• Add to your permanent collection\n• Sync across devices\n• Trading with other users');
+            } else {
+                alert('📱 QR Scanner (Guest Mode)...\n\nGuest features:\n• Temporary scan only\n• No permanent collection\n• Login to save Pokemon');
+            }
         }
 
         function browsePokemon() {
@@ -234,17 +509,29 @@
 
         function evolutionLab() {
             trackAction('Evolution_Lab');
-            alert('🧬 Evolution Lab...\n\nEvolve your Pokemon:\n• Check evolution requirements\n• Use evolution stones\n• Trade evolutions\n• Mega evolution options');
+            if (isAuthenticated) {
+                alert('🧬 Evolution Lab...\n\nAuthenticated features:\n• Evolve your Pokemon\n• Track evolution history\n• Permanent progress\n• Achievement unlocks');
+            } else {
+                alert('🧬 Evolution Lab (Guest Mode)...\n\nLimited features available\nLogin to access full evolution system');
+            }
         }
 
         function viewProfile() {
             trackAction('View_Profile');
-            alert('👤 Player Profile...\n\nYour game stats:\n• Total Pokemon caught: 47\n• Battles won: 23\n• Level: 15\n• Achievements unlocked\n• Friend list');
+            if (isAuthenticated) {
+                alert(`👤 ${currentUser.name}'s Profile...\n\nYour game stats:\n• Email: ${currentUser.email}\n• Level: ${currentUser.level}\n• Pokemon Count: ${currentUser.pokemonCount}\n• Last Played: ${new Date(currentUser.lastPlayed).toLocaleDateString()}`);
+            } else {
+                alert('👤 Guest Profile...\n\nLogin to access:\n• Permanent profile\n• Game statistics\n• Achievement tracking\n• Friend connections');
+            }
         }
 
         function adminPanel() {
             trackAction('Admin_Panel');
-            alert('⚙️ Admin Panel...\n\nGame management:\n• User management\n• Pokemon database\n• Battle system config\n• Analytics dashboard');
+            if (isAuthenticated) {
+                alert(`⚙️ Admin Panel - ${currentUser.email}...\n\nSeminar Management:\n• Verified attendee access\n• Real email confirmation\n• Progress tracking\n• Analytics dashboard`);
+            } else {
+                alert('⚙️ Admin Panel...\n\nLogin required for admin access\nSeminar leaders need verified identity');
+            }
         }
 
         function gameSettings() {
@@ -257,22 +544,36 @@
             window.location.href = '/debug.html';
         }
 
-        function tryReactApp() {
-            trackAction('Try_React_App');
-            if (confirm('⚠️ The React app has been failing on mobile.\n\nWould you like to try it anyway? (You can always come back to this HTML version)')) {
-                window.location.href = '/';
+        function showLoginPage() {
+            trackAction('Show_Login_Page');
+            window.location.href = '/login.html';
+        }
+
+        function logout() {
+            trackAction('Logout');
+            if (confirm('🚪 Logout and return to login page?')) {
+                // Clear session
+                document.cookie = 'pokemon_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                localStorage.removeItem('pokemon_user');
+                sessionStorage.clear();
+                
+                // Redirect to login
+                window.location.href = '/login.html';
             }
         }
 
         function clearAllData() {
             trackAction('Clear_All_Data');
-            if (confirm('🚨 This will clear all your game data and reset everything.\n\nAre you sure?')) {
+            if (confirm('🚨 This will clear all your game data and logout.\n\nAre you sure?')) {
+                // Clear everything
+                document.cookie = 'pokemon_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                 localStorage.clear();
                 sessionStorage.clear();
                 document.cookie.split(";").forEach(function(c) { 
                     document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
                 });
-                alert('✅ All data cleared! You can now try the React app with a fresh start.');
+                alert('✅ All data cleared!');
+                window.location.href = '/login.html';
             }
         }
 
@@ -289,12 +590,14 @@
                 <div>🌐 Browser: ${isChrome ? 'Chrome' : isSafari ? 'Safari' : 'Other'}</div>
                 <div>🕒 Last Updated: ${new Date().toLocaleTimeString()}</div>
                 <div>✅ HTML Version: Fully Functional</div>
-                <div>❌ React Version: Failed on Mobile</div>
+                <div>🔐 Auth: ${isAuthenticated ? 'Social Login ✅' : 'Guest Mode 👤'}</div>
+                ${isAuthenticated ? `<div>👤 User: ${currentUser?.email}</div>` : ''}
             `;
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
             updateSystemStatus();
             setInterval(updateSystemStatus, 30000); // Update every 30 seconds
         });
