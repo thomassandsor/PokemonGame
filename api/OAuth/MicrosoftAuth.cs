@@ -75,8 +75,8 @@ namespace PokemonGame.Api.OAuth
                     return CreateErrorResponse(req, "Failed to get access token");
                 }
 
-                // Get user info from Microsoft
-                var userInfo = await GetMicrosoftUserInfo(tokenResponse.access_token);
+                // Get user info from ID token instead of Graph API
+                var userInfo = GetUserInfoFromIdToken(tokenResponse.id_token);
                 if (userInfo == null)
                 {
                     return CreateErrorResponse(req, "Failed to get user information");
@@ -132,6 +132,54 @@ namespace PokemonGame.Api.OAuth
             { 
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
             });
+        }
+
+        private MicrosoftUserInfo? GetUserInfoFromIdToken(string idToken)
+        {
+            try
+            {
+                // JWT tokens have 3 parts separated by dots: header.payload.signature
+                var parts = idToken.Split('.');
+                if (parts.Length != 3)
+                {
+                    _logger.LogError("Invalid ID token format");
+                    return null;
+                }
+
+                // Decode the payload (second part)
+                var payload = parts[1];
+                
+                // Add padding if needed for Base64 decoding
+                switch (payload.Length % 4)
+                {
+                    case 2: payload += "=="; break;
+                    case 3: payload += "="; break;
+                }
+
+                var jsonBytes = Convert.FromBase64String(payload);
+                var jsonString = System.Text.Encoding.UTF8.GetString(jsonBytes);
+                
+                _logger.LogInformation($"ID Token payload: {jsonString}");
+                
+                var claims = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
+                if (claims == null) return null;
+
+                return new MicrosoftUserInfo
+                {
+                    id = claims.GetValueOrDefault("sub")?.ToString() ?? "",
+                    displayName = claims.GetValueOrDefault("name")?.ToString() ?? "",
+                    givenName = claims.GetValueOrDefault("given_name")?.ToString() ?? "",
+                    surname = claims.GetValueOrDefault("family_name")?.ToString() ?? "",
+                    mail = claims.GetValueOrDefault("email")?.ToString() ?? "",
+                    userPrincipalName = claims.GetValueOrDefault("preferred_username")?.ToString() ?? 
+                                       claims.GetValueOrDefault("email")?.ToString() ?? ""
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error decoding ID token");
+                return null;
+            }
         }
 
         private async Task<MicrosoftUserInfo?> GetMicrosoftUserInfo(string accessToken)

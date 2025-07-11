@@ -26,10 +26,21 @@ namespace PokemonGame.API
         
         [Function("DataverseProxy")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "patch", "delete", 
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "patch", "delete", "options",
                 Route = "dataverse/{restOfPath}")] HttpRequestData req,
             string restOfPath)
         {
+            // Handle CORS preflight requests
+            if (req.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase))
+            {
+                var corsResponse = req.CreateResponse(HttpStatusCode.OK);
+                corsResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                corsResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                corsResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                corsResponse.Headers.Add("Access-Control-Max-Age", "86400");
+                return corsResponse;
+            }
+
             try
             {
                 _logger.LogInformation($"DataverseProxy function processed request for path: {restOfPath}");
@@ -45,6 +56,9 @@ namespace PokemonGame.API
                     _logger.LogError($"Missing required environment variables for Dataverse authentication. ClientId: {!string.IsNullOrEmpty(clientId)}, ClientSecret: {!string.IsNullOrEmpty(clientSecret)}, TenantId: {!string.IsNullOrEmpty(tenantId)}");
                     var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                     errorResponse.Headers.Add("Content-Type", "application/json");
+                    errorResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                    errorResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    errorResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
                     await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
                         error = "Dataverse configuration not found",
                         details = new {
@@ -63,6 +77,9 @@ namespace PokemonGame.API
                 {
                     var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                     errorResponse.Headers.Add("Content-Type", "application/json");
+                    errorResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                    errorResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    errorResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
                     await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Failed to authenticate with Dataverse", statusCode = 401 }));
                     return errorResponse;
                 }
@@ -104,9 +121,12 @@ namespace PokemonGame.API
                     _logger.LogError($"Dataverse request failed. Status: {response.StatusCode}, Content: {responseContent}");
                 }
                 
-                // Return the response
+                // Return the response with CORS headers
                 var result = req.CreateResponse(response.StatusCode);
                 result.Headers.Add("Content-Type", "application/json");
+                result.Headers.Add("Access-Control-Allow-Origin", "*");
+                result.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                result.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
                 await result.WriteStringAsync(responseContent);
                 return result;
             }
@@ -116,6 +136,9 @@ namespace PokemonGame.API
                 _logger.LogError($"Stack trace: {ex.StackTrace}");
                 var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
                 errorResponse.Headers.Add("Content-Type", "application/json");
+                errorResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                errorResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                errorResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
                 await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Backend call failure", details = ex.Message }));
                 return errorResponse;
             }

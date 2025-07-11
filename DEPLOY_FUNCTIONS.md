@@ -57,17 +57,7 @@ cd api
 func azure functionapp publish pokemongame-functions-2025
 ```
 
-## Step 5: Disable Application Insights (Optional - Save Costs)
-
-```bash
-# Remove Application Insights to save costs and improve privacy
-az functionapp config appsettings delete --name pokemongame-functions-2025 --resource-group rg-pokemongame --setting-names APPLICATIONINSIGHTS_CONNECTION_STRING
-
-# Redeploy without Application Insights
-func azure functionapp publish pokemongame-functions-2025
-```
-
-## Step 6: Configure Environment Variables
+## Step 5: Configure Environment Variables
 
 In Azure Portal → Function App → Configuration → Application Settings:
 - `DATAVERSE_URL`: https://pokemongame.crm4.dynamics.com/api/data/v9.2
@@ -76,28 +66,18 @@ In Azure Portal → Function App → Configuration → Application Settings:
 - `DATAVERSE_CLIENT_SECRET`: [your-client-secret]
 - `DATAVERSE_SCOPE`: https://pokemongame.crm4.dynamics.com/.default
 
-## Step 7: Configure CORS (Production Only)
+## Step 6: Configure CORS
 
-⚠️ **Security Note**: Only add CORS origins for your production domains. Never add localhost origins as they create security vulnerabilities.
+In Azure Portal → Function App → CORS:
+Add your Static Web Apps URL: `https://[your-static-app].azurestaticapps.net`
 
-```bash
-# Add your Static Web App URL
-az functionapp cors add --name pokemongame-functions-2025 --resource-group rg-pokemongame --allowed-origins "https://red-forest-0b2b6ae03.1.azurestaticapps.net"
-```
+## Step 7: Update Frontend
 
-**For Local Development**: Use local Functions (`func start`) instead of configuring CORS.
+Create new environment variable for production:
+`REACT_APP_API_BASE_URL=https://[your-function-app].azurewebsites.net`
 
-## Step 8: Update Frontend
+## Step 8: Test
 
-Update your frontend environment variables:
-- **Production**: `REACT_APP_API_BASE_URL=https://pokemongame-functions-2025.azurewebsites.net`
-- **Local Dev**: `REACT_APP_API_BASE_URL=http://localhost:7071` (when using `func start`)
-
-## Step 9: Test
-
-Your Functions are now available at:
-- **Health Check**: `https://pokemongame-functions-2025.azurewebsites.net/api/health`
-- **Hello Endpoint**: `https://pokemongame-functions-2025.azurewebsites.net/api/hello`
-- **Dataverse Proxy**: `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts`
-
-**Static Web App**: https://red-forest-0b2b6ae03.1.azurestaticapps.net
+Your Functions will be available at:
+- `https://[your-function-app].azurewebsites.net/api/health`
+- `https://[your-function-app].azurewebsites.net/api/dataverse/contacts`

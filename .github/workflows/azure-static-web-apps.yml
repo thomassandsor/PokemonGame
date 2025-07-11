@@ -25,7 +25,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/html-version" # HTML version source code path
+          app_location: "/" # Root - cleaned up HTML structure
           api_location: "" # No managed Functions - using standalone Functions
           output_location: "" # No build step needed for HTML
 

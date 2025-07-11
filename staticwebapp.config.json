@@ -1,0 +1,98 @@
+{
+  "routes": [
+    {
+      "route": "/static/*",
+      "headers": {
+        "cache-control": "public, immutable, max-age=31536000"
+      }
+    },
+    {
+      "route": "/styles/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000"
+      }
+    },
+    {
+      "route": "/js/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000"
+      }
+    },
+    {
+      "route": "/index.html",
+      "serve": "/index.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/my-pokemon.html",
+      "serve": "/my-pokemon.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/pokemon-browser.html",
+      "serve": "/pokemon-browser.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/redirect.html",
+      "serve": "/redirect.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/servegame-redirect.html",
+      "serve": "/servegame-redirect.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/api/GoogleLogin",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/GoogleCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/MicrosoftLogin",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/MicrosoftCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/ServeGame",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/dataverse/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/WhoAmI",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/*",
+      "serve": "/index.html",
+      "statusCode": 200
+    }
+  ],
+  "responseOverrides": {
+    "404": {
+      "redirect": "/",
+      "statusCode": 302
+    }
+  },
+  "globalHeaders": {
+    "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https: wss:",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "application/javascript",
+    ".css": "text/css",
+    ".html": "text/html"
+  }
+}

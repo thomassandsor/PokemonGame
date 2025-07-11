@@ -9,6 +9,10 @@ local.settings.json
 .env.local
 .env.production.local
 
+# Legacy React files (moved to legacy-react folder)
+/legacy-react/build
+/legacy-react/node_modules
+
 # dependencies
 /node_modules
 /api/node_modules

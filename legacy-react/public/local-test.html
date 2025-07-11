@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local OAuth Test - Pokemon Game</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .debug-section {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .status.success { background: rgba(40, 167, 69, 0.3); border: 2px solid #28a745; }
+        .status.error { background: rgba(220, 53, 69, 0.3); border: 2px solid #dc3545; }
+        .status.info { background: rgba(23, 162, 184, 0.3); border: 2px solid #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Local OAuth Test</h1>
+        <p>Open this file directly in your browser (file://) - no server needed!</p>
+        
+        <div id="status" class="status info">
+            ⏳ Ready to test OAuth flow
+        </div>
+
+        <h3>🧪 Test Actions</h3>
+        <a href="/api/MicrosoftLogin" class="button">🏢 Test Microsoft Login</a>
+        <button class="button" onclick="testWhoAmI()">👤 Test WhoAmI</button>
+        <button class="button" onclick="testDiagnostic()">🔍 Test Diagnostic</button>
+
+        <h3>🐛 Debug Console</h3>
+        <div id="debugConsole" class="debug-section">
+            <div id="debugLog">Starting local OAuth test...</div>
+        </div>
+        <button class="button" onclick="clearDebug()" style="background: #6c757d;">Clear Debug</button>
+
+        <h3>📋 Current URL Parameters</h3>
+        <div id="urlParams" class="debug-section"></div>
+
+        <h3>📝 Local Test Instructions</h3>
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px;">
+            <p><strong>✅ Local Environment Setup:</strong></p>
+            <ul>
+                <li>🌐 <strong>HTML Server</strong>: http://localhost:8080 (Python HTTP server)</li>
+                <li>⚙️ <strong>Azure Functions</strong>: http://localhost:7071 (Backend OAuth)</li>
+                <li>🎮 <strong>Game Page</strong>: <a href="http://localhost:8080/game.html" target="_blank">http://localhost:8080/game.html</a></li>
+            </ul>
+            <p><strong>🧪 Test Steps:</strong></p>
+            <ol>
+                <li><strong>Test WhoAmI first</strong> - Should return "not authenticated"</li>
+                <li><strong>Click "Test Microsoft Login"</strong> - Will redirect to Microsoft</li>
+                <li><strong>Complete Microsoft auth</strong> - Will redirect back to game page</li>
+                <li><strong>Check game page</strong> - Should show your authenticated user info</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function debugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const debugLogElement = document.getElementById('debugLog');
+            debugLogElement.innerHTML += `<br>[${timestamp}] ${message}`;
+            debugLogElement.scrollTop = debugLogElement.scrollHeight;
+            console.log(`[DEBUG ${timestamp}] ${message}`);
+        }
+
+        function clearDebug() {
+            document.getElementById('debugLog').innerHTML = 'Debug log cleared...';
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            statusElement.innerHTML = message;
+            statusElement.className = `status ${type}`;
+        }
+
+        async function testWhoAmI() {
+            debugLog('🧪 Testing WhoAmI endpoint...');
+            try {
+                const response = await fetch('/api/WhoAmI', {
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                debugLog(`📋 WhoAmI Response Status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    debugLog(`✅ WhoAmI Response: ${JSON.stringify(data, null, 2)}`);
+                    updateStatus(`✅ WhoAmI Success: ${data.authenticated ? 'Authenticated as ' + data.name : 'Not Authenticated'}`, data.authenticated ? 'success' : 'info');
+                } else {
+                    const errorText = await response.text();
+                    debugLog(`❌ WhoAmI Error: ${errorText}`);
+                    updateStatus(`❌ WhoAmI Failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                debugLog(`🚨 WhoAmI Exception: ${error.message}`);
+                updateStatus(`🚨 WhoAmI Exception: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDiagnostic() {
+            debugLog('🧪 Testing Diagnostic endpoint...');
+            try {
+                const response = await fetch('/api/DiagnosticCheck');
+                
+                debugLog(`📋 Diagnostic Response Status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    debugLog(`✅ Diagnostic Response: ${JSON.stringify(data, null, 2)}`);
+                    updateStatus(`✅ Diagnostic Success`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    debugLog(`❌ Diagnostic Error: ${errorText}`);
+                    updateStatus(`❌ Diagnostic Failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                debugLog(`🚨 Diagnostic Exception: ${error.message}`);
+                updateStatus(`🚨 Diagnostic Exception: ${error.message}`, 'error');
+            }
+        }
+
+        // Check URL parameters on load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramsDiv = document.getElementById('urlParams');
+            
+            if (urlParams.toString()) {
+                const params = {};
+                for (const [key, value] of urlParams) {
+                    params[key] = value;
+                }
+                paramsDiv.innerHTML = JSON.stringify(params, null, 2);
+                
+                // Check for OAuth callback parameters
+                if (urlParams.get('error')) {
+                    const error = urlParams.get('error');
+                    debugLog(`🚨 OAuth Error in URL: ${error}`);
+                    updateStatus(`🚨 OAuth Error: ${error}`, 'error');
+                } else if (urlParams.get('token') && urlParams.get('email')) {
+                    const email = urlParams.get('email');
+                    debugLog(`✅ OAuth success! Redirected with token for: ${email}`);
+                    updateStatus(`✅ OAuth callback received for: ${email}`, 'success');
+                    
+                    // Test WhoAmI after OAuth callback
+                    setTimeout(testWhoAmI, 1000);
+                }
+            } else {
+                paramsDiv.innerHTML = 'No URL parameters';
+            }
+        });
+    </script>
+</body>
+</html>
