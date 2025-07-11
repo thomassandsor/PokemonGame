@@ -13,6 +13,9 @@ local.settings.json
 /legacy-react/build
 /legacy-react/node_modules
 
+# Duplicate HTML development folder (files moved to root)
+/html-version/
+
 # dependencies
 /node_modules
 /api/node_modules
