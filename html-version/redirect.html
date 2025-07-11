@@ -49,16 +49,26 @@
         `;
         
         if (token && email) {
-            console.log('REDIRECT: Valid authentication data found, redirecting to localhost...');
+            console.log('REDIRECT: Valid authentication data found, redirecting...');
             
-            // Build the localhost URL with the authentication data
-            const localhostUrl = `http://localhost:8080/index.html?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}`;
+            // Determine the base URL - use current origin if on Azure, localhost if local
+            let baseUrl;
+            if (window.location.hostname.includes('azurestaticapps.net')) {
+                baseUrl = window.location.origin; // Use Azure Static Web Apps URL
+                console.log('REDIRECT: Detected Azure deployment, using:', baseUrl);
+            } else {
+                baseUrl = 'http://localhost:8080'; // Use localhost for local development
+                console.log('REDIRECT: Detected local development, using:', baseUrl);
+            }
             
-            console.log('REDIRECT: Redirecting to:', localhostUrl);
+            // Build the URL with the authentication data
+            const redirectUrl = `${baseUrl}/index.html?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}`;
+            
+            console.log('REDIRECT: Redirecting to:', redirectUrl);
             
             // Give user a moment to see the message, then redirect
             setTimeout(() => {
-                window.location.href = localhostUrl;
+                window.location.href = redirectUrl;
             }, 2000);
             
         } else {
@@ -67,7 +77,11 @@
             document.querySelector('body > div').textContent = 'Please try logging in again.';
             
             setTimeout(() => {
-                window.location.href = 'http://localhost:8080';
+                // Use current origin if on Azure, localhost if local
+                const homeUrl = window.location.hostname.includes('azurestaticapps.net') 
+                    ? window.location.origin 
+                    : 'http://localhost:8080';
+                window.location.href = homeUrl;
             }, 5000);
         }
     </script>
