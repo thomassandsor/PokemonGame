@@ -63,6 +63,9 @@ class AuthService {
             const storedUser = sessionStorage.getItem('pokemonGame_user');
             const isAuthenticated = sessionStorage.getItem('pokemonGame_authenticated');
             
+            console.log('AUTH: Stored user data:', storedUser);
+            console.log('AUTH: Stored auth flag:', isAuthenticated);
+            
             if (storedUser && isAuthenticated === 'true') {
                 const user = JSON.parse(storedUser);
                 console.log('AUTH: Restored user from session:', user);
@@ -75,6 +78,7 @@ class AuthService {
                     console.log('AUTH: Session restoration successful (localhost)');
                     return user;
                 } else {
+                    console.log('AUTH: Production environment, verifying token...');
                     // Verify the user is still valid by checking with the backend
                     const isValid = await this.verifyUserToken(user.token);
                     

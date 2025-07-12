@@ -1,6 +1,9 @@
 // My Pokemon page logic
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('MY-POKEMON: Page loaded, checking authentication...');
+    console.log('MY-POKEMON: Current URL:', window.location.href);
+    console.log('MY-POKEMON: Session storage auth:', sessionStorage.getItem('pokemonGame_authenticated'));
+    console.log('MY-POKEMON: Session storage user:', sessionStorage.getItem('pokemonGame_user'));
     
     // Give a moment for auth service to initialize
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -9,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const user = await AuthService.checkAuth();
     
     console.log('MY-POKEMON: Authentication check result:', user);
+    console.log('MY-POKEMON: AuthService.isAuthenticated():', AuthService.isAuthenticated());
     
     if (!user) {
         console.log('MY-POKEMON: User not authenticated');
@@ -18,6 +22,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         const token = urlParams.get('token');
         const email = urlParams.get('email');
         const name = urlParams.get('name');
+        
+        console.log('MY-POKEMON: URL params - token:', !!token, 'email:', email, 'name:', name);
         
         if (token && email) {
             console.log('MY-POKEMON: Found auth params in URL, setting up user...');
