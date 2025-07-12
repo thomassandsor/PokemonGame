@@ -178,15 +178,26 @@
             console.log('INDEX: Starting login process...');
             console.log('INDEX: Using real Microsoft OAuth login');
             
-            const loginUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin?dev=true';
+            // Detect environment to set proper redirect
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const devParam = isLocalhost ? '?dev=true' : '';
+            
+            const loginUrl = `https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin${devParam}`;
+            console.log('INDEX: Is localhost:', isLocalhost);
             console.log('INDEX: Redirecting to login URL:', loginUrl);
             window.location.href = loginUrl;
         }
 
         function tryDirectAuth() {
             console.log('INDEX: Trying direct authentication...');
+            
+            // Detect environment to set proper redirect
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const devParam = isLocalhost ? '?dev=true' : '';
+            
             // Open OAuth in a new window to avoid redirect issues
-            const loginUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin?dev=true';
+            const loginUrl = `https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin${devParam}`;
+            console.log('INDEX: Auth window URL:', loginUrl);
             const authWindow = window.open(loginUrl, 'authWindow', 'width=500,height=600');
             
             // Check if authentication completed
