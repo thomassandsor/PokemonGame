@@ -105,6 +105,54 @@ class PokemonService {
             return null;
         }
     }
+
+    // Get all available Pokemon from the Pokemon_pokemon table
+    static async getAllPokemon(offset = 0, limit = 20) {
+        try {
+            console.log('POKEMON-SERVICE: Loading all available Pokemon from Dataverse...');
+            
+            const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?$top=${limit}&$skip=${offset}&$orderby=pokemon_id`;
+            console.log('POKEMON-SERVICE: URL:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('POKEMON-SERVICE: Got Pokemon data from Dataverse:', data);
+                
+                // Map Dataverse field names to expected format
+                const mappedPokemon = (data.value || []).map(p => ({
+                    id: p.pokemon_id,
+                    name: p.pokemon_name,
+                    type1: p.pokemon_type1,
+                    type2: p.pokemon_type2,
+                    baseHp: p.pokemon_basehp,
+                    baseAttack: p.pokemon_baseattack,
+                    baseDefence: p.pokemon_basedefence,
+                    baseSpeed: p.pokemon_basespeed,
+                    description: p.pokemon_description,
+                    generation: p.pokemon_generation,
+                    legendary: p.pokemon_legendary
+                }));
+                
+                console.log('POKEMON-SERVICE: Mapped Pokemon data:', mappedPokemon);
+                return {
+                    pokemon: mappedPokemon,
+                    hasMore: data.value && data.value.length === limit
+                };
+            } else {
+                console.error('POKEMON-SERVICE: Failed to load Pokemon:', response.status);
+                throw new Error(`Failed to load Pokemon: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('POKEMON-SERVICE: Error loading Pokemon:', error);
+            throw error;
+        }
+    }
 }
 
 // Make it available globally

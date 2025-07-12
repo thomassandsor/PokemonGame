@@ -111,8 +111,12 @@ async function displayPokemon(pokemonList) {
     
     if (pokemonList.length === 0) {
         pokemonGrid.innerHTML = '<div class="no-pokemon">No Pokemon found. Start catching some!</div>';
+        pokemonGrid.style.display = 'block';
         return;
     }
+    
+    // Show the Pokemon grid
+    pokemonGrid.style.display = 'grid';
     
     for (const pokemon of pokemonList) {
         try {
