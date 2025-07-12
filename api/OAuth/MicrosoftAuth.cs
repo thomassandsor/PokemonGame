@@ -90,14 +90,17 @@ namespace PokemonGame.Api.OAuth
 
                 // Create or update user profile in Dataverse
                 var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
+                var profileCreationResult = "";
                 
                 try 
                 {
                     await CreateOrUpdateUserProfile(userEmail, userInfo.displayName);
+                    profileCreationResult = "SUCCESS";
                 }
                 catch (Exception profileEx)
                 {
                     _logger.LogError(profileEx, $"Failed to create user profile for {userEmail}");
+                    profileCreationResult = $"ERROR: {profileEx.Message}";
                     // Don't fail the authentication if profile creation fails
                 }
 
@@ -113,7 +116,8 @@ namespace PokemonGame.Api.OAuth
                 var sessionToken = CreateSessionToken(userEmail, userInfo.displayName);
                 
                 var response = req.CreateResponse(HttpStatusCode.Redirect);
-                response.Headers.Add("Location", $"{gameUrl}?token={sessionToken}&email={HttpUtility.UrlEncode(userEmail)}&name={HttpUtility.UrlEncode(userInfo.displayName)}");
+                // Include profile creation result in the redirect URL for debugging
+                response.Headers.Add("Location", $"{gameUrl}?token={sessionToken}&email={HttpUtility.UrlEncode(userEmail)}&name={HttpUtility.UrlEncode(userInfo.displayName)}&profile_result={HttpUtility.UrlEncode(profileCreationResult)}");
                 
                 // Set session cookie
                 response.Headers.Add("Set-Cookie", $"pokemon_session={sessionToken}; Path=/; HttpOnly; Secure; SameSite=Strict");

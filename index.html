@@ -108,6 +108,18 @@
             const email = urlParams.get('email');
             const name = urlParams.get('name');
             const error = urlParams.get('error');
+            const profileResult = urlParams.get('profile_result');
+
+            // Show profile creation result for debugging
+            if (profileResult) {
+                console.log('INDEX: Profile creation result:', profileResult);
+                if (profileResult !== 'SUCCESS') {
+                    // Show the error to the user for debugging
+                    setTimeout(() => {
+                        alert(`🐛 DEBUG INFO 🐛\n\nProfile Creation: ${profileResult}\n\nThis is debug info - authentication still worked!`);
+                    }, 1000);
+                }
+            }
 
             // Handle authentication error case
             if (error) {
