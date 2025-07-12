@@ -105,6 +105,18 @@
         const token = urlParams.get('token');
         const email = urlParams.get('email');
         const name = urlParams.get('name');
+        const error = urlParams.get('error');
+
+        // Handle authentication error case
+        if (error) {
+            console.log('INDEX: Authentication error detected:', error);
+            alert(`Authentication failed: ${error}\n\nPlease try logging in again.`);
+            // Clean up URL and show login prompt
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            showLoginPrompt();
+            return;
+        }
 
         if (token && email) {
             console.log('INDEX: Authentication data found in URL, setting up user session...');
@@ -163,6 +175,26 @@
             const loginUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin?dev=true';
             console.log('INDEX: Redirecting to login URL:', loginUrl);
             window.location.href = loginUrl;
+        }
+
+        function tryDirectAuth() {
+            console.log('INDEX: Trying direct authentication...');
+            // Open OAuth in a new window to avoid redirect issues
+            const loginUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/MicrosoftLogin?dev=true';
+            const authWindow = window.open(loginUrl, 'authWindow', 'width=500,height=600');
+            
+            // Check if authentication completed
+            const checkAuth = setInterval(() => {
+                try {
+                    if (authWindow.closed) {
+                        clearInterval(checkAuth);
+                        console.log('INDEX: Auth window closed, checking for authentication...');
+                        location.reload(); // Reload to check for auth
+                    }
+                } catch (e) {
+                    // Handle cross-origin errors
+                }
+            }, 1000);
         }
 
         function logout() {
