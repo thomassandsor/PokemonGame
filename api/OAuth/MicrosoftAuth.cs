@@ -247,13 +247,11 @@ namespace PokemonGame.Api.OAuth
                     }
                 }
 
-                // Create new contact
+                // Create new contact with minimal data
                 var contactData = new
                 {
                     emailaddress1 = email,
-                    fullname = displayName ?? email,
-                    firstname = displayName?.Split(' ').FirstOrDefault() ?? email.Split('@').FirstOrDefault(),
-                    lastname = displayName?.Split(' ').Skip(1).FirstOrDefault() ?? "",
+                    firstname = displayName ?? email.Split('@').FirstOrDefault(),
                     pokemon_trainerlevel = 1,
                     pokemon_totalcaught = 0
                 };
