@@ -1,7 +1,9 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Web;
 
@@ -86,6 +88,10 @@ namespace PokemonGame.Api.OAuth
                     return CreateErrorResponse(req, "Failed to get user information", state);
                 }
 
+                // Create or update user profile in Dataverse
+                var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
+                await CreateOrUpdateUserProfile(userEmail, userInfo.displayName);
+
                 // Create session and redirect to game
                 var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/game.html";
                 
@@ -95,10 +101,9 @@ namespace PokemonGame.Api.OAuth
                     gameUrl = "http://localhost:8080";
                 }
                 
-                var sessionToken = CreateSessionToken(userInfo.mail ?? userInfo.userPrincipalName, userInfo.displayName);
+                var sessionToken = CreateSessionToken(userEmail, userInfo.displayName);
                 
                 var response = req.CreateResponse(HttpStatusCode.Redirect);
-                var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
                 response.Headers.Add("Location", $"{gameUrl}?token={sessionToken}&email={HttpUtility.UrlEncode(userEmail)}&name={HttpUtility.UrlEncode(userInfo.displayName)}");
                 
                 // Set session cookie
@@ -187,6 +192,132 @@ namespace PokemonGame.Api.OAuth
             
             response.Headers.Add("Location", $"{gameUrl}?error={HttpUtility.UrlEncode(message)}");
             return response;
+        }
+
+        private async Task CreateOrUpdateUserProfile(string email, string displayName)
+        {
+            try
+            {
+                _logger.LogInformation($"Creating/updating user profile for {email}");
+                
+                // Get Dataverse configuration
+                var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
+                var clientId = Environment.GetEnvironmentVariable("DATAVERSE_CLIENT_ID");
+                var clientSecret = Environment.GetEnvironmentVariable("DATAVERSE_CLIENT_SECRET");
+                var tenantId = Environment.GetEnvironmentVariable("DATAVERSE_TENANT_ID");
+                
+                if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(tenantId))
+                {
+                    _logger.LogWarning("Dataverse configuration missing, skipping user profile creation");
+                    return;
+                }
+
+                // Get access token for Dataverse
+                var accessToken = await GetDataverseAccessToken(clientId, clientSecret, tenantId, dataverseUrl);
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    _logger.LogWarning("Failed to get Dataverse access token, skipping user profile creation");
+                    return;
+                }
+
+                using var httpClient = new HttpClient();
+                var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
+                
+                // First, check if user already exists
+                var checkUrl = $"{baseUrl}/api/data/v9.2/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,fullname,emailaddress1";
+                
+                var checkRequest = new HttpRequestMessage(HttpMethod.Get, checkUrl);
+                checkRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                checkRequest.Headers.Add("OData-MaxVersion", "4.0");
+                checkRequest.Headers.Add("OData-Version", "4.0");
+                checkRequest.Headers.Add("Accept", "application/json");
+
+                var checkResponse = await httpClient.SendAsync(checkRequest);
+                var checkContent = await checkResponse.Content.ReadAsStringAsync();
+                
+                if (checkResponse.IsSuccessStatusCode)
+                {
+                    var checkResult = JsonSerializer.Deserialize<JsonElement>(checkContent);
+                    var existingContacts = checkResult.GetProperty("value").EnumerateArray().ToList();
+                    
+                    if (existingContacts.Any())
+                    {
+                        _logger.LogInformation($"User {email} already exists in Dataverse, skipping creation");
+                        return;
+                    }
+                }
+
+                // Create new contact
+                var contactData = new
+                {
+                    emailaddress1 = email,
+                    fullname = displayName ?? email,
+                    firstname = displayName?.Split(' ').FirstOrDefault() ?? email.Split('@').FirstOrDefault(),
+                    lastname = displayName?.Split(' ').Skip(1).FirstOrDefault() ?? "",
+                    pokemon_trainerlevel = 1,
+                    pokemon_totalcaught = 0
+                };
+
+                var createUrl = $"{baseUrl}/api/data/v9.2/contacts";
+                var createRequest = new HttpRequestMessage(HttpMethod.Post, createUrl);
+                createRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                createRequest.Headers.Add("OData-MaxVersion", "4.0");
+                createRequest.Headers.Add("OData-Version", "4.0");
+                createRequest.Headers.Add("Accept", "application/json");
+                createRequest.Content = new StringContent(JsonSerializer.Serialize(contactData), Encoding.UTF8, "application/json");
+
+                var createResponse = await httpClient.SendAsync(createRequest);
+                var createContent = await createResponse.Content.ReadAsStringAsync();
+
+                if (createResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Successfully created user profile for {email}");
+                }
+                else
+                {
+                    _logger.LogError($"Failed to create user profile for {email}. Status: {createResponse.StatusCode}, Response: {createContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error creating/updating user profile for {email}: {ex.Message}");
+                // Don't throw - we don't want to break the authentication flow if user creation fails
+            }
+        }
+
+        private async Task<string?> GetDataverseAccessToken(string clientId, string clientSecret, string tenantId, string dataverseUrl)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                
+                var tokenRequest = new Dictionary<string, string>
+                {
+                    ["grant_type"] = "client_credentials",
+                    ["client_id"] = clientId,
+                    ["client_secret"] = clientSecret,
+                    ["scope"] = $"{dataverseUrl}/.default"
+                };
+
+                var tokenResponse = await httpClient.PostAsync(
+                    $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token",
+                    new FormUrlEncodedContent(tokenRequest));
+
+                if (tokenResponse.IsSuccessStatusCode)
+                {
+                    var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
+                    var tokenData = JsonSerializer.Deserialize<JsonElement>(tokenContent);
+                    return tokenData.GetProperty("access_token").GetString();
+                }
+
+                _logger.LogError($"Failed to get Dataverse access token. Status: {tokenResponse.StatusCode}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting Dataverse access token");
+                return null;
+            }
         }
     }
 
