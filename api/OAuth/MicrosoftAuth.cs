@@ -39,7 +39,7 @@ namespace PokemonGame.Api.OAuth
                 $"?client_id={_clientId}" +
                 $"&redirect_uri={HttpUtility.UrlEncode(_redirectUri)}" +
                 "&response_type=code" +
-                "&scope=openid%20profile%20email" +
+                "&scope=openid%20profile%20email%20User.Read" +
                 $"&state={state}";
 
             var response = req.CreateResponse(HttpStatusCode.Redirect);
@@ -124,7 +124,7 @@ namespace PokemonGame.Api.OAuth
                 {"client_secret", _clientSecret},
                 {"redirect_uri", _redirectUri},
                 {"grant_type", "authorization_code"},
-                {"scope", "openid profile email"}
+                {"scope", "openid profile email User.Read"}
             };
 
             var content = new FormUrlEncodedContent(tokenRequest);
