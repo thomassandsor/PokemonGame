@@ -1,10 +1,18 @@
 // Pokemon Service for loading REAL Pokemon data from Dataverse
 class PokemonService {
     
+    // Check if we're in development mode (localhost)
+    static isDevelopmentMode() {
+        return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    }
+    
     // Get caught Pokemon from REAL Dataverse via DataverseProxy.cs
     static async getCaughtPokemon(email) {
         try {
             console.log('POKEMON-SERVICE: Loading caught Pokemon for:', email);
+            
+            // ALWAYS try to get real data first, regardless of development mode
+            console.log('POKEMON-SERVICE: Attempting to load REAL data from Dataverse...');
             
             // For now, use your known user ID to bypass the email lookup CORS issue
             // TODO: Fix CORS for email lookup, but this gets you working immediately
@@ -33,12 +41,18 @@ class PokemonService {
                 console.log('POKEMON-SERVICE: Got real Pokemon data from Dataverse:', data);
                 return data.value || []; // Return actual Pokemon records from YOUR Dataverse
             } else {
-                console.error('POKEMON-SERVICE: Failed to load Pokemon:', response.status);
-                return [];
+                console.error('POKEMON-SERVICE: HTTP ERROR - Status:', response.status, 'StatusText:', response.statusText);
+                console.error('POKEMON-SERVICE: Failed URL was:', url);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
         } catch (error) {
-            console.error('POKEMON-SERVICE: Error loading Pokemon:', error);
-            return [];
+            console.error('POKEMON-SERVICE: DETAILED ERROR loading Pokemon:', error);
+            console.error('POKEMON-SERVICE: Error type:', error.name);
+            console.error('POKEMON-SERVICE: Error message:', error.message);
+            console.error('POKEMON-SERVICE: This is likely a CORS error preventing localhost from accessing Azure Functions');
+            
+            // Re-throw the error so the UI can show the real error to the user
+            throw error;
         }
     }
 

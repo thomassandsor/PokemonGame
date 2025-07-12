@@ -3,6 +3,35 @@ class AuthService {
     static currentUser = null;
     static isAuthenticatedFlag = false;
 
+    // Check if we're in development mode
+    static isDevelopmentMode() {
+        return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    }
+
+    // Development mode login bypass
+    static loginDevelopmentMode() {
+        console.log('AUTH: loginDevelopmentMode called');
+        console.log('AUTH: isDevelopmentMode check:', this.isDevelopmentMode());
+        
+        if (this.isDevelopmentMode()) {
+            console.log('AUTH: Development mode confirmed, creating dev user');
+            const devUser = {
+                email: 'dev@localhost.com',
+                name: 'Development User',
+                token: 'dev-token-123',
+                userId: 'dev-user-123'
+            };
+            console.log('AUTH: Created dev user:', devUser);
+            console.log('AUTH: Calling setAuthenticatedUser...');
+            this.setAuthenticatedUser(devUser);
+            console.log('AUTH: setAuthenticatedUser completed');
+            return devUser;
+        } else {
+            console.log('AUTH: Not in development mode, returning null');
+        }
+        return null;
+    }
+
     // Set authenticated user and store in session
     static setAuthenticatedUser(user) {
         console.log('AUTH: Setting authenticated user:', user);

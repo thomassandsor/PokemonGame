@@ -84,7 +84,22 @@ async function loadMyPokemon() {
     } catch (error) {
         console.error('MY-POKEMON: Error loading Pokemon:', error);
         errorMessage.style.display = 'block';
-        errorMessage.querySelector('p').textContent = 'Failed to load Pokemon collection. Please try again.';
+        
+        // Show the REAL error details to the user
+        let errorText = `Failed to load Pokemon: ${error.message}`;
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            errorText = `CORS Error: Cannot connect to Azure Functions from localhost. 
+                        This is a browser security restriction.
+                        
+                        Technical details: ${error.message}
+                        
+                        Options:
+                        1. Deploy to Azure to test with real data
+                        2. Use a CORS proxy for local development
+                        3. Configure Azure Functions to allow localhost CORS`;
+        }
+        
+        document.getElementById('errorText').innerHTML = errorText.replace(/\n/g, '<br>');
     } finally {
         loadingSpinner.style.display = 'none';
     }
