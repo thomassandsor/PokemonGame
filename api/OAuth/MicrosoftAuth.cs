@@ -90,7 +90,16 @@ namespace PokemonGame.Api.OAuth
 
                 // Create or update user profile in Dataverse
                 var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
-                await CreateOrUpdateUserProfile(userEmail, userInfo.displayName);
+                
+                try 
+                {
+                    await CreateOrUpdateUserProfile(userEmail, userInfo.displayName);
+                }
+                catch (Exception profileEx)
+                {
+                    _logger.LogError(profileEx, $"Failed to create user profile for {userEmail}");
+                    // Don't fail the authentication if profile creation fails
+                }
 
                 // Create session and redirect to game
                 var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/game.html";
@@ -198,7 +207,7 @@ namespace PokemonGame.Api.OAuth
         {
             try
             {
-                _logger.LogInformation($"Creating/updating user profile for {email}");
+                _logger.LogInformation($"PROFILE-CREATION: Starting user profile creation for {email} with displayName: {displayName}");
                 
                 // Get Dataverse configuration
                 var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
@@ -206,25 +215,30 @@ namespace PokemonGame.Api.OAuth
                 var clientSecret = Environment.GetEnvironmentVariable("DATAVERSE_CLIENT_SECRET");
                 var tenantId = Environment.GetEnvironmentVariable("DATAVERSE_TENANT_ID");
                 
+                _logger.LogInformation($"PROFILE-CREATION: Config check - DataverseUrl: {dataverseUrl}, HasClientId: {!string.IsNullOrEmpty(clientId)}, HasClientSecret: {!string.IsNullOrEmpty(clientSecret)}, HasTenantId: {!string.IsNullOrEmpty(tenantId)}");
+                
                 if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(tenantId))
                 {
-                    _logger.LogWarning("Dataverse configuration missing, skipping user profile creation");
-                    return;
+                    _logger.LogError("PROFILE-CREATION: Dataverse configuration missing, cannot create user profile");
+                    throw new Exception("Dataverse configuration is incomplete");
                 }
 
                 // Get access token for Dataverse
+                _logger.LogInformation("PROFILE-CREATION: Requesting Dataverse access token...");
                 var accessToken = await GetDataverseAccessToken(clientId, clientSecret, tenantId, dataverseUrl);
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    _logger.LogWarning("Failed to get Dataverse access token, skipping user profile creation");
-                    return;
+                    _logger.LogError("PROFILE-CREATION: Failed to get Dataverse access token");
+                    throw new Exception("Failed to authenticate with Dataverse");
                 }
+                _logger.LogInformation("PROFILE-CREATION: Successfully obtained Dataverse access token");
 
                 using var httpClient = new HttpClient();
                 var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
                 
                 // First, check if user already exists
                 var checkUrl = $"{baseUrl}/api/data/v9.2/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,fullname,emailaddress1";
+                _logger.LogInformation($"PROFILE-CREATION: Checking if user exists with URL: {checkUrl}");
                 
                 var checkRequest = new HttpRequestMessage(HttpMethod.Get, checkUrl);
                 checkRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
@@ -235,28 +249,39 @@ namespace PokemonGame.Api.OAuth
                 var checkResponse = await httpClient.SendAsync(checkRequest);
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
                 
+                _logger.LogInformation($"PROFILE-CREATION: User existence check response - Status: {checkResponse.StatusCode}, Content: {checkContent}");
+                
                 if (checkResponse.IsSuccessStatusCode)
                 {
                     var checkResult = JsonSerializer.Deserialize<JsonElement>(checkContent);
                     var existingContacts = checkResult.GetProperty("value").EnumerateArray().ToList();
                     
+                    _logger.LogInformation($"PROFILE-CREATION: Found {existingContacts.Count} existing contacts for {email}");
+                    
                     if (existingContacts.Any())
                     {
-                        _logger.LogInformation($"User {email} already exists in Dataverse, skipping creation");
+                        _logger.LogInformation($"PROFILE-CREATION: User {email} already exists in Dataverse, skipping creation");
                         return;
                     }
                 }
+                else
+                {
+                    _logger.LogError($"PROFILE-CREATION: Failed to check existing user. Status: {checkResponse.StatusCode}, Content: {checkContent}");
+                    throw new Exception($"Failed to check if user exists: {checkResponse.StatusCode}");
+                }
 
-                // Create new contact with minimal data
+                // Create new contact with minimal data - only use standard fields
                 var contactData = new
                 {
                     emailaddress1 = email,
-                    firstname = displayName ?? email.Split('@').FirstOrDefault(),
-                    pokemon_trainerlevel = 1,
-                    pokemon_totalcaught = 0
+                    firstname = displayName ?? email.Split('@').FirstOrDefault()
                 };
 
+                _logger.LogInformation($"PROFILE-CREATION: Creating new contact with data: {JsonSerializer.Serialize(contactData)}");
+
                 var createUrl = $"{baseUrl}/api/data/v9.2/contacts";
+                _logger.LogInformation($"PROFILE-CREATION: Creating contact at URL: {createUrl}");
+                
                 var createRequest = new HttpRequestMessage(HttpMethod.Post, createUrl);
                 createRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
                 createRequest.Headers.Add("OData-MaxVersion", "4.0");
@@ -267,19 +292,22 @@ namespace PokemonGame.Api.OAuth
                 var createResponse = await httpClient.SendAsync(createRequest);
                 var createContent = await createResponse.Content.ReadAsStringAsync();
 
+                _logger.LogInformation($"PROFILE-CREATION: Contact creation response - Status: {createResponse.StatusCode}, Content: {createContent}");
+
                 if (createResponse.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Successfully created user profile for {email}");
+                    _logger.LogInformation($"PROFILE-CREATION: Successfully created user profile for {email}");
                 }
                 else
                 {
-                    _logger.LogError($"Failed to create user profile for {email}. Status: {createResponse.StatusCode}, Response: {createContent}");
+                    _logger.LogError($"PROFILE-CREATION: Failed to create user profile for {email}. Status: {createResponse.StatusCode}, Response: {createContent}");
+                    throw new Exception($"Contact creation failed: {createResponse.StatusCode} - {createContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error creating/updating user profile for {email}: {ex.Message}");
-                // Don't throw - we don't want to break the authentication flow if user creation fails
+                _logger.LogError(ex, $"PROFILE-CREATION: Exception creating user profile for {email}: {ex.Message}");
+                throw; // Re-throw so the outer catch can handle it
             }
         }
 
@@ -287,6 +315,8 @@ namespace PokemonGame.Api.OAuth
         {
             try
             {
+                _logger.LogInformation($"DATAVERSE-TOKEN: Requesting access token for tenant: {tenantId}, scope: {dataverseUrl}/.default");
+                
                 using var httpClient = new HttpClient();
                 
                 var tokenRequest = new Dictionary<string, string>
@@ -297,23 +327,28 @@ namespace PokemonGame.Api.OAuth
                     ["scope"] = $"{dataverseUrl}/.default"
                 };
 
-                var tokenResponse = await httpClient.PostAsync(
-                    $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token",
-                    new FormUrlEncodedContent(tokenRequest));
+                var tokenUrl = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token";
+                _logger.LogInformation($"DATAVERSE-TOKEN: Requesting token from: {tokenUrl}");
+
+                var tokenResponse = await httpClient.PostAsync(tokenUrl, new FormUrlEncodedContent(tokenRequest));
+                var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
+                
+                _logger.LogInformation($"DATAVERSE-TOKEN: Token response - Status: {tokenResponse.StatusCode}, Content: {tokenContent}");
 
                 if (tokenResponse.IsSuccessStatusCode)
                 {
-                    var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
                     var tokenData = JsonSerializer.Deserialize<JsonElement>(tokenContent);
-                    return tokenData.GetProperty("access_token").GetString();
+                    var accessToken = tokenData.GetProperty("access_token").GetString();
+                    _logger.LogInformation($"DATAVERSE-TOKEN: Successfully obtained access token (length: {accessToken?.Length})");
+                    return accessToken;
                 }
 
-                _logger.LogError($"Failed to get Dataverse access token. Status: {tokenResponse.StatusCode}");
+                _logger.LogError($"DATAVERSE-TOKEN: Failed to get Dataverse access token. Status: {tokenResponse.StatusCode}, Content: {tokenContent}");
                 return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Dataverse access token");
+                _logger.LogError(ex, $"DATAVERSE-TOKEN: Exception getting Dataverse access token: {ex.Message}");
                 return null;
             }
         }
