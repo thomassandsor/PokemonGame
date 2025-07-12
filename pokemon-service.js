@@ -39,7 +39,24 @@ class PokemonService {
             if (response.ok) {
                 const data = await response.json();
                 console.log('POKEMON-SERVICE: Got real Pokemon data from Dataverse:', data);
-                return data.value || []; // Return actual Pokemon records from YOUR Dataverse
+                
+                // Map Dataverse field names to expected format
+                const mappedPokemon = (data.value || []).map(p => ({
+                    name: p.pokemon_name,
+                    level: p.pokemon_level,
+                    hp: p.pokemon_hp,
+                    hpmax: p.pokemon_hpmax,
+                    attack: p.pokemon_attack,
+                    defence: p.pokemon_defence,
+                    height: p.pokemon_height,
+                    weight: p.pokemon_weight,
+                    pokedexid: p.pokemon_pokedexid,
+                    dateCaught: p.createdon,
+                    userId: p._pokemon_user_value
+                }));
+                
+                console.log('POKEMON-SERVICE: Mapped Pokemon data:', mappedPokemon);
+                return mappedPokemon;
             } else {
                 console.error('POKEMON-SERVICE: HTTP ERROR - Status:', response.status, 'StatusText:', response.statusText);
                 console.error('POKEMON-SERVICE: Failed URL was:', url);
