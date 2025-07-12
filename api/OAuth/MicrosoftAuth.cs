@@ -61,13 +61,13 @@ namespace PokemonGame.Api.OAuth
             if (!string.IsNullOrEmpty(error))
             {
                 _logger.LogError($"Microsoft OAuth error: {error}");
-                return CreateErrorResponse(req, "Authentication failed");
+                return CreateErrorResponse(req, "Authentication failed", state);
             }
 
             if (string.IsNullOrEmpty(code))
             {
                 _logger.LogError("No authorization code received from Microsoft");
-                return CreateErrorResponse(req, "No authorization code received");
+                return CreateErrorResponse(req, "No authorization code received", state);
             }
 
             try
@@ -76,14 +76,14 @@ namespace PokemonGame.Api.OAuth
                 var tokenResponse = await ExchangeCodeForToken(code);
                 if (tokenResponse == null)
                 {
-                    return CreateErrorResponse(req, "Failed to get access token");
+                    return CreateErrorResponse(req, "Failed to get access token", state);
                 }
 
                 // Get user info from Microsoft
                 var userInfo = await GetMicrosoftUserInfo(tokenResponse.access_token);
                 if (userInfo == null)
                 {
-                    return CreateErrorResponse(req, "Failed to get user information");
+                    return CreateErrorResponse(req, "Failed to get user information", state);
                 }
 
                 // Create session and redirect to game
@@ -109,7 +109,7 @@ namespace PokemonGame.Api.OAuth
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during Microsoft OAuth callback");
-                return CreateErrorResponse(req, "Authentication error occurred");
+                return CreateErrorResponse(req, "Authentication error occurred", state);
             }
         }
 
@@ -174,10 +174,17 @@ namespace PokemonGame.Api.OAuth
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(payload));
         }
 
-        private HttpResponseData CreateErrorResponse(HttpRequestData req, string message)
+        private HttpResponseData CreateErrorResponse(HttpRequestData req, string message, string? state = null)
         {
             var response = req.CreateResponse(HttpStatusCode.Redirect);
             var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/game.html";
+            
+            // If state is "localhost", redirect to localhost instead
+            if (state == "localhost")
+            {
+                gameUrl = "http://localhost:8080";
+            }
+            
             response.Headers.Add("Location", $"{gameUrl}?error={HttpUtility.UrlEncode(message)}");
             return response;
         }
