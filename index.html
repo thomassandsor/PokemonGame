@@ -100,56 +100,61 @@
     <script>
         console.log('INDEX: Page loaded, checking authentication...');
 
-        // Check for authentication parameters in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const email = urlParams.get('email');
-        const name = urlParams.get('name');
-        const error = urlParams.get('error');
+        function initializeAuth() {
+            // Check for authentication parameters in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const email = urlParams.get('email');
+            const name = urlParams.get('name');
+            const error = urlParams.get('error');
 
-        // Handle authentication error case
-        if (error) {
-            console.log('INDEX: Authentication error detected:', error);
-            alert(`Authentication failed: ${error}\n\nPlease try logging in again.`);
-            // Clean up URL and show login prompt
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-            showLoginPrompt();
-            return;
-        }
+            // Handle authentication error case
+            if (error) {
+                console.log('INDEX: Authentication error detected:', error);
+                alert(`Authentication failed: ${error}\n\nPlease try logging in again.`);
+                // Clean up URL and show login prompt
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                showLoginPrompt();
+                return;
+            }
 
-        if (token && email) {
-            console.log('INDEX: Authentication data found in URL, setting up user session...');
-            
-            // Store authentication data
-            AuthService.setAuthenticatedUser({
-                token: token,
-                email: email,
-                name: name || email
-            });
-
-            // Clean up URL parameters
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-            
-            showUserInterface();
-        } else {
-            // Check if user is already authenticated from previous session
-            AuthService.restoreAuthFromSession()
-                .then(() => {
-                    if (AuthService.isAuthenticated()) {
-                        console.log('INDEX: User already authenticated from session');
-                        showUserInterface();
-                    } else {
-                        console.log('INDEX: No authentication found, showing login prompt');
-                        showLoginPrompt();
-                    }
-                })
-                .catch(error => {
-                    console.error('INDEX: Error restoring auth session:', error);
-                    showLoginPrompt();
+            if (token && email) {
+                console.log('INDEX: Authentication data found in URL, setting up user session...');
+                
+                // Store authentication data
+                AuthService.setAuthenticatedUser({
+                    token: token,
+                    email: email,
+                    name: name || email
                 });
+
+                // Clean up URL parameters
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                
+                showUserInterface();
+            } else {
+                // Check if user is already authenticated from previous session
+                AuthService.restoreAuthFromSession()
+                    .then(() => {
+                        if (AuthService.isAuthenticated()) {
+                            console.log('INDEX: User already authenticated from session');
+                            showUserInterface();
+                        } else {
+                            console.log('INDEX: No authentication found, showing login prompt');
+                            showLoginPrompt();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('INDEX: Error restoring auth session:', error);
+                        showLoginPrompt();
+                    });
+            }
         }
+
+        // Initialize authentication when page loads
+        initializeAuth();
 
         function showUserInterface() {
             const user = AuthService.getCurrentUser();
