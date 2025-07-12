@@ -281,6 +281,7 @@ namespace PokemonGame.Api.OAuth
                 _logger.LogError(ex, $"PROFILE-CREATION: Exception creating user profile for {email}: {ex.Message}");
                 throw; // Re-throw so the outer catch can handle it
             }
+        }
     }
 
     public class MicrosoftTokenResponse
