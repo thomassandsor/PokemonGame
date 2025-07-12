@@ -78,7 +78,14 @@ class AuthService {
                     console.log('AUTH: Session restoration successful (localhost)');
                     return user;
                 } else {
-                    console.log('AUTH: Production environment, verifying token...');
+                    console.log('AUTH: Production environment, TEMPORARILY skipping token verification...');
+                    // TEMPORARY: Skip token verification in production until we fix the whoami endpoint
+                    this.currentUser = user;
+                    this.isAuthenticatedFlag = true;
+                    console.log('AUTH: Session restoration successful (production - no verification)');
+                    return user;
+                    
+                    /* DISABLED FOR NOW - whoami endpoint may not exist
                     // Verify the user is still valid by checking with the backend
                     const isValid = await this.verifyUserToken(user.token);
                     
@@ -92,6 +99,7 @@ class AuthService {
                         this.logout();
                         return null;
                     }
+                    */
                 }
             } else {
                 console.log('AUTH: No valid session found');

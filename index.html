@@ -122,6 +122,9 @@
 
             if (token && email) {
                 console.log('INDEX: Authentication data found in URL, setting up user session...');
+                console.log('INDEX: Token present:', !!token);
+                console.log('INDEX: Email:', email);
+                console.log('INDEX: Name:', name);
                 
                 // Store authentication data
                 AuthService.setAuthenticatedUser({
@@ -132,7 +135,9 @@
 
                 // Clean up URL parameters
                 const cleanUrl = window.location.origin + window.location.pathname;
+                console.log('INDEX: Cleaning URL from:', window.location.href, 'to:', cleanUrl);
                 window.history.replaceState({}, document.title, cleanUrl);
+                console.log('INDEX: URL cleaned. Current URL:', window.location.href);
                 
                 showUserInterface();
             } else {
