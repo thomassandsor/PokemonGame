@@ -1,6 +1,6 @@
 // Pokemon Browser page logic
-let currentOffset = 0;
-const pokemonPerPage = 20;
+let currentOffset = 0; // Track current offset for pagination
+const pokemonPerPage = 20; // Back to reasonable page size
 let allPokemon = [];
 let filteredPokemon = [];
 let isLoading = false;
@@ -53,30 +53,50 @@ async function loadPokemon() {
         const result = await PokemonService.getAllPokemon(currentOffset, pokemonPerPage);
         
         if (currentOffset === 0) {
+            // First load - replace everything
             allPokemon = result.pokemon;
             filteredPokemon = [...allPokemon];
+            displayPokemon(true); // true = clear existing
         } else {
-            allPokemon.push(...result.pokemon);
-            filteredPokemon = [...allPokemon];
+            // Load more - append new Pokemon
+            const newPokemon = result.pokemon;
+            allPokemon.push(...newPokemon);
+            
+            // For pagination, we don't re-filter, just add new ones
+            filteredPokemon.push(...newPokemon);
+            displayNewPokemon(newPokemon); // Just add the new ones to UI
         }
         
-        console.log('POKEMON-BROWSER: Loaded Pokemon:', allPokemon.length);
+        console.log('POKEMON-BROWSER: Total Pokemon loaded:', allPokemon.length);
+        console.log('POKEMON-BROWSER: Current offset:', currentOffset);
+        console.log('POKEMON-BROWSER: Has more data?', result.hasMore);
         
         // Update UI
-        displayPokemon();
-        updateStats();
+        if (currentOffset > 0) {
+            // This was a "Load More" operation
+            updateStats();
+        } else {
+            // First load
+            updateStats();
+        }
         
         // Show stats
         pokemonStats.style.display = 'flex';
         
-        // Show/hide load more button
+        // Show/hide load more button based on whether there are more records
         const loadMoreContainer = document.getElementById('loadMoreContainer');
+        console.log('POKEMON-BROWSER: Load more container element:', loadMoreContainer);
+        console.log('POKEMON-BROWSER: Has more data for pagination?', result.hasMore);
+        
         if (result.hasMore) {
+            console.log('POKEMON-BROWSER: Showing load more button');
             loadMoreContainer.style.display = 'block';
         } else {
+            console.log('POKEMON-BROWSER: Hiding load more button (no more data)');
             loadMoreContainer.style.display = 'none';
         }
         
+        // Update offset for next request
         currentOffset += pokemonPerPage;
         
     } catch (error) {
@@ -89,10 +109,10 @@ async function loadPokemon() {
     }
 }
 
-function displayPokemon() {
+function displayPokemon(clearExisting = false) {
     const pokemonGrid = document.getElementById('pokemonGrid');
     
-    if (currentOffset === 0) {
+    if (clearExisting) {
         pokemonGrid.innerHTML = '';
     }
     
@@ -102,7 +122,22 @@ function displayPokemon() {
         return;
     }
     
-    filteredPokemon.forEach(pokemon => {
+    // Only add Pokemon that aren't already displayed
+    const existingCards = pokemonGrid.children.length;
+    const pokemonToShow = clearExisting ? filteredPokemon : filteredPokemon.slice(existingCards);
+    
+    pokemonToShow.forEach(pokemon => {
+        const pokemonCard = createPokemonCard(pokemon);
+        pokemonGrid.appendChild(pokemonCard);
+    });
+    
+    pokemonGrid.style.display = 'grid';
+}
+
+function displayNewPokemon(newPokemon) {
+    const pokemonGrid = document.getElementById('pokemonGrid');
+    
+    newPokemon.forEach(pokemon => {
         const pokemonCard = createPokemonCard(pokemon);
         pokemonGrid.appendChild(pokemonCard);
     });

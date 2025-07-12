@@ -106,13 +106,91 @@ class PokemonService {
         }
     }
 
-    // Get all available Pokemon from the Pokemon_pokemon table
+    // Get all available Pokemon from the Pokemon master table
     static async getAllPokemon(offset = 0, limit = 20) {
         try {
-            console.log('POKEMON-SERVICE: Loading all available Pokemon from Dataverse...');
+            console.log('POKEMON-SERVICE: Loading Pokemon from Dataverse...');
+            console.log('POKEMON-SERVICE: Using confirmed table name: pokemon_pokemons');
+            console.log('POKEMON-SERVICE: Pagination - offset:', offset, 'limit:', limit);
             
-            const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?$top=${limit}&$skip=${offset}&$orderby=pokemon_id`;
-            console.log('POKEMON-SERVICE: URL:', url);
+            // HYBRID APPROACH: Since $skip causes 400 errors, use a workaround
+            if (offset === 0) {
+                // First page: Use only $top (which works)
+                const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=${limit}`;
+                console.log('POKEMON-SERVICE: First page URL:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('POKEMON-SERVICE: Got first page from Dataverse:', data);
+                    
+                    const mappedPokemon = this.mapPokemonData(data.value || []);
+                    
+                    // For subsequent pages, we'll need to load all data and cache it
+                    // So let's also make a request for all Pokemon to cache
+                    this.loadAndCacheAllPokemon();
+                    
+                    const hasMore = data.value && data.value.length === limit;
+                    console.log('POKEMON-SERVICE: First page - has more?', hasMore);
+                    
+                    return {
+                        pokemon: mappedPokemon,
+                        hasMore: hasMore,
+                        tableName: 'pokemon_pokemons'
+                    };
+                } else {
+                    console.error('POKEMON-SERVICE: HTTP ERROR - Status:', response.status);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } else {
+                // Subsequent pages: Use cached data (since $skip doesn't work)
+                console.log('POKEMON-SERVICE: Loading from cache for offset:', offset);
+                
+                if (!PokemonService._allPokemonCache) {
+                    console.log('POKEMON-SERVICE: Cache not ready, loading all Pokemon...');
+                    await this.loadAndCacheAllPokemon();
+                }
+                
+                const startIndex = offset;
+                const endIndex = offset + limit;
+                const pagePokemons = PokemonService._allPokemonCache.slice(startIndex, endIndex);
+                const hasMore = endIndex < PokemonService._allPokemonCache.length;
+                
+                console.log('POKEMON-SERVICE: Returning cached page:', pagePokemons.length, 'Pokemon');
+                console.log('POKEMON-SERVICE: Cache total:', PokemonService._allPokemonCache.length);
+                console.log('POKEMON-SERVICE: Has more?', hasMore);
+                
+                return {
+                    pokemon: pagePokemons,
+                    hasMore: hasMore,
+                    tableName: 'pokemon_pokemons'
+                };
+            }
+            
+        } catch (error) {
+            console.error('POKEMON-SERVICE: DETAILED ERROR loading all Pokemon:', error);
+            console.error('POKEMON-SERVICE: Error type:', error.name);
+            console.error('POKEMON-SERVICE: Error message:', error.message);
+            throw error;
+        }
+    }
+
+    // Helper method to load and cache all Pokemon data (background operation)
+    static async loadAndCacheAllPokemon() {
+        try {
+            if (PokemonService._allPokemonCache) {
+                console.log('POKEMON-SERVICE: Cache already exists, skipping load');
+                return;
+            }
+            
+            console.log('POKEMON-SERVICE: Loading ALL Pokemon for caching...');
+            // Load a large batch to get all Pokemon (Dataverse default max is usually 5000)
+            const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=1000`;
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -122,36 +200,35 @@ class PokemonService {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('POKEMON-SERVICE: Got Pokemon data from Dataverse:', data);
+                console.log('POKEMON-SERVICE: Loaded all Pokemon for cache:', data.value?.length || 0);
                 
-                // Map Dataverse field names to expected format
-                const mappedPokemon = (data.value || []).map(p => ({
-                    id: p.pokemon_id,
-                    name: p.pokemon_name,
-                    type1: p.pokemon_type1,
-                    type2: p.pokemon_type2,
-                    baseHp: p.pokemon_basehp,
-                    baseAttack: p.pokemon_baseattack,
-                    baseDefence: p.pokemon_basedefence,
-                    baseSpeed: p.pokemon_basespeed,
-                    description: p.pokemon_description,
-                    generation: p.pokemon_generation,
-                    legendary: p.pokemon_legendary
-                }));
-                
-                console.log('POKEMON-SERVICE: Mapped Pokemon data:', mappedPokemon);
-                return {
-                    pokemon: mappedPokemon,
-                    hasMore: data.value && data.value.length === limit
-                };
+                PokemonService._allPokemonCache = this.mapPokemonData(data.value || []);
+                console.log('POKEMON-SERVICE: Cached', PokemonService._allPokemonCache.length, 'Pokemon');
             } else {
-                console.error('POKEMON-SERVICE: Failed to load Pokemon:', response.status);
-                throw new Error(`Failed to load Pokemon: ${response.status}`);
+                console.error('POKEMON-SERVICE: Failed to load all Pokemon for cache');
             }
         } catch (error) {
-            console.error('POKEMON-SERVICE: Error loading Pokemon:', error);
-            throw error;
+            console.error('POKEMON-SERVICE: Error caching Pokemon:', error);
         }
+    }
+
+    // Helper method to map Pokemon data consistently
+    static mapPokemonData(rawPokemon) {
+        return rawPokemon.map(p => {
+            return {
+                id: p.pokemon_id || p.pokemonid || p.id || 1,
+                name: p.pokemon_name || p.pokemonname || p.name || 'Unknown',
+                type1: p.pokemon_type1 || p.type1 || p.pokemontype1 || 'normal',
+                type2: p.pokemon_type2 || p.type2 || p.pokemontype2 || null,
+                baseHp: p.pokemon_basehp || p.basehp || p.pokemonbasehp || 50,
+                baseAttack: p.pokemon_baseattack || p.baseattack || p.pokemonbaseattack || 50,
+                baseDefence: p.pokemon_basedefence || p.basedefence || p.pokemonbasedefence || 50,
+                baseSpeed: p.pokemon_basespeed || p.basespeed || p.pokemonbasespeed || 50,
+                description: p.pokemon_description || p.description || p.pokemondescription || '',
+                generation: p.pokemon_generation || p.generation || p.pokemongeneration || 1,
+                legendary: p.pokemon_legendary || p.legendary || p.pokemonlegendary || false
+            };
+        });
     }
 }
 
