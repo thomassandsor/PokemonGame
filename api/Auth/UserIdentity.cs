@@ -16,20 +16,9 @@ namespace PokemonGame.Api.Auth
         }
 
         [Function("WhoAmI")]
-        public HttpResponseData WhoAmI([HttpTrigger(AuthorizationLevel.Anonymous, "get", "options")] HttpRequestData req)
+        public HttpResponseData WhoAmI([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("WhoAmI endpoint called");
-
-            // Handle CORS preflight request
-            if (req.Method.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase))
-            {
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
-                response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-                response.Headers.Add("Access-Control-Allow-Credentials", "true");
-                return response;
-            }
 
             try
             {
@@ -37,14 +26,25 @@ namespace PokemonGame.Api.Auth
                 var query = System.Web.HttpUtility.ParseQueryString(req.Url.Query);
                 var token = query["token"];
                 
-                _logger.LogInformation($"Token from query string: {(string.IsNullOrEmpty(token) ? "EMPTY" : $"{token.Substring(0, Math.Min(20, token.Length))}...")}");
+                // Check for Authorization header (Bearer token)
+                if (string.IsNullOrEmpty(token))
+                {
+                    if (req.Headers.TryGetValues("Authorization", out var authHeaders))
+                    {
+                        var authHeader = authHeaders.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                        {
+                            token = authHeader.Substring("Bearer ".Length);
+                        }
+                    }
+                }
                 
                 // Check for session cookie
                 if (string.IsNullOrEmpty(token))
                 {
-                    try
+                    if (req.Headers.TryGetValues("Cookie", out var cookieHeaders))
                     {
-                        var cookies = req.Headers.GetValues("Cookie")?.FirstOrDefault();
+                        var cookies = cookieHeaders.FirstOrDefault();
                         if (!string.IsNullOrEmpty(cookies))
                         {
                             var sessionCookie = cookies.Split(';')
@@ -56,11 +56,6 @@ namespace PokemonGame.Api.Auth
                                 token = sessionCookie.Split('=')[1];
                             }
                         }
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // No Cookie header present - this is fine
-                        _logger.LogInformation("No Cookie header found in request");
                     }
                 }
 
@@ -107,84 +102,33 @@ namespace PokemonGame.Api.Auth
         {
             try
             {
-                if (string.IsNullOrEmpty(token))
-                {
-                    _logger.LogWarning("Token is null or empty");
-                    return null;
-                }
-                
-                _logger.LogInformation($"Attempting to decode token of length: {token.Length}");
-                
                 var jsonBytes = Convert.FromBase64String(token);
                 var jsonString = System.Text.Encoding.UTF8.GetString(jsonBytes);
-                
-                _logger.LogInformation($"Decoded JSON string: {jsonString}");
-                
                 var payload = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
                 
-                if (payload == null) 
-                {
-                    _logger.LogWarning("Payload is null after deserialization");
-                    return null;
-                }
+                if (payload == null) return null;
                 
                 // Check expiration
                 if (payload.ContainsKey("exp"))
                 {
-                    var expElement = payload["exp"];
-                    long exp;
-                    
-                    // Handle JsonElement conversion
-                    if (expElement is JsonElement jsonElement)
+                    var exp = Convert.ToInt64(payload["exp"]);
+                    if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > exp)
                     {
-                        exp = jsonElement.GetInt64();
-                    }
-                    else
-                    {
-                        exp = Convert.ToInt64(expElement);
-                    }
-                    
-                    var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    
-                    _logger.LogInformation($"Token expiration: {exp}, Current time: {currentTime}, Expired: {currentTime > exp}");
-                    
-                    if (currentTime > exp)
-                    {
-                        _logger.LogWarning("Token has expired");
                         return null; // Token expired
                     }
                 }
                 
-                var email = GetStringFromPayload(payload, "email");
-                var name = GetStringFromPayload(payload, "name");
-                
-                _logger.LogInformation($"Successfully decoded token for user: {email}");
-                
                 return new UserSession
                 {
-                    email = email,
-                    name = name,
+                    email = payload.GetValueOrDefault("email")?.ToString() ?? "",
+                    name = payload.GetValueOrDefault("name")?.ToString() ?? "",
                     loginTime = DateTime.UtcNow // You could store this in the token too
                 };
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error decoding session token");
                 return null;
             }
-        }
-
-        private static string GetStringFromPayload(Dictionary<string, object> payload, string key)
-        {
-            if (!payload.ContainsKey(key)) return "";
-            
-            var value = payload[key];
-            if (value is JsonElement jsonElement)
-            {
-                return jsonElement.GetString() ?? "";
-            }
-            
-            return value?.ToString() ?? "";
         }
 
         // Mock methods - replace with actual database queries based on email
@@ -213,8 +157,7 @@ namespace PokemonGame.Api.Auth
             response.Headers.Add("Content-Type", "application/json");
             response.Headers.Add("Access-Control-Allow-Origin", "*");
             response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-            response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
             
             var jsonString = JsonSerializer.Serialize(data, new JsonSerializerOptions 
             { 
