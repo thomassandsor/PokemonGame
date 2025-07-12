@@ -17,7 +17,7 @@ namespace PokemonGame.Api
         }
 
         [Function("TestContactCreation")]
-        public async Task<HttpResponseData> TestContactCreation([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<HttpResponseData> RunTest([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("Testing contact creation via DataverseProxy");
 
