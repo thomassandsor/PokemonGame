@@ -1,4 +1,4 @@
-using Microsoft.Azure.Functions.Worker;
+        using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using System.Linq;
@@ -213,44 +213,15 @@ namespace PokemonGame.Api.OAuth
             {
                 _logger.LogInformation($"PROFILE-CREATION: Starting user profile creation for {email} with displayName: {displayName}");
                 
-                // Get Dataverse configuration
-                var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
-                var clientId = Environment.GetEnvironmentVariable("DATAVERSE_CLIENT_ID");
-                var clientSecret = Environment.GetEnvironmentVariable("DATAVERSE_CLIENT_SECRET");
-                var tenantId = Environment.GetEnvironmentVariable("DATAVERSE_TENANT_ID");
-                
-                _logger.LogInformation($"PROFILE-CREATION: Config check - DataverseUrl: {dataverseUrl}, HasClientId: {!string.IsNullOrEmpty(clientId)}, HasClientSecret: {!string.IsNullOrEmpty(clientSecret)}, HasTenantId: {!string.IsNullOrEmpty(tenantId)}");
-                
-                if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret) || string.IsNullOrEmpty(tenantId))
-                {
-                    _logger.LogError("PROFILE-CREATION: Dataverse configuration missing, cannot create user profile");
-                    throw new Exception("Dataverse configuration is incomplete");
-                }
-
-                // Get access token for Dataverse
-                _logger.LogInformation("PROFILE-CREATION: Requesting Dataverse access token...");
-                var accessToken = await GetDataverseAccessToken(clientId, clientSecret, tenantId, dataverseUrl);
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    _logger.LogError("PROFILE-CREATION: Failed to get Dataverse access token");
-                    throw new Exception("Failed to authenticate with Dataverse");
-                }
-                _logger.LogInformation("PROFILE-CREATION: Successfully obtained Dataverse access token");
-
+                // Use the existing DataverseProxy instead of duplicating auth logic
                 using var httpClient = new HttpClient();
-                var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
+                var baseUrl = "https://pokemongame-functions-2025.azurewebsites.net"; // Your Azure Functions URL
                 
-                // First, check if user already exists
-                var checkUrl = $"{baseUrl}/api/data/v9.2/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,fullname,emailaddress1";
-                _logger.LogInformation($"PROFILE-CREATION: Checking if user exists with URL: {checkUrl}");
+                // First check if user exists using DataverseProxy
+                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,firstname,emailaddress1";
+                _logger.LogInformation($"PROFILE-CREATION: Checking if user exists via DataverseProxy: {checkUrl}");
                 
-                var checkRequest = new HttpRequestMessage(HttpMethod.Get, checkUrl);
-                checkRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-                checkRequest.Headers.Add("OData-MaxVersion", "4.0");
-                checkRequest.Headers.Add("OData-Version", "4.0");
-                checkRequest.Headers.Add("Accept", "application/json");
-
-                var checkResponse = await httpClient.SendAsync(checkRequest);
+                var checkResponse = await httpClient.GetAsync(checkUrl);
                 var checkContent = await checkResponse.Content.ReadAsStringAsync();
                 
                 _logger.LogInformation($"PROFILE-CREATION: User existence check response - Status: {checkResponse.StatusCode}, Content: {checkContent}");
@@ -270,26 +241,23 @@ namespace PokemonGame.Api.OAuth
                 }
                 else
                 {
-                    _logger.LogError($"PROFILE-CREATION: Failed to check existing user. Status: {checkResponse.StatusCode}, Content: {checkContent}");
+                    _logger.LogError($"PROFILE-CREATION: Failed to check existing user via DataverseProxy. Status: {checkResponse.StatusCode}, Content: {checkContent}");
                     throw new Exception($"Failed to check if user exists: {checkResponse.StatusCode}");
                 }
 
-                // Create new contact with minimal data - only use standard fields
+                // Create new contact using DataverseProxy
                 var contactData = new
                 {
                     emailaddress1 = email,
                     firstname = displayName ?? email.Split('@').FirstOrDefault()
                 };
 
-                _logger.LogInformation($"PROFILE-CREATION: Creating new contact with data: {JsonSerializer.Serialize(contactData)}");
+                _logger.LogInformation($"PROFILE-CREATION: Creating new contact via DataverseProxy with data: {JsonSerializer.Serialize(contactData)}");
 
-                var createUrl = $"{baseUrl}/api/data/v9.2/contacts";
-                _logger.LogInformation($"PROFILE-CREATION: Creating contact at URL: {createUrl}");
+                var createUrl = $"{baseUrl}/api/dataverse/contacts";
+                _logger.LogInformation($"PROFILE-CREATION: Creating contact via DataverseProxy at URL: {createUrl}");
                 
                 var createRequest = new HttpRequestMessage(HttpMethod.Post, createUrl);
-                createRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-                createRequest.Headers.Add("OData-MaxVersion", "4.0");
-                createRequest.Headers.Add("OData-Version", "4.0");
                 createRequest.Headers.Add("Accept", "application/json");
                 createRequest.Content = new StringContent(JsonSerializer.Serialize(contactData), Encoding.UTF8, "application/json");
 
@@ -300,12 +268,12 @@ namespace PokemonGame.Api.OAuth
 
                 if (createResponse.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"PROFILE-CREATION: Successfully created user profile for {email}");
+                    _logger.LogInformation($"PROFILE-CREATION: Successfully created user profile for {email} via DataverseProxy");
                 }
                 else
                 {
-                    _logger.LogError($"PROFILE-CREATION: Failed to create user profile for {email}. Status: {createResponse.StatusCode}, Response: {createContent}");
-                    throw new Exception($"Contact creation failed: {createResponse.StatusCode} - {createContent}");
+                    _logger.LogError($"PROFILE-CREATION: Failed to create user profile for {email} via DataverseProxy. Status: {createResponse.StatusCode}, Response: {createContent}");
+                    throw new Exception($"Contact creation failed via DataverseProxy: {createResponse.StatusCode} - {createContent}");
                 }
             }
             catch (Exception ex)
@@ -313,49 +281,6 @@ namespace PokemonGame.Api.OAuth
                 _logger.LogError(ex, $"PROFILE-CREATION: Exception creating user profile for {email}: {ex.Message}");
                 throw; // Re-throw so the outer catch can handle it
             }
-        }
-
-        private async Task<string?> GetDataverseAccessToken(string clientId, string clientSecret, string tenantId, string dataverseUrl)
-        {
-            try
-            {
-                _logger.LogInformation($"DATAVERSE-TOKEN: Requesting access token for tenant: {tenantId}, scope: {dataverseUrl}/.default");
-                
-                using var httpClient = new HttpClient();
-                
-                var tokenRequest = new Dictionary<string, string>
-                {
-                    ["grant_type"] = "client_credentials",
-                    ["client_id"] = clientId,
-                    ["client_secret"] = clientSecret,
-                    ["scope"] = $"{dataverseUrl}/.default"
-                };
-
-                var tokenUrl = $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token";
-                _logger.LogInformation($"DATAVERSE-TOKEN: Requesting token from: {tokenUrl}");
-
-                var tokenResponse = await httpClient.PostAsync(tokenUrl, new FormUrlEncodedContent(tokenRequest));
-                var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
-                
-                _logger.LogInformation($"DATAVERSE-TOKEN: Token response - Status: {tokenResponse.StatusCode}, Content: {tokenContent}");
-
-                if (tokenResponse.IsSuccessStatusCode)
-                {
-                    var tokenData = JsonSerializer.Deserialize<JsonElement>(tokenContent);
-                    var accessToken = tokenData.GetProperty("access_token").GetString();
-                    _logger.LogInformation($"DATAVERSE-TOKEN: Successfully obtained access token (length: {accessToken?.Length})");
-                    return accessToken;
-                }
-
-                _logger.LogError($"DATAVERSE-TOKEN: Failed to get Dataverse access token. Status: {tokenResponse.StatusCode}, Content: {tokenContent}");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"DATAVERSE-TOKEN: Exception getting Dataverse access token: {ex.Message}");
-                return null;
-            }
-        }
     }
 
     public class MicrosoftTokenResponse
