@@ -31,8 +31,8 @@ namespace PokemonGame.Api
                 var testEmail = "sandsor@outlook.com";
                 var testName = "Test User";
                 
-                // First check if user exists
-                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{testEmail}'&$select=contactid,firstname,lastname,emailaddress1";
+                // First check if user exists (email is unique, so only check email)
+                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{testEmail}'&$select=contactid";
                 _logger.LogInformation($"TEST: Checking if user exists: {checkUrl}");
                 
                 var checkResponse = await httpClient.GetAsync(checkUrl);

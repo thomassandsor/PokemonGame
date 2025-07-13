@@ -14,14 +14,28 @@ class PokemonService {
             // ALWAYS try to get real data first, regardless of development mode
             console.log('POKEMON-SERVICE: Attempting to load REAL data from Dataverse...');
             
-            // For now, use your known user ID to bypass the email lookup CORS issue
-            // TODO: Fix CORS for email lookup, but this gets you working immediately
+            // First, get the user's contact ID from their email
+            console.log('POKEMON-SERVICE: Looking up user contact ID for email:', email);
+            const contactUrl = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
+            
             let userId;
-            if (email === 'sandsor@outlook.com') {
-                userId = '20c3f8e3-a455-f011-877b-7c1e525e5f72'; // Your actual user ID from Dataverse
-                console.log('POKEMON-SERVICE: Using known user ID:', userId);
-            } else {
-                console.log('POKEMON-SERVICE: Unknown user, would need email lookup');
+            try {
+                const contactResponse = await fetch(contactUrl);
+                if (!contactResponse.ok) {
+                    console.error('POKEMON-SERVICE: Failed to lookup user contact:', contactResponse.status);
+                    return [];
+                }
+                
+                const contactData = await contactResponse.json();
+                if (!contactData.value || contactData.value.length === 0) {
+                    console.log('POKEMON-SERVICE: No contact found for email:', email);
+                    return [];
+                }
+                
+                userId = contactData.value[0].contactid;
+                console.log('POKEMON-SERVICE: Found user contact ID:', userId);
+            } catch (error) {
+                console.error('POKEMON-SERVICE: Error looking up user contact:', error);
                 return [];
             }
 
