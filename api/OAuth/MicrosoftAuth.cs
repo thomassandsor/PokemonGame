@@ -91,16 +91,28 @@ namespace PokemonGame.Api.OAuth
                 // Create or update user profile in Dataverse
                 var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
                 
-                // Determine the best name to use - prefer givenName, fallback to displayName
-                var firstName = !string.IsNullOrEmpty(userInfo.givenName) 
-                    ? userInfo.givenName 
-                    : userInfo.displayName;
+                // Map name fields properly
+                string firstName, lastName;
+                
+                if (!string.IsNullOrEmpty(userInfo.givenName))
+                {
+                    // Use givenName for first name
+                    firstName = userInfo.givenName;
+                    // Use surname for last name if available
+                    lastName = userInfo.surname ?? "";
+                }
+                else
+                {
+                    // Fallback to displayName for first name, no last name
+                    firstName = userInfo.displayName ?? userEmail.Split('@').FirstOrDefault() ?? "User";
+                    lastName = "";
+                }
                 
                 var profileCreationResult = "";
                 
                 try 
                 {
-                    await CreateOrUpdateUserProfile(userEmail, firstName);
+                    await CreateOrUpdateUserProfile(userEmail, firstName, lastName);
                     profileCreationResult = "SUCCESS";
                 }
                 catch (Exception profileEx)
@@ -213,18 +225,18 @@ namespace PokemonGame.Api.OAuth
             return response;
         }
 
-        private async Task CreateOrUpdateUserProfile(string email, string displayName)
+        private async Task CreateOrUpdateUserProfile(string email, string firstName, string lastName = "")
         {
             try
             {
-                _logger.LogInformation($"PROFILE-CREATION: Starting user profile creation for {email} with displayName: {displayName}");
+                _logger.LogInformation($"PROFILE-CREATION: Starting user profile creation for {email} with firstName: {firstName}, lastName: {lastName}");
                 
                 // Use the existing DataverseProxy instead of duplicating auth logic
                 using var httpClient = new HttpClient();
                 var baseUrl = "https://pokemongame-functions-2025.azurewebsites.net"; // Your Azure Functions URL
                 
                 // First check if user exists using DataverseProxy
-                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,firstname,emailaddress1";
+                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{email}'&$select=contactid,firstname,lastname,emailaddress1";
                 _logger.LogInformation($"PROFILE-CREATION: Checking if user exists via DataverseProxy: {checkUrl}");
                 
                 var checkResponse = await httpClient.GetAsync(checkUrl);
@@ -255,7 +267,8 @@ namespace PokemonGame.Api.OAuth
                 var contactData = new
                 {
                     emailaddress1 = email,
-                    firstname = displayName ?? email.Split('@').FirstOrDefault()
+                    firstname = firstName,
+                    lastname = lastName
                 };
 
                 _logger.LogInformation($"PROFILE-CREATION: Creating new contact via DataverseProxy with data: {JsonSerializer.Serialize(contactData)}");

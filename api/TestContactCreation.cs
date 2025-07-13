@@ -32,7 +32,7 @@ namespace PokemonGame.Api
                 var testName = "Test User";
                 
                 // First check if user exists
-                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{testEmail}'&$select=contactid,firstname,emailaddress1";
+                var checkUrl = $"{baseUrl}/api/dataverse/contacts?$filter=emailaddress1 eq '{testEmail}'&$select=contactid,firstname,lastname,emailaddress1";
                 _logger.LogInformation($"TEST: Checking if user exists: {checkUrl}");
                 
                 var checkResponse = await httpClient.GetAsync(checkUrl);
@@ -71,7 +71,8 @@ namespace PokemonGame.Api
                         var contactData = new
                         {
                             emailaddress1 = testEmail,
-                            firstname = testName
+                            firstname = testName,
+                            lastname = "User" // Test last name
                         };
 
                         var createUrl = $"{baseUrl}/api/dataverse/contacts";
