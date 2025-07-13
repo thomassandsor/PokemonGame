@@ -34,6 +34,11 @@
       "statusCode": 200
     },
     {
+      "route": "/catch-pokemon.html",
+      "serve": "/catch-pokemon.html",
+      "statusCode": 200
+    },
+    {
       "route": "/api/GoogleLogin",
       "allowedRoles": ["anonymous"]
     },
