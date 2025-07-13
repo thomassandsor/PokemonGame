@@ -40,7 +40,7 @@ namespace PokemonGame.Api
                 
                 _logger.LogInformation($"TEST: Check response - Status: {checkResponse.StatusCode}, Content: {checkContent}");
                 
-                var responseData = new
+                object responseData = new
                 {
                     step = "check_existing",
                     status = checkResponse.StatusCode.ToString(),
@@ -60,7 +60,9 @@ namespace PokemonGame.Api
                             step = "user_exists",
                             status = "found",
                             existing_contacts = existingContacts.Count,
-                            message = $"User {testEmail} already exists"
+                            message = $"User {testEmail} already exists",
+                            content = checkContent,
+                            url = checkUrl
                         };
                     }
                     else
@@ -88,7 +90,7 @@ namespace PokemonGame.Api
                             status = createResponse.StatusCode.ToString(),
                             content = createContent,
                             url = createUrl,
-                            data = contactData
+                            data = JsonSerializer.Serialize(contactData)
                         };
                     }
                 }
