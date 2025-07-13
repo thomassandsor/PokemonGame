@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Result - Pokemon Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .battle-result {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+        }
+        
+        .result-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .result-header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .winner-announcement {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        .battle-summary {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .pokemon-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
+        }
+        
+        .pokemon-sprite {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+        
+        .hp-bar {
+            background: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .hp-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .hp-high { background: #28a745; }
+        .hp-medium { background: #ffc107; }
+        .hp-low { background: #dc3545; }
+        
+        .battle-replay {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .turn-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .replay-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .turn-indicator {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .vs-indicator {
+            font-size: 3rem;
+            color: #ff6b6b;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .pokemon-final-state {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .winner-crown {
+            font-size: 2rem;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .pokemon-final-state {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .replay-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .vs-indicator {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="battle-result">
+        <div class="result-container">
+            <!-- Header -->
+            <div class="result-header">
+                <h1>⚔️ Battle Result</h1>
+                <p>See how the battle unfolded!</p>
+            </div>
+            
+            <div class="container-fluid p-4">
+                <!-- Loading State -->
+                <div id="loading" class="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading battle result...</span>
+                    </div>
+                </div>
+                
+                <!-- Error State -->
+                <div id="error" class="error-message" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span id="error-message"></span>
+                        <button class="btn btn-outline-danger btn-sm" onclick="window.history.back()">← Go Back</button>
+                    </div>
+                </div>
+                
+                <!-- Battle Result Content -->
+                <div id="result-content" style="display: none;">
+                    <!-- Winner Announcement -->
+                    <div id="winner-announcement" class="winner-announcement">
+                        <!-- Winner info will be loaded here -->
+                    </div>
+                    
+                    <!-- Battle Summary -->
+                    <div class="battle-summary">
+                        <h3>Battle Summary</h3>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="pokemon-card">
+                                    <div id="player1-card">
+                                        <!-- Player 1 info will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="vs-indicator">VS</div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="pokemon-card">
+                                    <div id="player2-card">
+                                        <!-- Player 2 info will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Battle Replay -->
+                    <div id="battle-replay" class="battle-replay" style="display: none;">
+                        <h3>Battle Replay</h3>
+                        
+                        <div class="replay-controls">
+                            <button class="btn btn-secondary" onclick="previousStep()" id="prev-btn">← Previous</button>
+                            <span class="turn-indicator" id="turn-indicator">Turn 0/0</span>
+                            <button class="btn btn-secondary" onclick="nextStep()" id="next-btn">Next →</button>
+                            <button class="btn btn-primary" onclick="toggleAutoReplay()" id="auto-btn">▶️ Auto</button>
+                        </div>
+                        
+                        <div id="replay-display">
+                            <!-- Replay content will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Battle Actions -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary me-3" onclick="showReplay()" id="replay-btn">
+                            📽️ Watch Replay
+                        </button>
+                        <a href="battle-arena.html" class="btn btn-success me-3">
+                            ⚔️ Back to Arena
+                        </a>
+                        <a href="my-pokemon.html" class="btn btn-outline-primary">
+                            👥 My Pokemon
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth-simple.js"></script>
+    <script>
+        class BattleResult {
+            constructor() {
+                this.battleId = this.getBattleIdFromUrl();
+                this.battleData = null;
+                this.replayData = null;
+                this.currentStep = 0;
+                this.autoReplayInterval = null;
+                this.isReplayVisible = false;
+                
+                this.init();
+            }
+            
+            getBattleIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('battleId');
+            }
+            
+            async init() {
+                console.log('🎮 Initializing Battle Result...', this.battleId);
+                
+                if (!this.battleId) {
+                    this.showError('No battle ID provided');
+                    return;
+                }
+                
+                await this.loadBattleResult();
+            }
+            
+            async loadBattleResult() {
+                try {
+                    console.log('🔄 Loading battle result...', this.battleId);
+                    
+                    // Load battle with expanded data
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles(${this.battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Battle not found (${response.status})`);
+                    }
+                    
+                    const battleData = await response.json();
+                    console.log('✅ Battle data loaded:', battleData);
+                    
+                    this.battleData = battleData;
+                    
+                    // Parse replay data if available
+                    if (battleData.pokemon_battleresultjson) {
+                        try {
+                            this.replayData = JSON.parse(battleData.pokemon_battleresultjson);
+                            console.log('✅ Replay data parsed:', this.replayData);
+                        } catch (error) {
+                            console.warn('⚠️ Failed to parse replay data:', error);
+                        }
+                    }
+                    
+                    // Render the result
+                    this.renderBattleResult();
+                    
+                    // Show content, hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('result-content').style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('❌ Error loading battle result:', error);
+                    this.showError(error.message);
+                }
+            }
+            
+            renderBattleResult() {
+                this.renderWinnerAnnouncement();
+                this.renderPlayerCards();
+                
+                // Show/hide replay button based on availability
+                if (this.replayData) {
+                    document.getElementById('replay-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('replay-btn').style.display = 'none';
+                }
+            }
+            
+            renderWinnerAnnouncement() {
+                const container = document.getElementById('winner-announcement');
+                
+                if (this.battleData.statuscode !== 895550001) { // Not completed
+                    container.innerHTML = `
+                        <h2>🔄 Battle In Progress</h2>
+                        <p>This battle has not been completed yet.</p>
+                    `;
+                    return;
+                }
+                
+                // Determine winner
+                let winnerName = 'Unknown';
+                let winnerPokemon = 'Unknown Pokemon';
+                
+                if (this.replayData?.completeBattleData?.final_result) {
+                    winnerName = this.replayData.completeBattleData.final_result.winner_name;
+                } else if (this.replayData?.winner) {
+                    winnerName = this.replayData.winner;
+                } else {
+                    // Fallback - try to determine from player data
+                    winnerName = this.battleData.pokemon_Player1?.firstname || 'Player 1';
+                }
+                
+                container.innerHTML = `
+                    <h2>🏆 ${winnerName} Wins!</h2>
+                    <p class="fs-5">Victory achieved in an epic Pokemon battle!</p>
+                `;
+            }
+            
+            renderPlayerCards() {
+                const player1Card = document.getElementById('player1-card');
+                const player2Card = document.getElementById('player2-card');
+                
+                // Player 1 data
+                const player1Name = this.battleData.pokemon_Player1?.firstname || 'Player 1';
+                const player1Pokemon = this.battleData.pokemon_Player1Pokemon?.pokemon_Pokemon;
+                const player1PokemonName = player1Pokemon?.pokemon_name || 'Unknown Pokemon';
+                const player1PokemonId = player1Pokemon?.pokemon_id || 1;
+                
+                // Player 2 data
+                const player2Name = this.battleData.pokemon_Player2?.firstname || 'AI Opponent';
+                const player2Pokemon = this.battleData.pokemon_Player2Pokemon?.pokemon_Pokemon;
+                const player2PokemonName = player2Pokemon?.pokemon_name || 'Unknown Pokemon';
+                const player2PokemonId = player2Pokemon?.pokemon_id || 1;
+                
+                // Get final HP from replay data if available
+                let player1FinalHP = 0;
+                let player2FinalHP = 0;
+                let player1MaxHP = 100;
+                let player2MaxHP = 100;
+                
+                if (this.replayData?.completeBattleData) {
+                    const finalResult = this.replayData.completeBattleData.final_result;
+                    const player1Data = this.replayData.completeBattleData.pokemon_teams?.player1_team?.[0];
+                    const player2Data = this.replayData.completeBattleData.pokemon_teams?.player2_team?.[0];
+                    
+                    if (player1Data) {
+                        player1MaxHP = player1Data.max_hp || player1Data.hp || 100;
+                        player1FinalHP = finalResult?.player1_final_hp ?? 0;
+                    }
+                    
+                    if (player2Data) {
+                        player2MaxHP = player2Data.max_hp || player2Data.hp || 100;
+                        player2FinalHP = finalResult?.player2_final_hp ?? 0;
+                    }
+                }
+                
+                // Determine winner for crown display
+                const player1Won = this.replayData?.completeBattleData?.final_result?.winner === 'player1' || 
+                                  this.replayData?.winner?.includes(player1Name);
+                const player2Won = this.replayData?.completeBattleData?.final_result?.winner === 'player2' || 
+                                  this.replayData?.winner?.includes(player2Name);
+                
+                player1Card.innerHTML = this.renderPlayerCard(
+                    player1Name, player1PokemonName, player1PokemonId, 
+                    player1FinalHP, player1MaxHP, player1Won
+                );
+                
+                player2Card.innerHTML = this.renderPlayerCard(
+                    player2Name, player2PokemonName, player2PokemonId, 
+                    player2FinalHP, player2MaxHP, player2Won
+                );
+            }
+            
+            renderPlayerCard(playerName, pokemonName, pokemonId, finalHP, maxHP, isWinner) {
+                const hpPercentage = maxHP > 0 ? (finalHP / maxHP) * 100 : 0;
+                const hpClass = hpPercentage > 60 ? 'hp-high' : hpPercentage > 30 ? 'hp-medium' : 'hp-low';
+                
+                return `
+                    <div class="text-center">
+                        <h5>${playerName} ${isWinner ? '👑' : ''}</h5>
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png" 
+                             class="pokemon-sprite mb-2" alt="${pokemonName}">
+                        <h6>${pokemonName}</h6>
+                        <div class="hp-bar">
+                            <div class="hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
+                        </div>
+                        <small>Final HP: ${finalHP}/${maxHP}</small>
+                        ${isWinner ? '<div class="mt-2"><span class="badge bg-warning text-dark">🏆 Winner</span></div>' : ''}
+                    </div>
+                `;
+            }
+            
+            showReplay() {
+                if (!this.replayData) {
+                    alert('No replay data available for this battle');
+                    return;
+                }
+                
+                this.isReplayVisible = true;
+                this.currentStep = 0;
+                document.getElementById('battle-replay').style.display = 'block';
+                this.renderReplay();
+                
+                // Scroll to replay
+                document.getElementById('battle-replay').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            renderReplay() {
+                if (!this.replayData || !this.isReplayVisible) return;
+                
+                const battleData = this.replayData.completeBattleData;
+                const container = document.getElementById('replay-display');
+                
+                if (!battleData || !battleData.battle_turns) {
+                    // Legacy format
+                    container.innerHTML = `
+                        <div class="turn-display">
+                            <h5>Battle Log</h5>
+                            ${this.replayData.battleLog?.map(log => `<p>• ${log}</p>`).join('') || '<p>No detailed log available</p>'}
+                        </div>
+                    `;
+                    
+                    // Hide controls for legacy format
+                    document.querySelector('.replay-controls').style.display = 'none';
+                    return;
+                }
+                
+                const totalTurns = battleData.battle_turns.length;
+                const currentTurn = Math.min(this.currentStep, totalTurns);
+                const currentTurnData = currentTurn > 0 ? battleData.battle_turns[currentTurn - 1] : null;
+                
+                // Update controls
+                document.getElementById('turn-indicator').textContent = `Turn ${currentTurn}/${totalTurns}`;
+                document.getElementById('prev-btn').disabled = currentTurn <= 0;
+                document.getElementById('next-btn').disabled = currentTurn >= totalTurns;
+                
+                // Get Pokemon data
+                const player1Pokemon = battleData.pokemon_teams.player1_team[0];
+                const player2Pokemon = battleData.pokemon_teams.player2_team[0];
+                
+                // Get current HP
+                const player1HP = currentTurnData ? currentTurnData.turn_result.player1_pokemon_hp : player1Pokemon.hp;
+                const player2HP = currentTurnData ? currentTurnData.turn_result.player2_pokemon_hp : player2Pokemon.hp;
+                
+                container.innerHTML = `
+                    <div class="turn-display">
+                        ${currentTurn === 0 ? 
+                            `<div class="text-center">
+                                <h5>⚔️ Battle Beginning!</h5>
+                                <p>${battleData.metadata.player1_name} vs ${battleData.metadata.player2_name}</p>
+                            </div>` :
+                            currentTurn >= totalTurns ?
+                            `<div class="text-center">
+                                <h5>🏆 ${battleData.final_result.winner_name} Wins!</h5>
+                                <p>${battleData.final_result.battle_summary}</p>
+                            </div>` :
+                            `<div class="text-center mb-3">
+                                <h5>Turn ${currentTurn}</h5>
+                                <p>${currentTurnData.turn_result.turn_summary}</p>
+                            </div>`
+                        }
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${player1Pokemon.pokemon_id}.png" 
+                                         class="pokemon-sprite mb-2" alt="${player1Pokemon.name}" style="width: 80px; height: 80px;">
+                                    <h6>${player1Pokemon.name}</h6>
+                                    <div class="hp-bar">
+                                        <div class="hp-fill ${this.getHpClass(player1HP, player1Pokemon.max_hp)}" 
+                                             style="width: ${(player1HP / player1Pokemon.max_hp) * 100}%"></div>
+                                    </div>
+                                    <small>HP: ${player1HP}/${player1Pokemon.max_hp}</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center">
+                                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${player2Pokemon.pokemon_id}.png" 
+                                         class="pokemon-sprite mb-2" alt="${player2Pokemon.name}" style="width: 80px; height: 80px;">
+                                    <h6>${player2Pokemon.name}</h6>
+                                    <div class="hp-bar">
+                                        <div class="hp-fill ${this.getHpClass(player2HP, player2Pokemon.max_hp)}" 
+                                             style="width: ${(player2HP / player2Pokemon.max_hp) * 100}%"></div>
+                                    </div>
+                                    <small>HP: ${player2HP}/${player2Pokemon.max_hp}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${currentTurnData && currentTurnData.actions ? 
+                            `<div class="mt-3">
+                                <h6>Turn Actions:</h6>
+                                <ul class="list-unstyled">
+                                    ${currentTurnData.actions.map(action => 
+                                        `<li>• ${action.description || action.action_description}</li>`
+                                    ).join('')}
+                                </ul>
+                            </div>` :
+                            ''
+                        }
+                    </div>
+                `;
+            }
+            
+            getHpClass(hp, maxHp) {
+                const percentage = (hp / maxHp) * 100;
+                return percentage > 60 ? 'hp-high' : percentage > 30 ? 'hp-medium' : 'hp-low';
+            }
+            
+            nextStep() {
+                if (!this.replayData?.completeBattleData) return;
+                
+                const totalTurns = this.replayData.completeBattleData.battle_turns.length;
+                if (this.currentStep < totalTurns) {
+                    this.currentStep++;
+                    this.renderReplay();
+                }
+            }
+            
+            previousStep() {
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.renderReplay();
+                }
+            }
+            
+            toggleAutoReplay() {
+                if (this.autoReplayInterval) {
+                    clearInterval(this.autoReplayInterval);
+                    this.autoReplayInterval = null;
+                    document.getElementById('auto-btn').textContent = '▶️ Auto';
+                } else {
+                    this.autoReplayInterval = setInterval(() => {
+                        const totalTurns = this.replayData?.completeBattleData?.battle_turns?.length || 0;
+                        if (this.currentStep < totalTurns) {
+                            this.nextStep();
+                        } else {
+                            this.toggleAutoReplay(); // Stop when finished
+                        }
+                    }, 2000);
+                    document.getElementById('auto-btn').textContent = '⏸️ Stop';
+                }
+            }
+            
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').textContent = message;
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+        
+        // Global functions
+        function showReplay() {
+            battleResult.showReplay();
+        }
+        
+        function nextStep() {
+            battleResult.nextStep();
+        }
+        
+        function previousStep() {
+            battleResult.previousStep();
+        }
+        
+        function toggleAutoReplay() {
+            battleResult.toggleAutoReplay();
+        }
+        
+        // Initialize when page loads
+        let battleResult;
+        document.addEventListener('DOMContentLoaded', function() {
+            battleResult = new BattleResult();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Arena - Pokemon Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .battle-arena {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+        }
+        
+        .arena-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .arena-header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .nav-tabs {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 600;
+            border: none;
+            padding: 15px 20px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #ff6b6b;
+            background: white;
+            border-bottom: 3px solid #ff6b6b;
+        }
+        
+        .battle-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .battle-card:hover {
+            border-color: #ff6b6b;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .pokemon-selector {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pokemon-selector:hover {
+            border-color: #feca57;
+            background: rgba(254, 202, 87, 0.1);
+        }
+        
+        .pokemon-selector.selected {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .pokemon-sprite {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        .hp-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .hp-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        
+        .hp-high { background: #28a745; }
+        .hp-medium { background: #ffc107; }
+        .hp-low { background: #dc3545; }
+        
+        .challenge-type-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .challenge-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .challenge-btn:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .challenge-btn.selected {
+            border-color: #ff6b6b;
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .battle-replay {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .replay-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .turn-indicator {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .winner-announcement {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success-message {
+            background: #d1edff;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .challenge-type-selector {
+                flex-direction: column;
+            }
+            
+            .pokemon-selector {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .replay-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="battle-arena">
+        <div class="arena-container">
+            <!-- Header -->
+            <div class="arena-header">
+                <h1>⚔️ Battle Arena</h1>
+                <p>Challenge trainers or train against AI opponents!</p>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs" id="arenaTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="challenges-tab" data-bs-toggle="tab" data-bs-target="#challenges" type="button" role="tab">
+                        🏟️ Open Challenges
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="create-tab" data-bs-toggle="tab" data-bs-target="#create" type="button" role="tab">
+                        ⚡ Create Challenge
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                        📜 Battle History
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content" id="arenaTabContent">
+                
+                <!-- Open Challenges Tab -->
+                <div class="tab-pane fade show active" id="challenges" role="tabpanel">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>Available Challenges</h3>
+                            <button class="btn btn-primary" onclick="loadOpenChallenges()">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        
+                        <div id="challenges-loading" class="loading-spinner" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="challenges-error" class="error-message" style="display: none;"></div>
+                        
+                        <div id="challenges-list">
+                            <!-- Challenges will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Create Challenge Tab -->
+                <div class="tab-pane fade" id="create" role="tabpanel">
+                    <div class="p-4">
+                        <h3>Create New Challenge</h3>
+                        
+                        <!-- Challenge Type Selection -->
+                        <div class="challenge-type-selector">
+                            <div class="challenge-btn" data-type="open" onclick="selectChallengeType('open')">
+                                <h5>🌐 Open Challenge</h5>
+                                <p class="mb-0">Other players can join</p>
+                            </div>
+                            <div class="challenge-btn" data-type="training" onclick="selectChallengeType('training')">
+                                <h5>🤖 Training Battle</h5>
+                                <p class="mb-0">Battle against AI</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Pokemon Selection -->
+                        <div id="pokemon-selection" style="display: none;">
+                            <h4>Choose Your Pokemon</h4>
+                            <div id="user-pokemon-list">
+                                <!-- User's Pokemon will be loaded here -->
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <button class="btn btn-success btn-lg" onclick="createChallenge()" id="create-challenge-btn" disabled>
+                                    Create Challenge
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="create-loading" class="loading-spinner" style="display: none;">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Creating...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="create-error" class="error-message" style="display: none;"></div>
+                        <div id="create-success" class="success-message" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <!-- Battle History Tab -->
+                <div class="tab-pane fade" id="history" role="tabpanel">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>Your Battle History</h3>
+                            <button class="btn btn-primary" onclick="loadBattleHistory()">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        
+                        <div id="history-loading" class="loading-spinner" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="history-error" class="error-message" style="display: none;"></div>
+                        
+                        <div id="history-list">
+                            <!-- Battle history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Battle Replay Modal -->
+        <div class="modal fade" id="replayModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">⚔️ Battle Replay</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="replay-content">
+                            <!-- Replay content will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="replay-controls">
+                            <button class="btn btn-secondary" onclick="previousStep()" id="prev-btn">← Previous</button>
+                            <span class="turn-indicator" id="turn-indicator">Turn 0/0</span>
+                            <button class="btn btn-secondary" onclick="nextStep()" id="next-btn">Next →</button>
+                            <button class="btn btn-primary" onclick="toggleAutoReplay()" id="auto-btn">▶️ Auto</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth-simple.js"></script>
+    <script>
+        // Battle Arena JavaScript Implementation
+        class BattleArena {
+            constructor() {
+                this.selectedChallengeType = null;
+                this.selectedPokemonId = null;
+                this.currentUser = null;
+                this.userPokemon = [];
+                this.currentReplay = null;
+                this.currentStep = 0;
+                this.autoReplayInterval = null;
+                
+                this.init();
+            }
+            
+            async init() {
+                console.log('🎮 Initializing Battle Arena...');
+                
+                // Get current user
+                this.currentUser = await this.getCurrentUser();
+                if (!this.currentUser) {
+                    console.error('❌ User not authenticated');
+                    this.showError('Please login to access the Battle Arena', 'challenges-error');
+                    return;
+                }
+                
+                console.log('✅ User authenticated:', this.currentUser);
+                
+                // Load initial data
+                await this.loadUserPokemon();
+                await this.loadOpenChallenges();
+            }
+            
+            async getCurrentUser() {
+                try {
+                    const authResult = await getStoredAuthData();
+                    if (!authResult || !authResult.contactId) {
+                        return null;
+                    }
+                    
+                    return {
+                        id: authResult.contactId,
+                        name: authResult.name || 'Unknown Trainer',
+                        email: authResult.email
+                    };
+                } catch (error) {
+                    console.error('❌ Error getting current user:', error);
+                    return null;
+                }
+            }
+            
+            async loadUserPokemon() {
+                try {
+                    console.log('🔄 Loading user Pokemon...');
+                    
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_caught?$filter=pokemon_trainer eq '${this.currentUser.id}'&$expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load Pokemon: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    this.userPokemon = data.value || [];
+                    
+                    console.log('✅ Loaded user Pokemon:', this.userPokemon.length);
+                    this.renderUserPokemon();
+                    
+                } catch (error) {
+                    console.error('❌ Error loading user Pokemon:', error);
+                    this.showError('Failed to load your Pokemon', 'create-error');
+                }
+            }
+            
+            renderUserPokemon() {
+                const container = document.getElementById('user-pokemon-list');
+                
+                if (this.userPokemon.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No Pokemon available for battle. Catch some Pokemon first!</p>';
+                    return;
+                }
+                
+                container.innerHTML = this.userPokemon.map(pokemon => {
+                    const pokemonData = pokemon.pokemon_Pokemon;
+                    const hp = pokemon.pokemon_current_hp || pokemon.pokemon_max_hp || 100;
+                    const maxHp = pokemon.pokemon_max_hp || 100;
+                    const hpPercentage = (hp / maxHp) * 100;
+                    const hpClass = hpPercentage > 60 ? 'hp-high' : hpPercentage > 30 ? 'hp-medium' : 'hp-low';
+                    
+                    if (hp <= 0) return ''; // Skip fainted Pokemon
+                    
+                    return `
+                        <div class="pokemon-selector d-flex align-items-center" 
+                             data-pokemon-id="${pokemon.pokemon_caughtid}"
+                             onclick="battleArena.selectPokemon('${pokemon.pokemon_caughtid}')">
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonData?.pokemon_id || 1}.png" 
+                                 class="pokemon-sprite me-3" alt="${pokemonData?.pokemon_name || 'Unknown'}">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">${pokemon.pokemon_nickname || pokemonData?.pokemon_name || 'Unknown Pokemon'}</h5>
+                                <p class="text-muted mb-1">Level ${pokemon.pokemon_level || 5}</p>
+                                <div class="hp-bar">
+                                    <div class="hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
+                                </div>
+                                <small>HP: ${hp}/${maxHp}</small>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            selectChallengeType(type) {
+                this.selectedChallengeType = type;
+                
+                // Update UI
+                document.querySelectorAll('.challenge-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+                
+                // Show Pokemon selection
+                document.getElementById('pokemon-selection').style.display = 'block';
+                
+                console.log('✅ Selected challenge type:', type);
+            }
+            
+            selectPokemon(pokemonId) {
+                this.selectedPokemonId = pokemonId;
+                
+                // Update UI
+                document.querySelectorAll('.pokemon-selector').forEach(selector => {
+                    selector.classList.remove('selected');
+                });
+                document.querySelector(`[data-pokemon-id="${pokemonId}"]`).classList.add('selected');
+                
+                // Enable create button
+                document.getElementById('create-challenge-btn').disabled = false;
+                
+                console.log('✅ Selected Pokemon:', pokemonId);
+            }
+            
+            async createChallenge() {
+                if (!this.selectedChallengeType || !this.selectedPokemonId) {
+                    this.showError('Please select a challenge type and Pokemon', 'create-error');
+                    return;
+                }
+                
+                this.showLoading('create-loading');
+                this.hideError('create-error');
+                this.hideSuccess('create-success');
+                
+                try {
+                    console.log('🔄 Creating challenge...', {
+                        type: this.selectedChallengeType,
+                        pokemon: this.selectedPokemonId
+                    });
+                    
+                    const challengeData = {
+                        pokemon_player1: this.currentUser.id,
+                        pokemon_player1pokemon: this.selectedPokemonId,
+                        pokemon_challengetype: this.selectedChallengeType === 'open' ? 1 : 2,
+                        statuscode: 1, // Open
+                        statecode: 0   // Active
+                    };
+                    
+                    const response = await fetch('https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(challengeData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to create challenge: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('✅ Challenge created:', result);
+                    
+                    // If training battle, simulate immediately
+                    if (this.selectedChallengeType === 'training') {
+                        await this.simulateTrainingBattle(result.pokemon_battleid);
+                    }
+                    
+                    this.showSuccess(
+                        this.selectedChallengeType === 'training' 
+                            ? 'Training battle completed! Check your battle history.' 
+                            : 'Challenge created successfully! Other players can now join.',
+                        'create-success'
+                    );
+                    
+                    // Reset form
+                    this.resetCreateForm();
+                    
+                    // Refresh challenges list
+                    await this.loadOpenChallenges();
+                    
+                } catch (error) {
+                    console.error('❌ Error creating challenge:', error);
+                    this.showError(`Failed to create challenge: ${error.message}`, 'create-error');
+                } finally {
+                    this.hideLoading('create-loading');
+                }
+            }
+            
+            async simulateTrainingBattle(battleId) {
+                try {
+                    console.log('🤖 Simulating training battle:', battleId);
+                    
+                    // Call the battle simulation endpoint
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/battle/simulate/${battleId}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) {
+                        console.warn('⚠️ Battle simulation endpoint not available, battle will remain open');
+                    } else {
+                        console.log('✅ Training battle simulated');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Error simulating training battle:', error);
+                }
+            }
+            
+            resetCreateForm() {
+                this.selectedChallengeType = null;
+                this.selectedPokemonId = null;
+                
+                document.querySelectorAll('.challenge-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                document.querySelectorAll('.pokemon-selector').forEach(selector => {
+                    selector.classList.remove('selected');
+                });
+                document.getElementById('pokemon-selection').style.display = 'none';
+                document.getElementById('create-challenge-btn').disabled = true;
+            }
+            
+            async loadOpenChallenges() {
+                this.showLoading('challenges-loading');
+                this.hideError('challenges-error');
+                
+                try {
+                    console.log('🔄 Loading open challenges...');
+                    
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles?$filter=statuscode eq 1 and statecode eq 0&$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=createdon desc`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load challenges: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    const challenges = data.value || [];
+                    
+                    console.log('✅ Loaded challenges:', challenges.length);
+                    this.renderChallenges(challenges);
+                    
+                } catch (error) {
+                    console.error('❌ Error loading challenges:', error);
+                    this.showError(`Failed to load challenges: ${error.message}`, 'challenges-error');
+                } finally {
+                    this.hideLoading('challenges-loading');
+                }
+            }
+            
+            renderChallenges(challenges) {
+                const container = document.getElementById('challenges-list');
+                
+                if (challenges.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No open challenges available. Create one to get started!</p>';
+                    return;
+                }
+                
+                container.innerHTML = challenges.map(battle => {
+                    const player1Name = battle.pokemon_Player1?.firstname || 'Unknown Trainer';
+                    const pokemonName = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown Pokemon';
+                    const pokemonId = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_id || 1;
+                    const challengeType = battle.pokemon_challengetype === 2 ? 'Training' : 'Open Challenge';
+                    const canJoin = battle._pokemon_player1_value !== this.currentUser.id;
+                    
+                    return `
+                        <div class="battle-card">
+                            <div class="d-flex align-items-center">
+                                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png" 
+                                     class="pokemon-sprite me-3" alt="${pokemonName}">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1">${player1Name}'s Challenge</h5>
+                                    <p class="text-muted mb-1">Pokemon: ${pokemonName}</p>
+                                    <p class="text-muted mb-1">Type: ${challengeType}</p>
+                                    <small class="text-muted">Created: ${new Date(battle.createdon).toLocaleString()}</small>
+                                </div>
+                                <div>
+                                    ${canJoin ? 
+                                        `<button class="btn btn-primary" onclick="battleArena.joinBattle('${battle.pokemon_battleid}')">
+                                            ⚔️ Join Battle
+                                        </button>` :
+                                        `<span class="badge bg-secondary">Your Challenge</span>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            async joinBattle(battleId) {
+                // Redirect to join battle page with battle ID
+                window.location.href = `battle-join.html?battleId=${battleId}`;
+            }
+            
+            async loadBattleHistory() {
+                this.showLoading('history-loading');
+                this.hideError('history-error');
+                
+                try {
+                    console.log('🔄 Loading battle history...');
+                    
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.currentUser.id}' or _pokemon_player2_value eq '${this.currentUser.id}') and statuscode ne 1&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=modifiedon desc`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load battle history: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    const battles = data.value || [];
+                    
+                    console.log('✅ Loaded battle history:', battles.length);
+                    this.renderBattleHistory(battles);
+                    
+                } catch (error) {
+                    console.error('❌ Error loading battle history:', error);
+                    this.showError(`Failed to load battle history: ${error.message}`, 'history-error');
+                } finally {
+                    this.hideLoading('history-loading');
+                }
+            }
+            
+            renderBattleHistory(battles) {
+                const container = document.getElementById('history-list');
+                
+                if (battles.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No battle history yet. Start battling to see your results here!</p>';
+                    return;
+                }
+                
+                container.innerHTML = battles.map(battle => {
+                    const player1Name = battle.pokemon_Player1?.firstname || 'Unknown';
+                    const player2Name = battle.pokemon_Player2?.firstname || 'AI Opponent';
+                    const pokemon1Name = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown';
+                    const pokemon2Name = battle.pokemon_Player2Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown';
+                    const pokemon1Id = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_id || 1;
+                    const pokemon2Id = battle.pokemon_Player2Pokemon?.pokemon_Pokemon?.pokemon_id || 1;
+                    
+                    const statusText = this.getStatusText(battle.statuscode);
+                    const isCompleted = battle.statuscode === 895550001; // Completed
+                    const hasReplay = battle.pokemon_battleresultjson;
+                    
+                    return `
+                        <div class="battle-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon1Id}.png" 
+                                             class="pokemon-sprite me-2" alt="${pokemon1Name}" style="width: 50px; height: 50px;">
+                                        <div class="me-2">
+                                            <strong>${player1Name}</strong><br>
+                                            <small>${pokemon1Name}</small>
+                                        </div>
+                                        <span class="me-2">⚔️</span>
+                                        <div class="me-2">
+                                            <strong>${player2Name}</strong><br>
+                                            <small>${pokemon2Name}</small>
+                                        </div>
+                                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon2Id}.png" 
+                                             class="pokemon-sprite" alt="${pokemon2Name}" style="width: 50px; height: 50px;">
+                                    </div>
+                                    <div>
+                                        <span class="badge ${this.getStatusBadgeClass(battle.statuscode)}">${statusText}</span>
+                                        <small class="text-muted ms-2">
+                                            ${new Date(battle.modifiedon || battle.createdon).toLocaleString()}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    ${isCompleted && hasReplay ? 
+                                        `<button class="btn btn-outline-primary" onclick="battleArena.showReplay('${battle.pokemon_battleid}')">
+                                            📽️ Watch Replay
+                                        </button>` :
+                                        ''
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            getStatusText(statusCode) {
+                switch(statusCode) {
+                    case 1: return 'Open';
+                    case 895550002: return 'In Progress';
+                    case 895550001: return 'Completed';
+                    default: return 'Unknown';
+                }
+            }
+            
+            getStatusBadgeClass(statusCode) {
+                switch(statusCode) {
+                    case 1: return 'bg-primary';
+                    case 895550002: return 'bg-warning';
+                    case 895550001: return 'bg-success';
+                    default: return 'bg-secondary';
+                }
+            }
+            
+            async showReplay(battleId) {
+                try {
+                    console.log('🎬 Loading battle replay:', battleId);
+                    
+                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles(${battleId})?$select=pokemon_battleresultjson`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to load battle replay');
+                    }
+                    
+                    const battle = await response.json();
+                    const replayData = JSON.parse(battle.pokemon_battleresultjson || '{}');
+                    
+                    this.currentReplay = replayData;
+                    this.currentStep = 0;
+                    
+                    this.renderReplay();
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('replayModal'));
+                    modal.show();
+                    
+                } catch (error) {
+                    console.error('❌ Error loading replay:', error);
+                    alert('Failed to load battle replay');
+                }
+            }
+            
+            renderReplay() {
+                if (!this.currentReplay) return;
+                
+                const container = document.getElementById('replay-content');
+                const battleData = this.currentReplay.completeBattleData;
+                
+                if (!battleData) {
+                    container.innerHTML = `
+                        <div class="text-center">
+                            <h4>🏆 Battle Result</h4>
+                            <p>Winner: ${this.currentReplay.winner}</p>
+                            <div class="battle-log">
+                                ${this.currentReplay.battleLog?.map(log => `<p>${log}</p>`).join('') || ''}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const totalTurns = battleData.battle_turns?.length || 0;
+                const currentTurn = Math.min(this.currentStep, totalTurns);
+                const currentTurnData = currentTurn > 0 ? battleData.battle_turns[currentTurn - 1] : null;
+                
+                // Update turn indicator
+                document.getElementById('turn-indicator').textContent = `Turn ${currentTurn}/${totalTurns}`;
+                
+                // Update navigation buttons
+                document.getElementById('prev-btn').disabled = currentTurn <= 0;
+                document.getElementById('next-btn').disabled = currentTurn >= totalTurns;
+                
+                // Get Pokemon data
+                const player1Pokemon = battleData.pokemon_teams?.player1_team?.[0];
+                const player2Pokemon = battleData.pokemon_teams?.player2_team?.[0];
+                
+                if (!player1Pokemon || !player2Pokemon) {
+                    container.innerHTML = '<p>Battle data incomplete</p>';
+                    return;
+                }
+                
+                // Get current HP values
+                const player1HP = currentTurnData ? currentTurnData.turn_result?.player1_pokemon_hp : player1Pokemon.hp;
+                const player2HP = currentTurnData ? currentTurnData.turn_result?.player2_pokemon_hp : player2Pokemon.hp;
+                
+                container.innerHTML = `
+                    <div class="battle-scene">
+                        ${currentTurn === 0 ? 
+                            `<div class="text-center mb-4">
+                                <h4>⚔️ Battle Beginning!</h4>
+                                <p>${battleData.metadata?.player1_name} vs ${battleData.metadata?.player2_name}</p>
+                            </div>` :
+                            currentTurn >= totalTurns ?
+                            `<div class="winner-announcement">
+                                <h4>🏆 ${battleData.final_result?.winner_name} Wins!</h4>
+                                <p>${battleData.final_result?.battle_summary}</p>
+                            </div>` :
+                            `<div class="text-center mb-4">
+                                <p class="fs-5">${currentTurnData?.turn_result?.turn_summary}</p>
+                            </div>`
+                        }
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="pokemon-status text-center">
+                                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${player1Pokemon.pokemon_id}.png" 
+                                         class="pokemon-sprite mb-2" alt="${player1Pokemon.name}">
+                                    <h5>${player1Pokemon.name}</h5>
+                                    <div class="hp-bar">
+                                        <div class="hp-fill ${this.getHpClass(player1HP, player1Pokemon.max_hp)}" 
+                                             style="width: ${(player1HP / player1Pokemon.max_hp) * 100}%"></div>
+                                    </div>
+                                    <small>HP: ${player1HP}/${player1Pokemon.max_hp}</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="pokemon-status text-center">
+                                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${player2Pokemon.pokemon_id}.png" 
+                                         class="pokemon-sprite mb-2" alt="${player2Pokemon.name}">
+                                    <h5>${player2Pokemon.name}</h5>
+                                    <div class="hp-bar">
+                                        <div class="hp-fill ${this.getHpClass(player2HP, player2Pokemon.max_hp)}" 
+                                             style="width: ${(player2HP / player2Pokemon.max_hp) * 100}%"></div>
+                                    </div>
+                                    <small>HP: ${player2HP}/${player2Pokemon.max_hp}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${currentTurnData ? 
+                            `<div class="turn-details mt-3">
+                                <h6>Turn ${currentTurn} Actions:</h6>
+                                <ul class="list-unstyled">
+                                    ${currentTurnData.actions?.map(action => 
+                                        `<li>• ${action.description || action.action_description}</li>`
+                                    ).join('') || ''}
+                                </ul>
+                            </div>` :
+                            ''
+                        }
+                    </div>
+                `;
+            }
+            
+            getHpClass(hp, maxHp) {
+                const percentage = (hp / maxHp) * 100;
+                return percentage > 60 ? 'hp-high' : percentage > 30 ? 'hp-medium' : 'hp-low';
+            }
+            
+            // Utility methods for UI management
+            showLoading(elementId) {
+                document.getElementById(elementId).style.display = 'block';
+            }
+            
+            hideLoading(elementId) {
+                document.getElementById(elementId).style.display = 'none';
+            }
+            
+            showError(message, elementId) {
+                const element = document.getElementById(elementId);
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+            
+            hideError(elementId) {
+                document.getElementById(elementId).style.display = 'none';
+            }
+            
+            showSuccess(message, elementId) {
+                const element = document.getElementById(elementId);
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+            
+            hideSuccess(elementId) {
+                document.getElementById(elementId).style.display = 'none';
+            }
+        }
+        
+        // Replay control functions
+        function previousStep() {
+            if (battleArena.currentStep > 0) {
+                battleArena.currentStep--;
+                battleArena.renderReplay();
+            }
+        }
+        
+        function nextStep() {
+            const totalTurns = battleArena.currentReplay?.completeBattleData?.battle_turns?.length || 0;
+            if (battleArena.currentStep < totalTurns) {
+                battleArena.currentStep++;
+                battleArena.renderReplay();
+            }
+        }
+        
+        function toggleAutoReplay() {
+            if (battleArena.autoReplayInterval) {
+                clearInterval(battleArena.autoReplayInterval);
+                battleArena.autoReplayInterval = null;
+                document.getElementById('auto-btn').textContent = '▶️ Auto';
+            } else {
+                battleArena.autoReplayInterval = setInterval(() => {
+                    const totalTurns = battleArena.currentReplay?.completeBattleData?.battle_turns?.length || 0;
+                    if (battleArena.currentStep < totalTurns) {
+                        nextStep();
+                    } else {
+                        toggleAutoReplay(); // Stop auto replay when finished
+                    }
+                }, 2000);
+                document.getElementById('auto-btn').textContent = '⏸️ Stop';
+            }
+        }
+        
+        // Global functions for onclick handlers
+        function loadOpenChallenges() {
+            battleArena.loadOpenChallenges();
+        }
+        
+        function loadBattleHistory() {
+            battleArena.loadBattleHistory();
+        }
+        
+        // Initialize when page loads
+        let battleArena;
+        document.addEventListener('DOMContentLoaded', function() {
+            battleArena = new BattleArena();
+        });
+    </script>
+</body>
+</html>
