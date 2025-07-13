@@ -28,6 +28,7 @@ jobs:
           app_location: "/" # Root - cleaned up HTML structure
           api_location: "" # No managed Functions - using standalone Functions
           output_location: "" # No build step needed for HTML
+          skip_app_build: true # Skip React build since this is static HTML
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
