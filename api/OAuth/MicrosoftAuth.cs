@@ -90,11 +90,17 @@ namespace PokemonGame.Api.OAuth
 
                 // Create or update user profile in Dataverse
                 var userEmail = userInfo.mail ?? userInfo.userPrincipalName;
+                
+                // Determine the best name to use - prefer givenName, fallback to displayName
+                var firstName = !string.IsNullOrEmpty(userInfo.givenName) 
+                    ? userInfo.givenName 
+                    : userInfo.displayName;
+                
                 var profileCreationResult = "";
                 
                 try 
                 {
-                    await CreateOrUpdateUserProfile(userEmail, userInfo.displayName);
+                    await CreateOrUpdateUserProfile(userEmail, firstName);
                     profileCreationResult = "SUCCESS";
                 }
                 catch (Exception profileEx)
@@ -113,11 +119,11 @@ namespace PokemonGame.Api.OAuth
                     gameUrl = "http://localhost:8080";
                 }
                 
-                var sessionToken = CreateSessionToken(userEmail, userInfo.displayName);
+                var sessionToken = CreateSessionToken(userEmail, firstName);
                 
                 var response = req.CreateResponse(HttpStatusCode.Redirect);
                 // Include profile creation result in the redirect URL for debugging
-                response.Headers.Add("Location", $"{gameUrl}?token={sessionToken}&email={HttpUtility.UrlEncode(userEmail)}&name={HttpUtility.UrlEncode(userInfo.displayName)}&profile_result={HttpUtility.UrlEncode(profileCreationResult)}");
+                response.Headers.Add("Location", $"{gameUrl}?token={sessionToken}&email={HttpUtility.UrlEncode(userEmail)}&name={HttpUtility.UrlEncode(firstName)}&profile_result={HttpUtility.UrlEncode(profileCreationResult)}");
                 
                 // Set session cookie
                 response.Headers.Add("Set-Cookie", $"pokemon_session={sessionToken}; Path=/; HttpOnly; Secure; SameSite=Strict");
