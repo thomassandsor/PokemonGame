@@ -1,0 +1,109 @@
+body {
+  margin: 0;
+  font-family: 'Arial Black', 'Arial', 'Helvetica', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: 
+    linear-gradient(135deg, #1e40af 0%, #3b82f6 25%, #60a5fa 50%, #93c5fd 75%, #dbeafe 100%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="pokeball" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/><circle cx="25" cy="25" r="8" fill="rgba(255,255,255,0.03)"/><line x1="5" y1="25" x2="45" y2="25" stroke="rgba(255,255,255,0.05)" stroke-width="2"/></pattern></defs><rect width="100" height="100" fill="url(%23pokeball)"/></svg>');
+  background-attachment: fixed;
+  background-size: cover, 200px 200px;
+  min-height: 100vh;
+  color: #1f2937;
+  position: relative;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.pokemon-card {
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.pokemon-card:hover {
+  transform: translateY(-5px);
+}
+
+.scanner-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Global Pokémon-themed body effects */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 193, 7, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 60% 60%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+  animation: pokemonAura 20s ease-in-out infinite;
+}
+
+body::after {
+  content: '⚡🔥💧🌿❄️⚔️☠️🪨👻🐲🌑🔩🧚';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 2rem;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: -1;
+  animation: floatingElements 60s linear infinite;
+  white-space: pre-wrap;
+  word-spacing: 100px;
+  line-height: 150px;
+  overflow: hidden;
+}
+
+@keyframes pokemonAura {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  25% { transform: scale(1.1) rotate(90deg); opacity: 1; }
+  50% { transform: scale(0.9) rotate(180deg); opacity: 0.6; }
+  75% { transform: scale(1.05) rotate(270deg); opacity: 0.9; }
+}
+
+@keyframes floatingElements {
+  0% { transform: translateY(100vh) translateX(-50px); }
+  100% { transform: translateY(-100px) translateX(50px); }
+}
+
+/* Global Pokemon-themed scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border-radius: 10px;
+  border: 2px solid #1e40af;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}

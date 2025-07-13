@@ -1,0 +1,29 @@
+{
+  "portal_settings": {
+    "version": "1.0.0",
+    "description": "Default portal settings for Pokemon Game application",
+    "last_updated": "2025-01-06",
+    "settings": [
+      {
+        "key": "demo_mode",
+        "value": "false",
+        "description": "Enable demo mode to bypass authentication for testing. Values: true/false"
+      },
+      {
+        "key": "maintenance_mode",
+        "value": "false",
+        "description": "Enable maintenance mode to show maintenance page to all users. Values: true/false"
+      },
+      {
+        "key": "ui_theme",
+        "value": "pokemon",
+        "description": "Default UI theme for the application. Values: pokemon, dark, light"
+      },
+      {
+        "key": "demo_user_email",
+        "value": "userX@domain.com",
+        "description": "Email address of the demo user when demo mode is enabled. Values: valid email address"
+      }
+    ]
+  }
+}

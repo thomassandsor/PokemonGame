@@ -1,0 +1,2 @@
+// Backup of BattleArena.js or BattleArena.jsx/tsx (main component file)
+// Replace this comment with the full contents of the file if needed for restore.

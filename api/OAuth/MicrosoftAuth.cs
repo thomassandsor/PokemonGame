@@ -122,13 +122,13 @@ namespace PokemonGame.Api.OAuth
                     // Don't fail the authentication if profile creation fails
                 }
 
-                // Create session and redirect to game
-                var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/game.html";
+                // Create session and redirect to redirect page for authentication processing
+                var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/redirect.html";
                 
                 // If state is "localhost", redirect to localhost instead
                 if (state == "localhost")
                 {
-                    gameUrl = "http://localhost:8080";
+                    gameUrl = "http://localhost:8080/redirect.html";
                 }
                 
                 var sessionToken = CreateSessionToken(userEmail, firstName);
@@ -213,12 +213,12 @@ namespace PokemonGame.Api.OAuth
         private HttpResponseData CreateErrorResponse(HttpRequestData req, string message, string? state = null)
         {
             var response = req.CreateResponse(HttpStatusCode.Redirect);
-            var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/game.html";
+            var gameUrl = Environment.GetEnvironmentVariable("GAME_URL") ?? "/index.html";
             
             // If state is "localhost", redirect to localhost instead
             if (state == "localhost")
             {
-                gameUrl = "http://localhost:8080";
+                gameUrl = "http://localhost:8080/index.html";
             }
             
             response.Headers.Add("Location", $"{gameUrl}?error={HttpUtility.UrlEncode(message)}");

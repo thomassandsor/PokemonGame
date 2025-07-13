@@ -24,23 +24,8 @@
       "statusCode": 200
     },
     {
-      "route": "/my-pokemon.html",
-      "serve": "/my-pokemon.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/pokemon-browser.html",
-      "serve": "/pokemon-browser.html",
-      "statusCode": 200
-    },
-    {
       "route": "/redirect.html",
       "serve": "/redirect.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/servegame-redirect.html",
-      "serve": "/servegame-redirect.html",
       "statusCode": 200
     },
     {

@@ -3,14 +3,7 @@
   "functionTimeout": "00:05:00",
   "extensions": {
     "http": {
-      "routePrefix": "api",
-      "cors": {
-        "allowedOrigins": [
-          "http://localhost:8080",
-          "https://localhost:8080"
-        ],
-        "supportCredentials": true
-      }
+      "routePrefix": "api"
     }
   }
 }
