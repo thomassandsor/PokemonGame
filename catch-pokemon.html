@@ -163,12 +163,22 @@
             async initializeScanner() {
                 console.log('🎮 Initializing QR Scanner...');
                 
+                // Wait a moment for AuthService to restore session
+                console.log('AUTH: Waiting for session restoration...');
+                await AuthService.restoreAuthFromSession();
+                
                 // Check authentication
+                console.log('AUTH: Checking authentication status...');
+                console.log('AUTH: isAuthenticated():', AuthService.isAuthenticated());
+                console.log('AUTH: getCurrentUser():', AuthService.getCurrentUser());
+                
                 if (!AuthService.isAuthenticated()) {
                     console.log('User not authenticated, redirecting to login');
                     window.location.href = '/index.html';
                     return;
                 }
+                
+                console.log('✅ User authenticated, proceeding with scanner setup...');
                 
                 // Set up event listeners
                 document.getElementById('startBtn').addEventListener('click', () => this.startScanning());
