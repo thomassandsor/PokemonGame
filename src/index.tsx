@@ -146,7 +146,7 @@ initAttempts++;
 sessionStorage.setItem(INIT_ATTEMPT_KEY, initAttempts.toString());
 
 // Track initialization attempt
-appInsightsLogger.trackMSALEvent('Initialization_Attempt', {
+logger.trackMSALEvent('Initialization_Attempt', {
   attempt: initAttempts,
   url: window.location.href,
   hasAuthParams: window.location.hash.includes('id_token') || window.location.search.includes('code')
@@ -163,7 +163,7 @@ const initStartTime = Date.now();
 // Set a timeout to prevent infinite hanging
 const initTimeout = setTimeout(() => {
   console.error('🚨 MSAL initialization timeout! Forcing emergency stop...');
-  appInsightsLogger.trackEvent('MSAL_Initialization_Timeout', {
+  logger.trackEvent('MSAL_Initialization_Timeout', {
     timeoutMs: 10000,
     url: window.location.href,
     attempt: initAttempts
@@ -181,7 +181,7 @@ msalInstanceSingleton.initialize().then(() => {
   console.log('✅ Has auth params:', window.location.hash.includes('id_token') || window.location.search.includes('code'));
   
   // Track successful initialization
-  appInsightsLogger.trackMSALEvent('Initialization_Success', {
+  logger.trackMSALEvent('Initialization_Success', {
     durationMs: initDuration,
     attempt: initAttempts,
     url: window.location.href,
@@ -206,7 +206,7 @@ msalInstanceSingleton.initialize().then(() => {
   console.log(`✅ Redirect promise handled in ${totalDuration}ms total`);
   
   // Track redirect handling
-  appInsightsLogger.trackMSALEvent('Redirect_Handled', {
+  logger.trackMSALEvent('Redirect_Handled', {
     durationMs: totalDuration,
     hasResponse: !!response,
     url: window.location.href
@@ -222,7 +222,7 @@ msalInstanceSingleton.initialize().then(() => {
     console.log('✅ Access token present:', !!response.accessToken);
     
     // Track successful authentication
-    appInsightsLogger.trackAuthEvent('Authentication_Success', {
+    logger.trackAuthEvent('Authentication_Success', {
       username: response.account?.username,
       hasAccessToken: !!response.accessToken,
       hasIdToken: !!response.idToken,
@@ -267,7 +267,7 @@ msalInstanceSingleton.initialize().then(() => {
   window[MSAL_INIT_KEY] = false; // Reset flag on error
   
   // Track the error
-  appInsightsLogger.trackException(error, {
+  logger.trackException(error, {
     errorCode: error.errorCode,
     errorMessage: error.errorMessage,
     stage: 'MSAL_Initialization_or_Redirect',
@@ -278,14 +278,14 @@ msalInstanceSingleton.initialize().then(() => {
   // Handle specific hash_empty_error
   if (error.errorCode === 'hash_empty_error') {
     console.log('Hash empty error detected - this is usually safe to ignore on first load');
-    appInsightsLogger.trackMSALEvent('Hash_Empty_Error', {
+    logger.trackMSALEvent('Hash_Empty_Error', {
       message: 'Safe to ignore on first load',
       url: window.location.href
     });
     // Don't clear cache here as it might interfere with ongoing auth
   } else if (error.errorCode === 'interaction_in_progress') {
     console.log('Authentication interaction already in progress');
-    appInsightsLogger.trackMSALEvent('Interaction_In_Progress', {
+    logger.trackMSALEvent('Interaction_In_Progress', {
       message: 'Retrying in 2 seconds',
       url: window.location.href
     });
@@ -294,15 +294,15 @@ msalInstanceSingleton.initialize().then(() => {
       console.log('🔄 Retrying redirect handling after interaction_in_progress');
       msalInstanceSingleton.handleRedirectPromise().then(response => {
         console.log('Retry result:', response);
-        appInsightsLogger.trackMSALEvent('Retry_Success', { hasResponse: !!response });
+        logger.trackMSALEvent('Retry_Success', { hasResponse: !!response });
       }).catch(retryError => {
         console.error('Retry failed:', retryError);
-        appInsightsLogger.trackException(retryError, { stage: 'Retry_After_Interaction_In_Progress' });
+        logger.trackException(retryError, { stage: 'Retry_After_Interaction_In_Progress' });
       });
     }, 2000);
   } else {
     console.error('Unexpected authentication error:', error);
-    appInsightsLogger.trackMSALEvent('Unexpected_Error', {
+    logger.trackMSALEvent('Unexpected_Error', {
       errorCode: error.errorCode,
       errorMessage: error.errorMessage,
       stack: error.stack
