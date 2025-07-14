@@ -14,7 +14,7 @@ class CatchPokemonService {
             
             // Get current user info
             const currentUser = AuthService.getCurrentUser();
-            if (!currentUser || !currentUser.id) {
+            if (!currentUser || !currentUser.email) {
                 throw new Error('User not authenticated');
             }
             
