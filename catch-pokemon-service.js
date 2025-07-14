@@ -42,7 +42,7 @@ class CatchPokemonService {
                 throw new Error(`You already have ${masterPokemon.pokemon_name} in your collection!`);
             }
             
-            // Step 4: Create Pokedex entry with smart defaults
+            // Step 4: Create Pokedex entry with lookup relationships
             console.log('🎯 CATCH-SERVICE: Creating entry with userId:', userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
             const pokedexEntry = this.createPokedexEntry(userId, masterPokemon, options);
             console.log('🎯 CATCH-SERVICE: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
@@ -133,19 +133,19 @@ class CatchPokemonService {
     }
     
     /**
-     * Create Pokedex entry with only required fields plus Pokemon name
+     * Create Pokedex entry with lookup relationships using @odata.bind
      */
     static createPokedexEntry(userId, masterPokemon, options = {}) {
-        // Ensure GUIDs are properly formatted (remove braces if present, add them back)
+        // Clean GUIDs (remove braces if present)
         const cleanUserId = userId.replace(/[{}]/g, '');
         const cleanPokemonId = masterPokemon.pokemon_pokemonid.replace(/[{}]/g, '');
         
         return {
-            // Required relationships - using navigation properties with properly formatted GUIDs
-            "pokemon_user@odata.bind": `/contacts(${cleanUserId})`,
-            "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${cleanPokemonId})`,
+            // Associate with existing contact and pokemon using @odata.bind (trying Pascal case)
+            "pokemon_User@odata.bind": `/contacts(${cleanUserId})`,
+            "pokemon_Pokemon@odata.bind": `/pokemon_pokemons(${cleanPokemonId})`,
             
-            // Pokemon name (extra field)
+            // Pokemon name
             pokemon_name: masterPokemon.pokemon_name
         };
     }
