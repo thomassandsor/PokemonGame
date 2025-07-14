@@ -135,9 +135,9 @@ class CatchPokemonService {
      */
     static createPokedexEntry(userId, masterPokemon, options = {}) {
         return {
-            // Required relationships
-            "pokemon_user@odata.bind": `/contacts(${userId})`,
-            "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${masterPokemon.pokemon_pokemonid})`,
+            // Required relationships - using direct lookup values
+            "_pokemon_user_value": userId,
+            "_pokemon_pokemon_value": masterPokemon.pokemon_pokemonid,
             
             // Pokemon name (extra field)
             pokemon_name: masterPokemon.pokemon_name
