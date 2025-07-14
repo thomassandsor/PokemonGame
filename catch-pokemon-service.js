@@ -43,7 +43,9 @@ class CatchPokemonService {
             }
             
             // Step 4: Create Pokedex entry with smart defaults
+            console.log('🎯 CATCH-SERVICE: Creating entry with userId:', userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
             const pokedexEntry = this.createPokedexEntry(userId, masterPokemon, options);
+            console.log('🎯 CATCH-SERVICE: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
             const result = await this.addToPokedex(pokedexEntry);
             
             console.log('🎯 CATCH-SERVICE: Successfully caught Pokemon!');
@@ -134,10 +136,14 @@ class CatchPokemonService {
      * Create Pokedex entry with only required fields plus Pokemon name
      */
     static createPokedexEntry(userId, masterPokemon, options = {}) {
+        // Ensure GUIDs are properly formatted (remove braces if present, add them back)
+        const cleanUserId = userId.replace(/[{}]/g, '');
+        const cleanPokemonId = masterPokemon.pokemon_pokemonid.replace(/[{}]/g, '');
+        
         return {
-            // Required relationships - using direct lookup values
-            "_pokemon_user_value": userId,
-            "_pokemon_pokemon_value": masterPokemon.pokemon_pokemonid,
+            // Required relationships - using navigation properties with properly formatted GUIDs
+            "pokemon_user@odata.bind": `/contacts(${cleanUserId})`,
+            "pokemon_pokemon@odata.bind": `/pokemon_pokemons(${cleanPokemonId})`,
             
             // Pokemon name (extra field)
             pokemon_name: masterPokemon.pokemon_name
