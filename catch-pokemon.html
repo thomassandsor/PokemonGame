@@ -64,18 +64,48 @@
             text-align: center;
         }
         
-        .controls {
-            margin: 20px 0;
-            text-align: center;
+        .pokemon-image-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
         }
         
-        .btn-scanner {
-            margin: 5px;
-            min-width: 120px;
+        .pokemon-image {
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .pokemon-name-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pokemon-number {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .encounter-actions {
+            margin-top: 20px;
         }
         
         .camera-select {
             margin-top: 15px;
+        }
+        
+        .catch-result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .pokemon-preview .btn {
+            margin: 5px;
+        }
+        
+        #catchPokemonBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -96,16 +126,6 @@
                     </select>
                 </div>
                 
-                <!-- Controls -->
-                <div class="controls">
-                    <button id="startBtn" class="btn btn-success btn-scanner">
-                        <i class="fas fa-play"></i> Start Scanner
-                    </button>
-                    <button id="stopBtn" class="btn btn-danger btn-scanner" disabled>
-                        <i class="fas fa-stop"></i> Stop Scanner
-                    </button>
-                </div>
-                
                 <!-- Video Element for Camera -->
                 <div class="text-center">
                     <video id="video" autoplay muted playsinline></video>
@@ -124,11 +144,41 @@
                     <p id="errorMessage"></p>
                 </div>
                 
-                <!-- Pokemon Preview (for future use) -->
+                <!-- Pokemon Preview -->
                 <div id="pokemonPreview" class="pokemon-preview" style="display: none;">
-                    <h4>🎉 Pokemon Found!</h4>
-                    <p>Pokemon #<span id="previewNumber"></span></p>
-                    <button class="btn btn-light btn-lg">Catch This Pokemon!</button>
+                    <div class="pokemon-encounter">
+                        <h4>🎉 Wild Pokemon Appeared!</h4>
+                        <div class="pokemon-image-container text-center mb-3">
+                            <img id="pokemonImage" src="" alt="Pokemon" class="pokemon-image" style="max-width: 200px; height: auto;">
+                        </div>
+                        <div class="pokemon-details text-center mb-3">
+                            <h5 id="pokemonName" class="pokemon-name-display">Loading...</h5>
+                            <p class="pokemon-number">Pokemon #<span id="previewNumber"></span></p>
+                        </div>
+                        <div class="encounter-actions">
+                            <button id="catchPokemonBtn" class="btn btn-success btn-lg me-2" onclick="handleCatchPokemon()">
+                                <i class="fas fa-hand-paper"></i> Catch
+                            </button>
+                            <button id="runAwayBtn" class="btn btn-warning btn-lg" onclick="handleRunAway()">
+                                <i class="fas fa-running"></i> Run
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Catch Result -->
+                <div id="catchResult" class="catch-result" style="display: none;">
+                    <div id="catchSuccess" class="alert alert-success" style="display: none;">
+                        <h5><i class="fas fa-trophy"></i> Pokemon Caught!</h5>
+                        <p id="catchSuccessMessage"></p>
+                    </div>
+                    <div id="catchError" class="alert alert-danger" style="display: none;">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Catch Failed</h5>
+                        <p id="catchErrorMessage"></p>
+                    </div>
+                    <button class="btn btn-primary" onclick="startNewScan()">
+                        <i class="fas fa-qrcode"></i> Scan Another Pokemon
+                    </button>
                 </div>
             </div>
         </div>
@@ -145,6 +195,9 @@
     
     <!-- Include Auth Service -->
     <script src="auth.js"></script>
+    
+    <!-- Include Catch Pokemon Service -->
+    <script src="catch-pokemon-service.js"></script>
     
     <script>
         class QRScanner {
@@ -180,13 +233,16 @@
                 
                 console.log('✅ User authenticated, proceeding with scanner setup...');
                 
-                // Set up event listeners
-                document.getElementById('startBtn').addEventListener('click', () => this.startScanning());
-                document.getElementById('stopBtn').addEventListener('click', () => this.stopScanning());
+                // Set up camera selection event listener
                 document.getElementById('cameraSelect').addEventListener('change', (e) => this.switchCamera(e.target.value));
                 
-                // Get available cameras
+                // Get available cameras and start scanning
                 await this.loadCameras();
+                
+                // Auto-start scanning after cameras are loaded
+                if (this.cameras.length > 0) {
+                    await this.startScanning();
+                }
             }
             
             async loadCameras() {
@@ -248,8 +304,6 @@
                     this.video.srcObject = this.stream;
                     
                     this.scanning = true;
-                    document.getElementById('startBtn').disabled = true;
-                    document.getElementById('stopBtn').disabled = false;
                     
                     // Start the scanning loop
                     this.video.addEventListener('loadedmetadata', () => {
@@ -278,9 +332,6 @@
                 }
                 
                 this.video.srcObject = null;
-                
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
             }
             
             switchCamera(deviceId) {
@@ -346,17 +397,90 @@
                 return null;
             }
             
-            showResult(pokemonNumber, rawData) {
+            async showResult(pokemonNumber, rawData) {
+                // Store globally for catch function
+                currentPokemonNumber = pokemonNumber;
+                
                 document.getElementById('pokemonNumber').textContent = pokemonNumber;
                 document.getElementById('rawData').textContent = rawData;
                 document.getElementById('scanResult').style.display = 'block';
                 document.getElementById('errorResult').style.display = 'none';
                 
-                // Show pokemon preview for future use
+                // Show pokemon preview
                 document.getElementById('previewNumber').textContent = pokemonNumber;
                 document.getElementById('pokemonPreview').style.display = 'block';
                 
+                // Load Pokemon data
+                await this.loadPokemonData(pokemonNumber);
+                
                 console.log(`✅ Pokemon #${pokemonNumber} detected!`);
+            }
+            
+            async loadPokemonData(pokemonNumber) {
+                try {
+                    document.getElementById('pokemonName').textContent = 'Loading...';
+                    document.getElementById('pokemonImage').style.display = 'none';
+                    
+                    // Fetch Pokemon data from local JSON file
+                    const response = await fetch('/legacy-react/src/data/pokemon.json');
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load Pokemon data: ${response.status}`);
+                    }
+                    
+                    const pokemonData = await response.json();
+                    
+                    // Find Pokemon by ID
+                    const pokemon = pokemonData.find(p => p.id === pokemonNumber);
+                    
+                    if (pokemon) {
+                        // Update Pokemon name (capitalize first letter)
+                        const pokemonName = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+                        document.getElementById('pokemonName').textContent = pokemonName;
+                        
+                        // Set Pokemon image - prefer official artwork, fallback to front_default
+                        const imageUrl = pokemon.sprites.official_artwork || pokemon.sprites.front_default;
+                        const pokemonImage = document.getElementById('pokemonImage');
+                        pokemonImage.src = imageUrl;
+                        pokemonImage.alt = pokemonName;
+                        pokemonImage.style.display = 'block';
+                        
+                        // Store Pokemon data globally for catch function
+                        window.currentPokemonData = {
+                            id: pokemon.id,
+                            number: pokemonNumber,
+                            name: pokemonName,
+                            types: pokemon.types,
+                            sprites: pokemon.sprites,
+                            stats: pokemon.stats
+                        };
+                        
+                        console.log(`📊 Loaded Pokemon data:`, window.currentPokemonData);
+                        
+                    } else {
+                        throw new Error(`Pokemon #${pokemonNumber} not found in local data`);
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading Pokemon data:', error);
+                    
+                    // Fallback to basic display
+                    const pokemonName = `Pokemon #${pokemonNumber}`;
+                    document.getElementById('pokemonName').textContent = pokemonName;
+                    
+                    // Set fallback image from PokeAPI
+                    const pokemonImage = document.getElementById('pokemonImage');
+                    pokemonImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonNumber}.png`;
+                    pokemonImage.alt = pokemonName;
+                    pokemonImage.style.display = 'block';
+                    
+                    // Store minimal data
+                    window.currentPokemonData = {
+                        id: pokemonNumber,
+                        number: pokemonNumber,
+                        name: pokemonName
+                    };
+                }
             }
             
             showError(message) {
@@ -372,12 +496,110 @@
             hideResult() {
                 document.getElementById('scanResult').style.display = 'none';
                 document.getElementById('pokemonPreview').style.display = 'none';
+                document.getElementById('catchResult').style.display = 'none';
+            }
+        }
+        
+        // Global variables to store current scan data
+        let currentPokemonNumber = null;
+        
+        // Handle catching the Pokemon
+        async function handleCatchPokemon() {
+            if (!currentPokemonNumber) {
+                alert('No Pokemon selected to catch!');
+                return;
+            }
+            
+            const catchBtn = document.getElementById('catchPokemonBtn');
+            const originalText = catchBtn.innerHTML;
+            
+            try {
+                // Disable button and show loading
+                catchBtn.disabled = true;
+                catchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Catching...';
+                
+                // Call catch service with no options (simplified)
+                const result = await CatchPokemonService.catchPokemon(currentPokemonNumber);
+                
+                // Hide preview and show result
+                document.getElementById('pokemonPreview').style.display = 'none';
+                document.getElementById('catchResult').style.display = 'block';
+                
+                if (result.success) {
+                    // Show success
+                    document.getElementById('catchSuccess').style.display = 'block';
+                    document.getElementById('catchError').style.display = 'none';
+                    
+                    const pokemon = result.pokemon;
+                    let message = `🎉 ${pokemon.name} has been added to your Pokedex!`;
+                    
+                    document.getElementById('catchSuccessMessage').textContent = message;
+                    
+                } else {
+                    // Show error
+                    document.getElementById('catchSuccess').style.display = 'none';
+                    document.getElementById('catchError').style.display = 'block';
+                    document.getElementById('catchErrorMessage').textContent = result.error;
+                }
+                
+            } catch (error) {
+                console.error('Error catching Pokemon:', error);
+                
+                // Show error
+                document.getElementById('pokemonPreview').style.display = 'none';
+                document.getElementById('catchResult').style.display = 'block';
+                document.getElementById('catchSuccess').style.display = 'none';
+                document.getElementById('catchError').style.display = 'block';
+                document.getElementById('catchErrorMessage').textContent = 'An unexpected error occurred while catching the Pokemon.';
+                
+            } finally {
+                // Reset button
+                catchBtn.disabled = false;
+                catchBtn.innerHTML = originalText;
+            }
+        }
+        
+        // Handle running away from the Pokemon
+        function handleRunAway() {
+            console.log('🏃 Player chose to run away');
+            
+            // Clear current Pokemon data
+            currentPokemonNumber = null;
+            window.currentPokemonData = null;
+            
+            // Hide all result sections
+            document.getElementById('scanResult').style.display = 'none';
+            document.getElementById('pokemonPreview').style.display = 'none';
+            document.getElementById('catchResult').style.display = 'none';
+            document.getElementById('errorResult').style.display = 'none';
+            
+            // Restart scanner for new Pokemon
+            const scanner = window.qrScanner;
+            if (scanner && !scanner.scanning) {
+                scanner.startScanning();
+            }
+        }
+        
+        // Start a new scan
+        function startNewScan() {
+            currentPokemonNumber = null;
+            
+            // Hide all result sections
+            document.getElementById('scanResult').style.display = 'none';
+            document.getElementById('pokemonPreview').style.display = 'none';
+            document.getElementById('catchResult').style.display = 'none';
+            document.getElementById('errorResult').style.display = 'none';
+            
+            // Restart scanner if not already running
+            const scanner = window.qrScanner;
+            if (scanner && !scanner.scanning) {
+                scanner.startScanning();
             }
         }
         
         // Initialize the scanner when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new QRScanner();
+            window.qrScanner = new QRScanner();
         });
     </script>
 </body>
