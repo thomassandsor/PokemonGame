@@ -536,21 +536,55 @@
                     document.getElementById('catchSuccessMessage').textContent = message;
                     
                 } else {
-                    // Show error
+                    // Show detailed error information
                     document.getElementById('catchSuccess').style.display = 'none';
                     document.getElementById('catchError').style.display = 'block';
-                    document.getElementById('catchErrorMessage').textContent = result.error;
+                    
+                    // Create detailed error message
+                    let errorDetails = `❌ Error: ${result.error}\n\n`;
+                    errorDetails += `📋 Debug Info:\n`;
+                    errorDetails += `• Pokemon Number: ${currentPokemonNumber}\n`;
+                    errorDetails += `• Timestamp: ${new Date().toISOString()}\n`;
+                    errorDetails += `• User Agent: ${navigator.userAgent.substring(0, 50)}...\n`;
+                    
+                    // Check console logs for additional context
+                    errorDetails += `\n🔍 Check browser console (F12) for detailed logs`;
+                    
+                    document.getElementById('catchErrorMessage').innerHTML = errorDetails.replace(/\n/g, '<br>');
                 }
                 
             } catch (error) {
-                console.error('Error catching Pokemon:', error);
+                console.error('🚨 CATCH ERROR:', error);
+                console.error('🚨 Error Stack:', error.stack);
+                console.error('🚨 Error Details:', {
+                    message: error.message,
+                    name: error.name,
+                    pokemonNumber: currentPokemonNumber,
+                    timestamp: new Date().toISOString()
+                });
                 
-                // Show error
+                // Show detailed error
                 document.getElementById('pokemonPreview').style.display = 'none';
                 document.getElementById('catchResult').style.display = 'block';
                 document.getElementById('catchSuccess').style.display = 'none';
                 document.getElementById('catchError').style.display = 'block';
-                document.getElementById('catchErrorMessage').textContent = 'An unexpected error occurred while catching the Pokemon.';
+                
+                // Create comprehensive error message
+                let errorDetails = `❌ Unexpected Error: ${error.message}\n\n`;
+                errorDetails += `📋 Technical Details:\n`;
+                errorDetails += `• Error Type: ${error.name}\n`;
+                errorDetails += `• Pokemon Number: ${currentPokemonNumber}\n`;
+                errorDetails += `• Timestamp: ${new Date().toISOString()}\n`;
+                errorDetails += `• Browser: ${navigator.userAgent.split(' ')[0]}\n`;
+                
+                if (error.stack) {
+                    const stackLines = error.stack.split('\n').slice(0, 3);
+                    errorDetails += `• Stack: ${stackLines.join(' → ')}\n`;
+                }
+                
+                errorDetails += `\n🔍 Check browser console (F12) for complete error details`;
+                
+                document.getElementById('catchErrorMessage').innerHTML = errorDetails.replace(/\n/g, '<br>');
                 
             } finally {
                 // Reset button

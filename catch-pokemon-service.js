@@ -9,9 +9,11 @@ class CatchPokemonService {
      * @returns {Promise<Object>} Result of catch operation
      */
     static async catchPokemon(pokemonNumber, options = {}) {
+        let currentStep = 'initialization';
         try {
             console.log('🎯 CATCH-SERVICE: Starting catch process for Pokemon #' + pokemonNumber);
             
+            currentStep = 'authentication';
             // Get current user info
             const currentUser = AuthService.getCurrentUser();
             if (!currentUser || !currentUser.email) {
@@ -20,6 +22,7 @@ class CatchPokemonService {
             
             console.log('🎯 CATCH-SERVICE: User authenticated:', currentUser.email);
             
+            currentStep = 'user_lookup';
             // Step 1: Get user's contact ID from Dataverse
             const userId = await this.getUserContactId(currentUser.email);
             if (!userId) {
@@ -28,6 +31,7 @@ class CatchPokemonService {
             
             console.log('🎯 CATCH-SERVICE: Found user contact ID:', userId);
             
+            currentStep = 'pokemon_lookup';
             // Step 2: Find the master Pokemon record
             const masterPokemon = await this.getMasterPokemon(pokemonNumber);
             if (!masterPokemon) {
@@ -36,16 +40,20 @@ class CatchPokemonService {
             
             console.log('🎯 CATCH-SERVICE: Found master Pokemon:', masterPokemon.pokemon_name);
             
+            currentStep = 'duplicate_check';
             // Step 3: Check if user already has this Pokemon
             const existingPokemon = await this.checkExistingPokemon(userId, masterPokemon.pokemon_pokemonid);
             if (existingPokemon) {
                 throw new Error(`You already have ${masterPokemon.pokemon_name} in your collection!`);
             }
             
+            currentStep = 'entry_creation';
             // Step 4: Create Pokedex entry with lookup relationships
             console.log('🎯 CATCH-SERVICE: Creating entry with userId:', userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
             const pokedexEntry = this.createPokedexEntry(userId, masterPokemon, options);
             console.log('🎯 CATCH-SERVICE: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
+            
+            currentStep = 'database_insert';
             const result = await this.addToPokedex(pokedexEntry);
             
             console.log('🎯 CATCH-SERVICE: Successfully caught Pokemon!');
@@ -61,9 +69,23 @@ class CatchPokemonService {
             
         } catch (error) {
             console.error('🎯 CATCH-SERVICE: Error catching Pokemon:', error);
+            console.error('🎯 CATCH-SERVICE: Error details:', {
+                pokemonNumber,
+                currentStep,
+                errorName: error.name,
+                errorMessage: error.message,
+                errorStack: error.stack,
+                timestamp: new Date().toISOString()
+            });
             return {
                 success: false,
-                error: error.message
+                error: `${error.message} (Failed at: ${currentStep})`,
+                debug: {
+                    step: currentStep,
+                    pokemonNumber,
+                    errorType: error.name,
+                    timestamp: new Date().toISOString()
+                }
             };
         }
     }
