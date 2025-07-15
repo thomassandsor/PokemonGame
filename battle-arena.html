@@ -354,6 +354,8 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="auth.js"></script>
+    <script src="battle-service.js"></script>
+    <script src="battle-challenge-service.js"></script>
     <script>
         // Battle Arena JavaScript Implementation
         class BattleArena {
@@ -401,21 +403,15 @@
                         return null;
                     }
                     
-                    // Get contact ID from Dataverse based on email
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts?$filter=emailaddress1 eq '${user.email}'&$select=contactid`);
-                    if (!response.ok) {
-                        console.error('Failed to fetch contact ID');
-                        return null;
-                    }
-                    
-                    const data = await response.json();
-                    if (!data.value || data.value.length === 0) {
+                    // Get contact ID using the battle challenge service
+                    const contactId = await BattleChallengeService.getUserContactId(user.email);
+                    if (!contactId) {
                         console.error('No contact found for email:', user.email);
                         return null;
                     }
                     
                     return {
-                        id: data.value[0].contactid,
+                        id: contactId,
                         name: user.name || 'Unknown Trainer',
                         email: user.email
                     };
@@ -429,14 +425,9 @@
                 try {
                     console.log('🔄 Loading user Pokemon...');
                     
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_caught?$filter=pokemon_trainer eq '${this.currentUser.id}'&$expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to load Pokemon: ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    this.userPokemon = data.value || [];
+                    // Use the battle challenge service to get caught Pokemon
+                    const pokemon = await BattleChallengeService.getCaughtPokemon(this.currentUser.id);
+                    this.userPokemon = pokemon;
                     
                     console.log('✅ Loaded user Pokemon:', this.userPokemon.length);
                     this.renderUserPokemon();
@@ -457,6 +448,7 @@
                 
                 container.innerHTML = this.userPokemon.map(pokemon => {
                     const pokemonData = pokemon.pokemon_Pokemon;
+                    const level = pokemon.pokemon_level || 5;
                     const hp = pokemon.pokemon_current_hp || pokemon.pokemon_max_hp || 100;
                     const maxHp = pokemon.pokemon_max_hp || 100;
                     const hpPercentage = (hp / maxHp) * 100;
@@ -466,13 +458,13 @@
                     
                     return `
                         <div class="pokemon-selector d-flex align-items-center" 
-                             data-pokemon-id="${pokemon.pokemon_caughtid}"
-                             onclick="battleArena.selectPokemon('${pokemon.pokemon_caughtid}')">
+                             data-pokemon-id="${pokemon.pokemon_pokedexid}"
+                             onclick="battleArena.selectPokemon('${pokemon.pokemon_pokedexid}')">
                             <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonData?.pokemon_id || 1}.png" 
                                  class="pokemon-sprite me-3" alt="${pokemonData?.pokemon_name || 'Unknown'}">
                             <div class="flex-grow-1">
                                 <h5 class="mb-1">${pokemon.pokemon_nickname || pokemonData?.pokemon_name || 'Unknown Pokemon'}</h5>
-                                <p class="text-muted mb-1">Level ${pokemon.pokemon_level || 5}</p>
+                                <p class="text-muted mb-1">Level ${level}</p>
                                 <div class="hp-bar">
                                     <div class="hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
                                 </div>
@@ -529,30 +521,22 @@
                         pokemon: this.selectedPokemonId
                     });
                     
-                    const challengeData = {
-                        pokemon_player1: this.currentUser.id,
-                        pokemon_player1pokemon: this.selectedPokemonId,
-                        pokemon_challengetype: this.selectedChallengeType === 'open' ? 1 : 2,
-                        statuscode: 1, // Open
-                        statecode: 0   // Active
-                    };
+                    // Use the new battle challenge service
+                    const result = await BattleChallengeService.createChallenge(
+                        this.currentUser.id,
+                        this.selectedPokemonId,
+                        this.selectedChallengeType
+                    );
                     
-                    const response = await fetch('https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(challengeData)
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to create challenge: ${response.statusText}`);
+                    if (!result.success) {
+                        throw new Error(result.error);
                     }
                     
-                    const result = await response.json();
                     console.log('✅ Challenge created:', result);
                     
                     // If training battle, simulate immediately
                     if (this.selectedChallengeType === 'training') {
-                        await this.simulateTrainingBattle(result.pokemon_battleid);
+                        await this.simulateTrainingBattle(result.battleId);
                     }
                     
                     this.showSuccess(
@@ -580,19 +564,23 @@
                 try {
                     console.log('🤖 Simulating training battle:', battleId);
                     
-                    // Call the battle simulation endpoint
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/battle/simulate/${battleId}`, {
-                        method: 'POST'
-                    });
-                    
-                    if (!response.ok) {
-                        console.warn('⚠️ Battle simulation endpoint not available, battle will remain open');
-                    } else {
-                        console.log('✅ Training battle simulated');
+                    // Get the user's selected Pokemon for battle
+                    const selectedPokemon = this.userPokemon.find(p => p.pokemon_pokedexid === this.selectedPokemonId);
+                    if (!selectedPokemon) {
+                        throw new Error('Selected Pokemon not found');
                     }
+                    
+                    // Simulate the battle using the service
+                    const battleResult = await BattleChallengeService.simulateTrainingBattle(battleId, selectedPokemon);
+                    
+                    // Save the battle result
+                    await BattleChallengeService.completeBattle(battleId, battleResult);
+                    
+                    console.log('✅ Training battle completed:', battleResult.winner);
                     
                 } catch (error) {
                     console.error('❌ Error simulating training battle:', error);
+                    // Don't throw - allow the challenge creation to succeed even if simulation fails
                 }
             }
             
@@ -617,14 +605,7 @@
                 try {
                     console.log('🔄 Loading open challenges...');
                     
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles?$filter=statuscode eq 1 and statecode eq 0&$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=createdon desc`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to load challenges: ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    const challenges = data.value || [];
+                    const challenges = await BattleChallengeService.getOpenChallenges();
                     
                     console.log('✅ Loaded challenges:', challenges.length);
                     this.renderChallenges(challenges);
@@ -689,14 +670,7 @@
                 try {
                     console.log('🔄 Loading battle history...');
                     
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.currentUser.id}' or _pokemon_player2_value eq '${this.currentUser.id}') and statuscode ne 1&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=modifiedon desc`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to load battle history: ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    const battles = data.value || [];
+                    const battles = await BattleChallengeService.getUserChallenges(this.currentUser.id);
                     
                     console.log('✅ Loaded battle history:', battles.length);
                     this.renderBattleHistory(battles);

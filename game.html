@@ -469,32 +469,50 @@
         function startBattle() {
             trackAction('Start_Battle');
             if (isAuthenticated) {
-                alert('🥊 Battle System Loading...\n\nAuthenticated battle features:\n• Your Pokemon team\n• Ranked battles\n• Experience tracking\n• Rewards saved to your account');
+                console.log('🥊 Redirecting to Battle Arena...');
+                window.location.href = 'battle-arena.html';
             } else {
-                alert('🥊 Battle System (Guest Mode)...\n\nGuest battle features:\n• Practice battles only\n• No progression saved\n• Login to unlock full features');
+                // For guests, show info and redirect to login
+                if (confirm('🥊 Battle System requires login for full features.\n\nWould you like to login now to access:\n• Your Pokemon team\n• Ranked battles\n• Experience tracking\n• Saved progress\n\nClick OK to login, Cancel to continue as guest.')) {
+                    window.location.href = 'auth.html';
+                } else {
+                    // Allow guest access with limited features
+                    window.location.href = 'battle-arena.html';
+                }
             }
         }
 
         function scanPokemon() {
             trackAction('Scan_Pokemon');
             if (isAuthenticated) {
-                alert('📱 QR Scanner Active...\n\nAuthenticated features:\n• Add to your permanent collection\n• Sync across devices\n• Trading with other users');
+                console.log('📱 Redirecting to Pokemon Scanner...');
+                window.location.href = 'catch-pokemon.html';
             } else {
-                alert('📱 QR Scanner (Guest Mode)...\n\nGuest features:\n• Temporary scan only\n• No permanent collection\n• Login to save Pokemon');
+                if (confirm('📱 QR Scanner works in guest mode, but Pokemon won\'t be saved.\n\nWould you like to login to save your catches?\n\nClick OK to login, Cancel to continue as guest.')) {
+                    window.location.href = 'auth.html';
+                } else {
+                    window.location.href = 'catch-pokemon.html';
+                }
             }
         }
 
         function browsePokemon() {
             trackAction('Browse_Pokemon');
-            alert('🔍 Pokemon Browser...\n\nFull Pokedex with:\n• All 1000+ Pokemon\n• Detailed stats and info\n• Evolution trees\n• Type effectiveness charts\n• Search and filters');
+            console.log('🔍 Redirecting to Pokemon Browser...');
+            window.location.href = 'pokemon-browser.html';
         }
 
         function evolutionLab() {
             trackAction('Evolution_Lab');
             if (isAuthenticated) {
-                alert('🧬 Evolution Lab...\n\nAuthenticated features:\n• Evolve your Pokemon\n• Track evolution history\n• Permanent progress\n• Achievement unlocks');
+                console.log('🧬 Redirecting to My Pokemon...');
+                window.location.href = 'my-pokemon.html';
             } else {
-                alert('🧬 Evolution Lab (Guest Mode)...\n\nLimited features available\nLogin to access full evolution system');
+                if (confirm('🧬 Evolution Lab requires login to manage your Pokemon.\n\nWould you like to login now?\n\nClick OK to login, Cancel to browse Pokemon instead.')) {
+                    window.location.href = 'auth.html';
+                } else {
+                    window.location.href = 'pokemon-browser.html';
+                }
             }
         }
 

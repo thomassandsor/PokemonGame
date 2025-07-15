@@ -209,6 +209,8 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="auth.js"></script>
+    <script src="battle-service.js"></script>
+    <script src="battle-challenge-service.js"></script>
     <script>
         class BattleJoin {
             constructor() {
@@ -261,21 +263,15 @@
                         return null;
                     }
                     
-                    // Get contact ID from Dataverse based on email
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts?$filter=emailaddress1 eq '${user.email}'&$select=contactid`);
-                    if (!response.ok) {
-                        console.error('Failed to fetch contact ID');
-                        return null;
-                    }
-                    
-                    const data = await response.json();
-                    if (!data.value || data.value.length === 0) {
+                    // Get contact ID using the battle challenge service
+                    const contactId = await BattleChallengeService.getUserContactId(user.email);
+                    if (!contactId) {
                         console.error('No contact found for email:', user.email);
                         return null;
                     }
                     
                     return {
-                        id: data.value[0].contactid,
+                        id: contactId,
                         name: user.name || 'Unknown Trainer',
                         email: user.email
                     };
@@ -289,14 +285,8 @@
                 try {
                     console.log('🔄 Loading battle data...', this.battleId);
                     
-                    // Load battle with expanded Pokemon data
-                    const battleResponse = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles(${this.battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))`);
-                    
-                    if (!battleResponse.ok) {
-                        throw new Error(`Battle not found (${battleResponse.status})`);
-                    }
-                    
-                    const battleData = await battleResponse.json();
+                    // Use the new battle challenge service
+                    const battleData = await BattleChallengeService.getBattleDetails(this.battleId);
                     console.log('✅ Battle data loaded:', battleData);
                     
                     // Check if battle is still open
@@ -332,19 +322,19 @@
                 try {
                     console.log('🔄 Loading user Pokemon...');
                     
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_caught?$filter=pokemon_trainer eq '${this.currentUser.id}' and (pokemon_current_hp gt 0 or pokemon_current_hp eq null)&$expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)`);
+                    // Use the battle challenge service to get caught Pokemon
+                    const pokemon = await BattleChallengeService.getCaughtPokemon(this.currentUser.id);
                     
-                    if (!response.ok) {
-                        throw new Error(`Failed to load Pokemon: ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    this.userPokemon = data.value || [];
+                    // Filter out fainted Pokemon (HP <= 0)
+                    this.userPokemon = pokemon.filter(p => {
+                        const hp = p.pokemon_current_hp || p.pokemon_max_hp || 100;
+                        return hp > 0;
+                    });
                     
                     console.log('✅ Loaded user Pokemon:', this.userPokemon.length);
                     
                     if (this.userPokemon.length === 0) {
-                        throw new Error('You have no Pokemon available for battle. Catch some Pokemon first!');
+                        throw new Error('You have no Pokemon available for battle. Catch some Pokemon first or heal your current team!');
                     }
                     
                 } catch (error) {
@@ -382,8 +372,8 @@
                     
                     return `
                         <div class="pokemon-selector d-flex align-items-center" 
-                             data-pokemon-id="${pokemon.pokemon_caughtid}"
-                             onclick="battleJoin.selectPokemon('${pokemon.pokemon_caughtid}')">
+                             data-pokemon-id="${pokemon.pokemon_pokedexid}"
+                             onclick="battleJoin.selectPokemon('${pokemon.pokemon_pokedexid}')">
                             <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonData?.pokemon_id || 1}.png" 
                                  class="pokemon-sprite me-3" alt="${pokemonData?.pokemon_name || 'Unknown'}">
                             <div class="flex-grow-1">
@@ -400,7 +390,7 @@
             }
             
             selectPokemon(pokemonId) {
-                this.selectedPokemon = this.userPokemon.find(p => p.pokemon_caughtid === pokemonId);
+                this.selectedPokemon = this.userPokemon.find(p => p.pokemon_pokedexid === pokemonId);
                 
                 // Update UI
                 document.querySelectorAll('.pokemon-selector').forEach(selector => {
@@ -441,24 +431,18 @@
                 try {
                     console.log('🔄 Joining battle...', {
                         battleId: this.battleId,
-                        pokemonId: this.selectedPokemon.pokemon_caughtid
+                        pokemonId: this.selectedPokemon.pokemon_pokedexid
                     });
                     
-                    // Update battle with player 2 data
-                    const updateData = {
-                        pokemon_player2: this.currentUser.id,
-                        pokemon_player2pokemon: this.selectedPokemon.pokemon_caughtid,
-                        statuscode: 895550002 // In Progress
-                    };
+                    // Use the battle challenge service to join
+                    const result = await BattleChallengeService.joinChallenge(
+                        this.battleId,
+                        this.currentUser.id,
+                        this.selectedPokemon.pokemon_pokedexid
+                    );
                     
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles(${this.battleId})`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updateData)
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to join battle: ${response.statusText}`);
+                    if (!result.success) {
+                        throw new Error(result.error);
                     }
                     
                     console.log('✅ Successfully joined battle');
@@ -482,22 +466,56 @@
             
             async simulateBattle() {
                 try {
-                    console.log('🎲 Simulating battle...');
+                    console.log('🎲 Simulating PvP battle...');
                     
-                    // Call battle simulation endpoint
-                    const response = await fetch(`https://pokemongame-functions-2025.azurewebsites.net/api/battle/simulate/${this.battleId}`, {
-                        method: 'POST'
-                    });
+                    // For now, just log that simulation would happen
+                    // In a full implementation, this would simulate the battle between the two players' Pokemon
+                    console.log('⚠️ PvP battle simulation not yet implemented - battle will be marked as completed');
                     
-                    if (!response.ok) {
-                        console.warn('⚠️ Battle simulation endpoint not available, battle will need manual resolution');
-                    } else {
-                        console.log('✅ Battle simulated successfully');
-                    }
+                    // Create a simple battle result for now
+                    const battleResult = {
+                        battleId: this.battleId,
+                        winner: Math.random() > 0.5 ? 'player1' : 'player2',
+                        battleLog: [
+                            'Battle simulation is not yet fully implemented.',
+                            'This is a placeholder result.',
+                            'In the future, this will be a full turn-by-turn battle.'
+                        ],
+                        metadata: {
+                            battleType: 'pvp',
+                            completedAt: new Date().toISOString()
+                        }
+                    };
+                    
+                    // Complete the battle
+                    await BattleChallengeService.completeBattle(this.battleId, battleResult);
                     
                 } catch (error) {
                     console.error('❌ Error simulating battle:', error);
                     // Don't throw - battle can still be resolved manually
+                }
+            }
+            
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').textContent = message;
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+        
+        // Global functions for onclick handlers
+        function joinBattle() {
+            battleJoin.joinBattle();
+        }
+        
+        // Initialize when page loads
+        let battleJoin;
+        document.addEventListener('DOMContentLoaded', function() {
+            battleJoin = new BattleJoin();
+        });
+    </script>
+</body>
+</html>
                 }
             }
             
