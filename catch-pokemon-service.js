@@ -186,12 +186,47 @@ class CatchPokemonService {
                 body: JSON.stringify(pokedexEntry)
             });
             
-            if (!response.ok) {
+            console.log('🎯 CATCH-SERVICE: Response status:', response.status);
+            console.log('🎯 CATCH-SERVICE: Response headers:', Object.fromEntries(response.headers.entries()));
+            
+              if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
-            
-            return await response.json();
+
+            // Handle different success response types from Dataverse
+            if (response.status === 204) {
+                // 204 No Content - successful creation with no body
+                console.log('🎯 CATCH-SERVICE: Pokemon created successfully (204 No Content)');
+                
+                // Extract ID from Location header if available
+                const locationHeader = response.headers.get('Location') || response.headers.get('OData-EntityId');
+                let createdId = null;
+                
+                if (locationHeader) {
+                    // Extract GUID from URL like: .../pokemon_pokedexes(guid-here)
+                    const match = locationHeader.match(/pokemon_pokedexes\(([^)]+)\)/);
+                    if (match) {
+                        createdId = match[1];
+                    }
+                }
+                
+                return {
+                    pokemon_pokedexid: createdId || 'created-successfully',
+                    success: true
+                };
+            } else {
+                // Try to parse JSON response (201 Created, etc.)
+                try {
+                    return await response.json();
+                } catch (jsonError) {
+                    console.log('🎯 CATCH-SERVICE: Could not parse response as JSON, but creation was successful');
+                    return {
+                        pokemon_pokedexid: 'created-successfully',
+                        success: true
+                    };
+                }
+            }
             
         } catch (error) {
             console.error('🎯 CATCH-SERVICE: Error adding to Pokedex:', error);
