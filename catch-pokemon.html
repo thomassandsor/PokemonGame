@@ -156,7 +156,14 @@
                             <p class="pokemon-number">Pokemon #<span id="previewNumber"></span></p>
                         </div>
                         <div class="encounter-actions">
-                            <button id="catchPokemonBtn" class="btn btn-success btn-lg me-2" onclick="handleCatchPokemon()">
+                            <div id="pokeballThrowContainer" style="display:none;">
+                                <div class="throw-instructions">Swipe up to throw the Pokeball!</div>
+                                <div class="catch-zone" id="catchZone" style="margin:0 auto;">
+                                    <img id="throwPokemonSprite" class="pokemon-sprite" src="" alt="Pokemon">
+                                </div>
+                                <img id="pokeball" class="pokeball" src="assets/pokeball.svg" alt="Pokeball">
+                            </div>
+                            <button id="catchPokemonBtn" class="btn btn-success btn-lg me-2" onclick="startPokeballThrow()">
                                 <i class="fas fa-hand-paper"></i> Catch
                             </button>
                             <button id="runAwayBtn" class="btn btn-warning btn-lg" onclick="handleRunAway()">
@@ -197,9 +204,32 @@
     <script src="auth.js"></script>
     
     <!-- Include Catch Pokemon Service -->
+    <!-- Include Pokeball Throw Logic -->
+    <script src="throw-pokeball.js"></script>
     <script src="catch-pokemon-service.js"></script>
     
     <script>
+        // Start Pokeball throw sequence
+        function startPokeballThrow() {
+            // Hide catch button, show throw UI
+            document.getElementById('catchPokemonBtn').style.display = 'none';
+            document.getElementById('pokeballThrowContainer').style.display = 'block';
+            // Set sprite
+            const spriteUrl = window.currentPokemonData?.sprites?.official_artwork || window.currentPokemonData?.sprites?.front_default || '';
+            document.getElementById('throwPokemonSprite').src = spriteUrl;
+            // Init throw logic
+            const pokeballElem = document.getElementById('pokeball');
+            const targetElem = document.getElementById('catchZone');
+            new PokeballThrow({
+                pokeballElem,
+                targetElem,
+                onThrow: async function() {
+                    // After throw, proceed to catch logic
+                    document.getElementById('pokeballThrowContainer').style.display = 'none';
+                    await handleCatchPokemon();
+                }
+            });
+        }
         class QRScanner {
             constructor() {
                 this.video = document.getElementById('video');
