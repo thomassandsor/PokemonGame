@@ -119,39 +119,104 @@
             
             <div class="scanner-content">
                 <!-- Camera Selection -->
-                <div class="camera-select">
-                    <label for="cameraSelect" class="form-label">Select Camera:</label>
-                    <select id="cameraSelect" class="form-select">
-                        <option value="">Loading cameras...</option>
-                    </select>
-                </div>
-                
-                <!-- Video Element for Camera -->
-                <div class="text-center">
-                    <video id="video" autoplay muted playsinline></video>
-                </div>
-                
-                <!-- Scan Results -->
-                <div id="scanResult" class="scan-result" style="display: none;">
-                    <h5><i class="fas fa-check-circle"></i> QR Code Detected!</h5>
-                    <p><strong>Pokemon Number:</strong> <span id="pokemonNumber"></span></p>
-                    <p><strong>Raw Data:</strong> <span id="rawData"></span></p>
-                </div>
-                
-                <!-- Error Display -->
-                <div id="errorResult" class="scan-result error" style="display: none;">
-                    <h5><i class="fas fa-exclamation-triangle"></i> Error</h5>
-                    <p id="errorMessage"></p>
-                </div>
-                
-                <!-- Pokemon Preview -->
-                <div id="pokemonPreview" class="pokemon-preview" style="display: none;">
-                    <div class="pokemon-encounter">
-                        <h4>🎉 Wild Pokemon Appeared!</h4>
-                        <div class="pokemon-image-container text-center mb-3">
-                            <img id="pokemonImage" src="" alt="Pokemon" class="pokemon-image" style="max-width: 200px; height: auto;">
-                        </div>
-                        <div class="pokemon-details text-center mb-3">
+    <div id="scannerContainer" class="scanner-container">
+        <video id="qrVideo" class="qr-video" playsinline></video>
+        <canvas id="qrCanvas" class="d-none"></canvas>
+    </div>
+    <!-- Fullscreen Modal for Capture Phase -->
+    <div id="captureModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display:none;">
+        <div class="modal-content">
+            <h2 id="modalTitle" class="modal-title visually-hidden">Pokémon Encounter</h2>
+            <div class="pokemon-preview">
+                <img id="modalPokemonImage" class="pokemon-sprite-large" src="" alt="Pokemon">
+                <h2 id="modalPokemonName" class="pokemon-name"></h2>
+            </div>
+            <div class="modal-actions">
+                <button id="modalCatchBtn" class="btn btn-success btn-lg" onclick="startPokeballThrow()">
+                    <i class="fas fa-hand-paper"></i> Catch
+                </button>
+                <button id="modalRunBtn" class="btn btn-warning btn-lg" onclick="handleRunAway()">
+                    <i class="fas fa-running"></i> Run
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Pokeball Throw Fullscreen -->
+    <div id="pokeballThrowContainer" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="throw-instructions">Swipe up to throw the Pokeball!</div>
+            <div class="catch-zone" id="catchZone">
+                <img id="throwPokemonSprite" class="pokemon-sprite-large" src="" alt="Pokemon">
+            </div>
+            <img id="pokeball" class="pokeball" src="assets/pokeball.svg" alt="Pokeball">
+        </div>
+    </div>
+    /* Fullscreen Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.85);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        width: 100vw;
+        max-width: 500px;
+        margin: auto;
+        background: transparent;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .pokemon-sprite-large {
+        width: 60vw;
+        max-width: 320px;
+        height: auto;
+        margin-bottom: 1rem;
+    }
+    .pokemon-name {
+        color: #fff;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    .btn-lg {
+        font-size: 1.5rem;
+        padding: 1rem 2.5rem;
+        border-radius: 2rem;
+    }
+    .throw-instructions {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    .catch-zone {
+        margin-bottom: 2rem;
+    }
+    .pokeball {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        display: block;
+    }
+    .visually-hidden {
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
                             <h5 id="pokemonName" class="pokemon-name-display">Loading...</h5>
                             <p class="pokemon-number">Pokemon #<span id="previewNumber"></span></p>
                         </div>
@@ -209,11 +274,24 @@
     <script src="catch-pokemon-service.js"></script>
     
     <script>
-        // Start Pokeball throw sequence
+        // Show fullscreen modal after scan
+        function showCaptureModal(pokemonData) {
+            document.getElementById('scannerContainer').style.display = 'none';
+            document.getElementById('captureModal').style.display = 'flex';
+            document.getElementById('modalPokemonImage').src = pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
+            document.getElementById('modalPokemonName').textContent = pokemonData.name;
+        }
+
+        // Hide modal and show scanner
+        function hideCaptureModal() {
+            document.getElementById('captureModal').style.display = 'none';
+            document.getElementById('scannerContainer').style.display = 'block';
+        }
+
+        // Start Pokeball throw sequence (fullscreen)
         function startPokeballThrow() {
-            // Hide catch button, show throw UI
-            document.getElementById('catchPokemonBtn').style.display = 'none';
-            document.getElementById('pokeballThrowContainer').style.display = 'block';
+            document.getElementById('captureModal').style.display = 'none';
+            document.getElementById('pokeballThrowContainer').style.display = 'flex';
             // Set sprite
             const spriteUrl = window.currentPokemonData?.sprites?.official_artwork || window.currentPokemonData?.sprites?.front_default || '';
             document.getElementById('throwPokemonSprite').src = spriteUrl;
@@ -224,12 +302,13 @@
                 pokeballElem,
                 targetElem,
                 onThrow: async function() {
-                    // After throw, proceed to catch logic
                     document.getElementById('pokeballThrowContainer').style.display = 'none';
                     await handleCatchPokemon();
                 }
             });
         }
+
+        // After scan, call showCaptureModal(window.currentPokemonData)
         class QRScanner {
             constructor() {
                 this.video = document.getElementById('video');
