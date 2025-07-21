@@ -1,6 +1,6 @@
 // Pokemon Catch Service - Handles adding Pokemon to user's Pokedex
 class CatchPokemonService {
-    static baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+    static baseUrl = '/api/dataverse';
     
     /**
      * Catch a Pokemon and add it to user's Pokedex
@@ -46,9 +46,14 @@ class CatchPokemonService {
             if (existingPokemon) {
                 throw new Error(`You already have ${masterPokemon.pokemon_name} in your collection!`);
             }
+
+            currentStep = 'pokeball_consumption';
+            // Step 4: Consume a pokeball (check if user has pokeballs)
+            const remainingPokeballs = await this.consumePokeball(currentUser.email);
+            console.log('🎯 CATCH-SERVICE: Pokeball consumed. Remaining:', remainingPokeballs);
             
             currentStep = 'entry_creation';
-            // Step 4: Create Pokedex entry with lookup relationships
+            // Step 5: Create Pokedex entry with lookup relationships
             console.log('🎯 CATCH-SERVICE: Creating entry with userId:', userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
             const pokedexEntry = this.createPokedexEntry(userId, masterPokemon, options);
             console.log('🎯 CATCH-SERVICE: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
@@ -107,6 +112,118 @@ class CatchPokemonService {
             
         } catch (error) {
             console.error('🎯 CATCH-SERVICE: Error getting user contact ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get user's pokeball count from contacts table
+     */
+    static async getUserPokeballCount(email) {
+        try {
+            const url = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=pokemon_Pokeballs`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            if (data.value && data.value.length > 0) {
+                const pokeballs = data.value[0].pokemon_Pokeballs;
+                // 0 and NULL are the same (no pokeballs)
+                return pokeballs || 0;
+            }
+            return 0;
+            
+        } catch (error) {
+            console.error('🎯 CATCH-SERVICE: Error getting user pokeball count:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * Consume a pokeball from user's inventory
+     */
+    static async consumePokeball(email) {
+        try {
+            // First get user's contact ID
+            const userId = await this.getUserContactId(email);
+            if (!userId) {
+                throw new Error('User not found');
+            }
+
+            // Get current pokeball count
+            const currentCount = await this.getUserPokeballCount(email);
+            if (currentCount <= 0) {
+                throw new Error('No pokeballs available');
+            }
+
+            // Update pokeball count (decrease by 1)
+            const newCount = currentCount - 1;
+            const updateData = {
+                pokemon_Pokeballs: newCount
+            };
+
+            const url = `${this.baseUrl}/contacts(${userId})`;
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update pokeball count: ${response.status}`);
+            }
+
+            console.log(`🎯 CATCH-SERVICE: Consumed pokeball. New count: ${newCount}`);
+            return newCount;
+            
+        } catch (error) {
+            console.error('🎯 CATCH-SERVICE: Error consuming pokeball:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Add pokeballs to user's inventory (reward from minigame)
+     */
+    static async addPokeballs(email, count = 1) {
+        try {
+            // First get user's contact ID
+            const userId = await this.getUserContactId(email);
+            if (!userId) {
+                throw new Error('User not found');
+            }
+
+            // Get current pokeball count
+            const currentCount = await this.getUserPokeballCount(email);
+            const newCount = currentCount + count;
+            
+            const updateData = {
+                pokemon_Pokeballs: newCount
+            };
+
+            const url = `${this.baseUrl}/contacts(${userId})`;
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update pokeball count: ${response.status}`);
+            }
+
+            console.log(`🎯 CATCH-SERVICE: Added ${count} pokeball(s). New count: ${newCount}`);
+            return newCount;
+            
+        } catch (error) {
+            console.error('🎯 CATCH-SERVICE: Error adding pokeballs:', error);
             throw error;
         }
     }

@@ -262,6 +262,86 @@
     .hidden {
         display: none !important;
     }
+
+    /* Pokeball count display */
+    .pokeball-count {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .pokeball-count.empty {
+        background: rgba(255, 107, 107, 0.3);
+        color: #ff6b6b;
+    }
+
+    /* No pokeballs message */
+    .no-pokeballs-message {
+        background: rgba(255, 107, 107, 0.2);
+        border: 2px solid #ff6b6b;
+        color: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Minigame styles */
+    .minigame-container {
+        background: linear-gradient(145deg, #4ecdc4, #44a08d);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .minigame-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .minigame-button {
+        background: linear-gradient(145deg, #feca57, #ff9ff3);
+        color: #333;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        margin: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .minigame-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .minigame-result {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+
+    .minigame-result.success {
+        background: rgba(76, 175, 80, 0.3);
+        color: #4CAF50;
+    }
+
+    .minigame-result.failure {
+        background: rgba(244, 67, 54, 0.3);
+        color: #f44336;
+    }
     </style>
 </head>
 <body>
@@ -295,13 +375,52 @@
             <div class="pokemon-encounter">
                 <img id="encounterPokemonImage" class="pokemon-sprite-large" src="" alt="Pokemon">
                 <div id="encounterPokemonName" class="pokemon-name">Loading...</div>
-                <div class="modal-actions">
+                
+                <!-- Pokeball Count Display -->
+                <div id="pokeballCountDisplay" class="pokeball-count">
+                    ⚾ Pokéballs: <span id="pokeballCount">0</span>
+                </div>
+                
+                <!-- Default Actions (when pokeballs available) -->
+                <div id="defaultActions" class="modal-actions">
                     <button class="btn-pokemon catch" onclick="startThrowAnimation()">
                         ⚾ Catch!
                     </button>
                     <button class="btn-pokemon run" onclick="runAway()">
                         🏃 Run Away
                     </button>
+                </div>
+
+                <!-- No Pokeballs Message -->
+                <div id="noPokeballs" class="no-pokeballs-message hidden">
+                    ❌ No more Pokéballs!<br>
+                    <small>Try the minigame to earn more</small>
+                </div>
+
+                <!-- No Pokeballs Actions -->
+                <div id="noPokeballActions" class="modal-actions hidden">
+                    <button class="btn-pokemon catch" onclick="startMinigame()">
+                        🎮 Play Minigame
+                    </button>
+                    <button class="btn-pokemon run" onclick="runAway()">
+                        🏃 Run Away
+                    </button>
+                </div>
+
+                <!-- Minigame Container -->
+                <div id="minigameContainer" class="minigame-container hidden">
+                    <div class="minigame-title">🎯 Catch the Moving Target!</div>
+                    <div id="minigameInstructions">
+                        Click the button when the target is in the green zone!
+                    </div>
+                    <div style="position: relative; width: 200px; height: 20px; background: #ccc; margin: 20px auto; border-radius: 10px;">
+                        <div style="position: absolute; width: 60px; height: 20px; background: #4CAF50; left: 70px; border-radius: 10px;"></div>
+                        <div id="minigameTarget" style="position: absolute; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; top: 0; transition: left 0.1s;"></div>
+                    </div>
+                    <button id="minigameClickButton" class="minigame-button" onclick="minigameClick()">
+                        🎯 CATCH!
+                    </button>
+                    <div id="minigameResult" class="minigame-result hidden"></div>
                 </div>
             </div>
         </div>
@@ -403,12 +522,63 @@
         }
 
         // Show Pokemon encounter screen
-        function showPokemonEncounter(pokemonData) {
+        async function showPokemonEncounter(pokemonData) {
             document.getElementById('encounterPokemonImage').src = 
                 pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
             document.getElementById('encounterPokemonName').textContent = pokemonData.name;
             
+            // Check pokeball count
+            await checkAndDisplayPokeballCount();
+            
             showUIState(UI_STATES.ENCOUNTER);
+        }
+
+        // Check pokeball count and display appropriate UI
+        async function checkAndDisplayPokeballCount() {
+            try {
+                // Check if CatchPokemonService is available
+                if (typeof CatchPokemonService === 'undefined') {
+                    console.warn('CatchPokemonService not available, defaulting to no pokeballs');
+                    showNoPokeballs();
+                    return;
+                }
+
+                // Get current user
+                const currentUser = AuthService.getCurrentUser();
+                if (!currentUser || !currentUser.email) {
+                    throw new Error('User not authenticated');
+                }
+
+                // Get pokeball count
+                const pokeballCount = await CatchPokemonService.getUserPokeballCount(currentUser.email);
+                document.getElementById('pokeballCount').textContent = pokeballCount;
+
+                // Update UI based on pokeball count
+                if (pokeballCount > 0) {
+                    // User has pokeballs - show normal catch option
+                    document.getElementById('pokeballCountDisplay').classList.remove('empty');
+                    document.getElementById('defaultActions').classList.remove('hidden');
+                    document.getElementById('noPokeballs').classList.add('hidden');
+                    document.getElementById('noPokeballActions').classList.add('hidden');
+                    document.getElementById('minigameContainer').classList.add('hidden');
+                } else {
+                    showNoPokeballs();
+                }
+
+            } catch (error) {
+                console.error('Error checking pokeball count:', error);
+                showNoPokeballs();
+            }
+        }
+
+        // Show no pokeballs UI
+        function showNoPokeballs() {
+            document.getElementById('pokeballCount').textContent = '0';
+            document.getElementById('pokeballCountDisplay').classList.add('empty');
+            document.getElementById('defaultActions').classList.add('hidden');
+            document.getElementById('noPokeballs').classList.remove('hidden');
+            document.getElementById('noPokeballActions').classList.remove('hidden');
+            document.getElementById('minigameContainer').classList.add('hidden');
         }
 
         // Start throw animation
@@ -482,6 +652,123 @@
                 console.error('Catch error:', error);
                 alert(`❌ Error catching Pokemon: ${error.message}`);
                 showUIState(UI_STATES.SCANNER);
+            }
+        }
+
+        // Minigame functionality
+        let minigameInterval = null;
+        let minigameTargetPosition = 0;
+        let minigameDirection = 1;
+        let minigameActive = false;
+
+        // Start the minigame
+        function startMinigame() {
+            console.log('🎮 Starting pokeball minigame');
+            
+            // Hide other actions and show minigame
+            document.getElementById('noPokeballActions').classList.add('hidden');
+            document.getElementById('minigameContainer').classList.remove('hidden');
+            
+            // Reset minigame state
+            minigameTargetPosition = 0;
+            minigameDirection = 1;
+            minigameActive = true;
+            
+            const target = document.getElementById('minigameTarget');
+            const result = document.getElementById('minigameResult');
+            result.classList.add('hidden');
+            
+            // Start the moving target
+            minigameInterval = setInterval(() => {
+                if (!minigameActive) return;
+                
+                minigameTargetPosition += minigameDirection * 3;
+                
+                // Bounce at edges
+                if (minigameTargetPosition >= 180) {
+                    minigameDirection = -1;
+                    minigameTargetPosition = 180;
+                } else if (minigameTargetPosition <= 0) {
+                    minigameDirection = 1;
+                    minigameTargetPosition = 0;
+                }
+                
+                target.style.left = minigameTargetPosition + 'px';
+            }, 50);
+        }
+
+        // Handle minigame click
+        function minigameClick() {
+            if (!minigameActive) return;
+            
+            // Stop the game
+            minigameActive = false;
+            clearInterval(minigameInterval);
+            
+            // Check if target is in green zone (70px to 130px)
+            const isInGreenZone = minigameTargetPosition >= 70 && minigameTargetPosition <= 130;
+            
+            const result = document.getElementById('minigameResult');
+            result.classList.remove('hidden', 'success', 'failure');
+            
+            if (isInGreenZone) {
+                // Success! Give user a pokeball
+                result.classList.add('success');
+                result.textContent = '🎉 Perfect! You earned a Pokéball!';
+                
+                // Add pokeball to user's inventory
+                addPokeballReward();
+                
+            } else {
+                // Failed - allow retry
+                result.classList.add('failure');
+                result.textContent = '❌ Missed! Try again?';
+                
+                setTimeout(() => {
+                    document.getElementById('minigameContainer').classList.add('hidden');
+                    document.getElementById('noPokeballActions').classList.remove('hidden');
+                }, 2000);
+            }
+        }
+
+        // Add pokeball as reward and update UI
+        async function addPokeballReward() {
+            try {
+                // Check if CatchPokemonService is available
+                if (typeof CatchPokemonService === 'undefined') {
+                    console.warn('CatchPokemonService not available, simulating reward');
+                    // Just update the UI to show success
+                    document.getElementById('pokeballCount').textContent = '1';
+                    document.getElementById('pokeballCountDisplay').classList.remove('empty');
+                    document.getElementById('defaultActions').classList.remove('hidden');
+                    document.getElementById('noPokeballs').classList.add('hidden');
+                    document.getElementById('noPokeballActions').classList.add('hidden');
+                    
+                    setTimeout(() => {
+                        document.getElementById('minigameContainer').classList.add('hidden');
+                    }, 2000);
+                    return;
+                }
+
+                const currentUser = AuthService.getCurrentUser();
+                if (!currentUser || !currentUser.email) {
+                    throw new Error('User not authenticated');
+                }
+
+                // Add a pokeball to user's inventory
+                await CatchPokemonService.addPokeballs(currentUser.email, 1);
+                
+                // Update the UI and allow catching
+                await checkAndDisplayPokeballCount();
+                
+                // Hide minigame, show success message briefly, then show catch button
+                setTimeout(() => {
+                    document.getElementById('minigameContainer').classList.add('hidden');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error adding pokeball reward:', error);
+                alert('Error adding pokeball reward: ' + error.message);
             }
         }
 
