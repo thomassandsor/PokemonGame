@@ -622,7 +622,7 @@
             showUIState(UI_STATES.SCANNER);
         }
 
-        // Handle catching Pokemon
+        // Handle catching Pokemon - Always succeeds when pokeball is thrown
         async function handleCatchPokemon() {
             if (!currentPokemonData) {
                 alert('No Pokemon to catch!');
@@ -630,29 +630,118 @@
             }
             
             try {
+                console.log(`🎯 Attempting to catch ${currentPokemonData.name}...`);
+                
                 // Use existing catch service if available
                 if (typeof CatchPokemonService !== 'undefined') {
                     const result = await CatchPokemonService.catchPokemon(currentPokemonData.id);
                     
                     if (result.success) {
-                        alert(`🎉 ${currentPokemonData.name} has been caught!`);
+                        // Always successful - pokeball was consumed and Pokemon caught
+                        showCatchSuccessMessage(currentPokemonData.name);
                     } else {
-                        alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
+                        // This could happen if no pokeballs (shouldn't reach here with our UI logic)
+                        if (result.error.includes('No pokeballs available')) {
+                            alert(`❌ No Pokéballs available! Play the minigame to earn more.`);
+                            showUIState(UI_STATES.ENCOUNTER); // Go back to encounter to show minigame
+                        } else {
+                            alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
+                            returnToScanner();
+                        }
                     }
                 } else {
-                    // Simple fallback
-                    alert(`🎉 ${currentPokemonData.name} has been caught! (Demo mode)`);
+                    // Fallback for when service isn't available
+                    showCatchSuccessMessage(currentPokemonData.name, true);
                 }
-                
-                // Reset and go back to scanner
-                currentPokemonData = null;
-                showUIState(UI_STATES.SCANNER);
                 
             } catch (error) {
                 console.error('Catch error:', error);
                 alert(`❌ Error catching Pokemon: ${error.message}`);
-                showUIState(UI_STATES.SCANNER);
+                returnToScanner();
             }
+        }
+
+        // Show catch success message and return to scanner
+        async function showCatchSuccessMessage(pokemonName, isDemo = false) {
+            const demoText = isDemo ? ' (Demo mode)' : '';
+            
+            // Get updated pokeball count to show in success message
+            let pokeballInfo = '';
+            if (!isDemo && typeof CatchPokemonService !== 'undefined') {
+                try {
+                    const currentUser = AuthService.getCurrentUser();
+                    if (currentUser && currentUser.email) {
+                        const remainingPokeballs = await CatchPokemonService.getUserPokeballCount(currentUser.email);
+                        pokeballInfo = `<div style="margin-top: 15px; color: #ffcc02; font-size: 1rem;">
+                            ⚾ Pokéballs remaining: ${remainingPokeballs}
+                        </div>`;
+                    }
+                } catch (error) {
+                    console.error('Error getting updated pokeball count:', error);
+                }
+            }
+            
+            // Create a nice success overlay
+            const successOverlay = document.createElement('div');
+            successOverlay.className = 'modal-overlay';
+            successOverlay.style.background = 'rgba(0,0,0,0.8)';
+            successOverlay.innerHTML = `
+                <div style="text-align: center; color: white; padding: 40px;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                    <h2 style="color: #4CAF50; font-size: 2rem; margin-bottom: 15px;">
+                        ${pokemonName} Caught!
+                    </h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 20px;">
+                        ${pokemonName} has been added to your Pokédex${demoText}
+                    </p>
+                    ${pokeballInfo}
+                    <button onclick="returnToMainMenu()" 
+                            style="background: linear-gradient(145deg, #4CAF50, #45a049); 
+                                   color: white; padding: 15px 30px; border: none; 
+                                   border-radius: 25px; font-size: 1.1rem; cursor: pointer;
+                                   margin-top: 20px;">
+                        Return to Main Menu
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(successOverlay);
+            
+            // Auto-remove success message after 4 seconds
+            setTimeout(() => {
+                if (document.body.contains(successOverlay)) {
+                    returnToMainMenu();
+                }
+            }, 4000);
+        }
+
+        // Return to main menu and clean up
+        function returnToMainMenu() {
+            // Remove any success overlays
+            const successOverlays = document.querySelectorAll('.modal-overlay:not(#encounterModal):not(#throwModal)');
+            successOverlays.forEach(overlay => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            });
+            
+            // Redirect to main menu
+            window.location.href = '/index.html';
+        }
+
+        // Return to scanner and clean up (for other cases like errors)
+        function returnToScanner() {
+            // Remove any success overlays
+            const successOverlays = document.querySelectorAll('.modal-overlay:not(#encounterModal):not(#throwModal)');
+            successOverlays.forEach(overlay => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+            });
+            
+            // Reset and go back to scanner
+            currentPokemonData = null;
+            showUIState(UI_STATES.SCANNER);
         }
 
         // Minigame functionality
