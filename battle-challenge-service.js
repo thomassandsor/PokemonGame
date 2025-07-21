@@ -1,6 +1,6 @@
 // Pokemon Battle Challenge Service - Handles battle challenges and management
 class BattleChallengeService {
-    static baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+    static baseUrl = '/api/dataverse';
 
     /**
      * Create a new battle challenge

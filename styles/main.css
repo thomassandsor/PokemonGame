@@ -1,0 +1,26 @@
+/* Minimal CSS for fullscreen modal and scanner */
+body {
+    margin: 0;
+    padding: 0;
+    background: #222;
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.qr-video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    background: #111;
+}
+
+.scanner-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+}
+
+/* Modal styles are in catch-pokemon.html */

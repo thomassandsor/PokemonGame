@@ -38,9 +38,19 @@ class PokemonDevHandler(http.server.SimpleHTTPRequestHandler):
     
     def proxy_to_azure(self, parsed_path):
         try:
-            # Build Azure Functions URL
-            azure_url = f"https://pokemongame-functions-2025.azurewebsites.net{self.path}"
-            print(f"PROXY: {self.path} -> {azure_url}")
+            # Check if local Azure Functions are running
+            local_functions_url = "http://localhost:7071"
+            try:
+                import urllib.request
+                req = urllib.request.Request(f"{local_functions_url}/api/")
+                with urllib.request.urlopen(req, timeout=2) as response:
+                    # Local functions are running - use them
+                    azure_url = f"{local_functions_url}{self.path}"
+                    print(f"PROXY [LOCAL]: {self.path} -> {azure_url}")
+            except:
+                # Local functions not running - fallback to live Azure
+                azure_url = f"https://pokemongame-functions-2025.azurewebsites.net{self.path}"
+                print(f"PROXY [LIVE]: {self.path} -> {azure_url}")
             
             # Make request to Azure
             req = urllib.request.Request(azure_url)

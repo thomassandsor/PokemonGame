@@ -1,6 +1,6 @@
 // Pokemon Battle Service - Core battle mechanics and calculations
 class BattleService {
-    static baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+    static baseUrl = '/api/dataverse';
     
     // Default moves for Pokemon without specific movesets
     static DEFAULT_MOVES = [
