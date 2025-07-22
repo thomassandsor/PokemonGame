@@ -11,7 +11,7 @@ class MinigameLibrary {
             name: '🎯 Target Timing',
             description: 'Click when the target is in the green zone',
             difficulty: 'easy',
-            rewardPokeballs: 1,
+            rewardPokeballs: 0,
             estimatedTime: '15-30 seconds'
         },
         'memory-match': {
@@ -19,7 +19,7 @@ class MinigameLibrary {
             name: '🧠 Pokemon Memory Match',
             description: 'Match pairs of Pokemon cards',
             difficulty: 'easy',
-            rewardPokeballs: 2,
+            rewardPokeballs: 0,
             estimatedTime: '1-2 minutes'
         },
         'reflex-challenge': {
@@ -27,7 +27,7 @@ class MinigameLibrary {
             name: '⚡ Lightning Reflexes',
             description: 'Tap Pokemon before they disappear',
             difficulty: 'medium',
-            rewardPokeballs: 3,
+            rewardPokeballs: 0,
             estimatedTime: '30-60 seconds'
         },
         'pattern-sequence': {
@@ -35,7 +35,7 @@ class MinigameLibrary {
             name: '🔄 Pattern Master',
             description: 'Remember and repeat Pokemon sequences',
             difficulty: 'hard',
-            rewardPokeballs: 4,
+            rewardPokeballs: 0,
             estimatedTime: '1-3 minutes'
         },
         'pokemon-quiz': {
@@ -43,7 +43,7 @@ class MinigameLibrary {
             name: '🎓 Pokemon Trivia',
             description: 'Answer Pokemon knowledge questions',
             difficulty: 'medium',
-            rewardPokeballs: 3,
+            rewardPokeballs: 0,
             estimatedTime: '1-2 minutes'
         }
     };
@@ -106,7 +106,7 @@ class MinigameLibrary {
                     🎮 Choose Your Minigame!
                 </h2>
                 <p style="text-align: center; color: #666; margin-bottom: 30px;">
-                    Complete a minigame to earn Pokéballs and catch this Pokemon!
+                    Complete a minigame to catch this Pokemon without using Pokéballs!
                 </p>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                     ${games.map(game => `
@@ -199,27 +199,20 @@ class MinigameLibrary {
         const game = this.games[gameId];
         
         if (result.success) {
-            // Use existing Pokemon catching flow instead of just adding pokeballs
+            // Catch the Pokemon directly without consuming pokeballs
             try {
                 // Check if the existing addPokeballReward function is available (catches Pokemon directly)
                 if (typeof addPokeballReward === 'function') {
-                    console.log('🎮 Minigame completed successfully - catching Pokemon via existing flow');
+                    console.log('🎮 Minigame completed successfully - catching Pokemon directly');
                     await addPokeballReward();
                 } else {
-                    // Fallback: just add pokeballs to inventory
-                    const currentUser = AuthService.getCurrentUser();
-                    if (currentUser && currentUser.email) {
-                        const newCount = await CatchPokemonService.addPokeballs(currentUser.email, game.rewardPokeballs);
-                        this.showMinigameSuccess(game, newCount);
-                    } else {
-                        console.warn('User not authenticated for pokeball reward');
-                        this.showMinigameSuccess(game, game.rewardPokeballs);
-                    }
+                    console.error('🎮 Cannot catch Pokemon - addPokeballReward function not available');
+                    this.showMinigameSuccess(game, 'Pokemon catch failed');
                 }
             } catch (error) {
-                console.error('Error handling minigame reward:', error);
-                // Fallback: show success message anyway
-                this.showMinigameSuccess(game, game.rewardPokeballs);
+                console.error('Error catching Pokemon via minigame:', error);
+                // Show error message
+                this.showMinigameFailure(game, 'Pokemon catch failed');
             }
         } else {
             // Show failure message with retry option
@@ -230,39 +223,11 @@ class MinigameLibrary {
     /**
      * Show minigame success modal
      */
-    static showMinigameSuccess(game, newPokeballCount) {
-        const successModal = document.createElement('div');
-        successModal.className = 'modal-overlay';
-        successModal.innerHTML = `
-            <div style="text-align: center; color: white; padding: 40px;">
-                <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
-                <h2 style="color: #28a745; font-size: 2rem; margin-bottom: 15px;">
-                    Minigame Complete!
-                </h2>
-                <p style="font-size: 1.2rem; margin-bottom: 10px;">
-                    You completed <strong>${game.name}</strong>!
-                </p>
-                <p style="font-size: 1.1rem; color: #ffcc02; margin-bottom: 20px;">
-                    ⚾ Earned ${game.rewardPokeballs} Pokéballs!
-                </p>
-                <p style="font-size: 1rem; color: #ccc; margin-bottom: 30px;">
-                    Total Pokéballs: ${newPokeballCount || '?'}
-                </p>
-                <button onclick="MinigameLibrary.closeSuccessModal()" 
-                        style="background: linear-gradient(145deg, #28a745, #20c997); 
-                               color: white; padding: 15px 30px; border: none; 
-                               border-radius: 25px; font-size: 1.1rem; cursor: pointer;">
-                    Continue Playing!
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(successModal);
-        
-        // Auto-close after 4 seconds
-        setTimeout(() => {
-            this.closeSuccessModal();
-        }, 4000);
+    static showMinigameSuccess(game, statusMessage) {
+        // The success is handled by the existing addPokeballReward() function
+        // which shows the Pokemon catch success message and redirects appropriately
+        // This function is only called if there's an error, so we don't need to show anything
+        console.log('🎮 Minigame success - Pokemon catch handled by existing flow');
     }
 
     /**
@@ -445,7 +410,7 @@ class MinigameLibrary {
                 const inGreenZone = targetPosition >= 70 && targetPosition <= 130;
                 
                 if (inGreenZone) {
-                    this.showSuccessModal('timing-challenge', 'Perfect timing! You earned a pokeball!');
+                    this.showSuccessModal('timing-challenge', 'Perfect timing! Pokemon caught!');
                     document.body.removeChild(gameModal);
                     resolve(true);
                 } else {

@@ -632,8 +632,28 @@
                     };
                 }
                 
-                // Get comprehensive user data
-                const userData = await CatchPokemonService.getUserData(currentUser.email);
+                // Get comprehensive user data with fallback handling
+                let userData;
+                try {
+                    userData = await CatchPokemonService.getUserData(currentUser.email);
+                } catch (error) {
+                    console.warn('🎯 MOBILE: Failed to get comprehensive user data, falling back to basic check:', error);
+                    // Fallback: just get user contact and pokeball count, skip Pokemon collection
+                    try {
+                        const userId = await CatchPokemonService.getUserContactId(currentUser.email);
+                        const pokeballCount = await CatchPokemonService.getUserPokeballCount(currentUser.email);
+                        userData = {
+                            userId,
+                            email: currentUser.email,
+                            pokeballCount,
+                            ownedPokemonNumbers: [] // Empty array = skip duplicate check
+                        };
+                        console.log('🎯 MOBILE: Using fallback user data:', userData);
+                    } catch (fallbackError) {
+                        console.error('🎯 MOBILE: Even fallback failed:', fallbackError);
+                        throw new Error('Unable to connect to game server. Please try again.');
+                    }
+                }
                 
                 // Check if Pokemon can be caught
                 const catchCheck = CatchPokemonService.canCatchPokemon(pokemonNumber, userData);
@@ -1066,8 +1086,19 @@
             }
         }
 
+        // Minigame completion guard to prevent duplicates
+        let isMinigameCatchInProgress = false;
+
         // Minigame completed - actually catch the Pokemon (no pokeball consumption)
         async function addPokeballReward() {
+            // Prevent multiple simultaneous calls that could create duplicates
+            if (isMinigameCatchInProgress) {
+                console.log('🎮 Minigame catch already in progress, ignoring duplicate call');
+                return;
+            }
+            
+            isMinigameCatchInProgress = true;
+            
             try {
                 const currentUser = AuthService.getCurrentUser();
                 if (!currentUser || !currentUser.email) {
@@ -1152,6 +1183,8 @@
                     // Show the same success message as normal catch but with "Back to Menu" button
                     showMinigameSuccessMessage(result.pokemon.name);
                     console.timeEnd('🎮 Success message display time');
+                    // Reset guard flag on success
+                    isMinigameCatchInProgress = false;
                 } else {
                     console.error('🎮 Minigame catch failed:', result.error);
                     alert(`Failed to catch Pokemon: ${result.error}`);
@@ -1159,6 +1192,8 @@
                     window.currentPokemonNumber = null;
                     currentPokemonData = null;
                     setUIState(UI_STATES.SCANNER);
+                    // Reset guard flag on failure
+                    isMinigameCatchInProgress = false;
                 }
                 
             } catch (error) {
@@ -1173,6 +1208,9 @@
                 window.currentPokemonNumber = null;
                 currentPokemonData = null;
                 setUIState(UI_STATES.SCANNER);
+            } finally {
+                // Always reset the guard flag to allow future minigame attempts
+                isMinigameCatchInProgress = false;
             }
         }
 

@@ -3,6 +3,47 @@ class CatchPokemonService {
     static baseUrl = '/api/dataverse';
     
     /**
+     * Fetch with timeout for mobile reliability
+     */
+    static async fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timed out - please check your connection');
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Validate OData query URL for mobile compatibility
+     */
+    static validateODataQuery(url, description = 'Query') {
+        if (url.length > 2048) {
+            console.warn(`🎯 CATCH-SERVICE: ${description} URL too long (${url.length} chars), may fail on mobile`);
+            return false;
+        }
+        
+        // Check for problematic characters or syntax
+        if (url.includes('undefined') || url.includes('null')) {
+            console.error(`🎯 CATCH-SERVICE: ${description} contains undefined/null values`);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
      * Catch a Pokemon via minigame completion (no pokeball consumption) - Optimized version
      * @param {number} pokemonNumber - Pokemon ID from QR code
      * @param {Object} userData - Pre-fetched user data from getUserData()
@@ -14,7 +55,7 @@ class CatchPokemonService {
         try {
             console.log('🎮 MINIGAME-CATCH: Starting optimized minigame catch for Pokemon #' + pokemonNumber);
             
-            // Skip user lookup and duplicate check - already done in QR detection
+            // Trust that duplicate check was already done during QR scan - no extra API calls
             console.log('🎮 MINIGAME-CATCH: Using pre-fetched user data:', userData.userId);
             
             currentStep = 'pokemon_lookup';
@@ -353,7 +394,7 @@ class CatchPokemonService {
             
             // First get user contact info with pokeball count
             const contactUrl = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid,pokemon_pokeballs`;
-            const contactResponse = await fetch(contactUrl);
+            const contactResponse = await this.fetchWithTimeout(contactUrl);
             
             if (!contactResponse.ok) {
                 throw new Error(`HTTP ${contactResponse.status}: ${contactResponse.statusText}`);
@@ -377,7 +418,12 @@ class CatchPokemonService {
                 const pokemonUrl = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'&$select=_pokemon_pokemon_value`;
                 console.log('🎯 CATCH-SERVICE: Pokemon collection URL:', pokemonUrl);
                 
-                const pokemonResponse = await fetch(pokemonUrl);
+                // Validate the OData query
+                if (!this.validateODataQuery(pokemonUrl, 'Pokemon collection')) {
+                    throw new Error('Invalid OData query format');
+                }
+                
+                const pokemonResponse = await this.fetchWithTimeout(pokemonUrl);
                 if (!pokemonResponse.ok) {
                     throw new Error(`Pokemon query failed: HTTP ${pokemonResponse.status}: ${pokemonResponse.statusText}`);
                 }
@@ -394,15 +440,23 @@ class CatchPokemonService {
                     if (ownedMasterIds.length > 0) {
                         const masterIdsFilter = ownedMasterIds.map(id => `pokemon_pokemonid eq '${id}'`).join(' or ');
                         const masterUrl = `${this.baseUrl}/pokemon_pokemons?$filter=${masterIdsFilter}&$select=pokemon_id,pokemon_pokemonid`;
-                        console.log('🎯 CATCH-SERVICE: Master Pokemon lookup URL:', masterUrl);
                         
-                        const masterResponse = await fetch(masterUrl);
-                        if (masterResponse.ok) {
-                            const masterData = await masterResponse.json();
-                            ownedPokemonNumbers = masterData.value.map(pokemon => pokemon.pokemon_id).filter(id => id);
-                            console.log('🎯 CATCH-SERVICE: Owned Pokemon numbers:', ownedPokemonNumbers);
+                        // Validate OData query before attempting
+                        if (!this.validateODataQuery(masterUrl, 'Master Pokemon lookup')) {
+                            console.warn('🎯 CATCH-SERVICE: OData query invalid, falling back to simplified approach');
+                            ownedPokemonNumbers = []; // Skip duplicate check rather than risk mobile failure
                         } else {
-                            console.warn('🎯 CATCH-SERVICE: Master Pokemon lookup failed, duplicate check may not work');
+                            console.log('🎯 CATCH-SERVICE: Master Pokemon lookup URL:', masterUrl);
+                            
+                            const masterResponse = await this.fetchWithTimeout(masterUrl);
+                            if (masterResponse.ok) {
+                                const masterData = await masterResponse.json();
+                                ownedPokemonNumbers = masterData.value.map(pokemon => pokemon.pokemon_id).filter(id => id);
+                                console.log('🎯 CATCH-SERVICE: Owned Pokemon numbers:', ownedPokemonNumbers);
+                            } else {
+                                console.warn('🎯 CATCH-SERVICE: Master Pokemon lookup failed, duplicate check may not work');
+                                ownedPokemonNumbers = [];
+                            }
                         }
                     }
                 }
@@ -438,7 +492,7 @@ class CatchPokemonService {
     static async getUserContactId(email) {
         try {
             const url = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -515,7 +569,7 @@ class CatchPokemonService {
     static async getUserPokeballCount(email) {
         try {
             const url = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=pokemon_pokeballs`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -583,7 +637,7 @@ class CatchPokemonService {
             console.log(`🎯 CATCH-SERVICE: Update data:`, updateData);
             
             // Use PATCH method as per Microsoft Dataverse documentation
-            const response = await fetch(url, {
+            const response = await this.fetchWithTimeout(url, {
                 method: 'PATCH',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -632,7 +686,7 @@ class CatchPokemonService {
             
             console.log(`🎯 CATCH-SERVICE: [OPTIMIZED] Updating pokeball count from ${currentCount} to ${newCount}`);
             
-            const response = await fetch(url, {
+            const response = await this.fetchWithTimeout(url, {
                 method: 'PATCH',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -659,48 +713,12 @@ class CatchPokemonService {
     }
 
     /**
-     * Add pokeballs to user's inventory (reward from minigame)
-     */
-    static async addPokeballs(email, count = 1) {
-        try {
-            // First get user's contact ID
-            const userId = await this.getUserContactId(email);
-            if (!userId) {
-                throw new Error('User not found');
-            }
-
-            // Get current pokeball count
-            const currentCount = await this.getUserPokeballCount(email);
-            const newCount = currentCount + count;
-            const updateData = { pokemon_pokeballs: newCount };
-            const url = `${this.baseUrl}/contacts(${userId})`;
-            
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to update pokeball count: HTTP ${response.status}`);
-            }
-
-            console.log(`🎯 CATCH-SERVICE: Added ${count} pokeball(s). New count: ${newCount}`);
-            return newCount;
-            
-        } catch (error) {
-            console.error('🎯 CATCH-SERVICE: Error adding pokeballs:', error);
-            throw error;
-        }
-    }
-
-    /**
      * Get master Pokemon data by number
      */
     static async getMasterPokemon(pokemonNumber) {
         try {
             const url = `${this.baseUrl}/pokemon_pokemons?$filter=pokemon_id eq ${pokemonNumber}&$select=pokemon_pokemonid,pokemon_name,pokemon_id`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -721,7 +739,7 @@ class CatchPokemonService {
     static async checkExistingPokemon(userId, masterPokemonId) {
         try {
             const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}' and _pokemon_pokemon_value eq '${masterPokemonId}'&$select=pokemon_pokedexid`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -762,7 +780,7 @@ class CatchPokemonService {
         try {
             const url = `${this.baseUrl}/pokemon_pokedexes`;
             console.time('🎯 CATCH-SERVICE: Dataverse POST request');
-            const response = await fetch(url, {
+            const response = await this.fetchWithTimeout(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -828,7 +846,7 @@ class CatchPokemonService {
             if (!userId) return 0;
             
             const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'&$count=true`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) return 0;
             
@@ -850,7 +868,7 @@ class CatchPokemonService {
             if (!userId) return [];
             
             const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'&$expand=pokemon_pokemon($select=pokemon_name,pokemon_id)&$orderby=createdon desc`;
-            const response = await fetch(url);
+            const response = await this.fetchWithTimeout(url);
             
             if (!response.ok) return [];
             
