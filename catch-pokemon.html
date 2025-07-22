@@ -632,28 +632,8 @@
                     };
                 }
                 
-                // Get comprehensive user data with fallback handling
-                let userData;
-                try {
-                    userData = await CatchPokemonService.getUserData(currentUser.email);
-                } catch (error) {
-                    console.warn('🎯 MOBILE: Failed to get comprehensive user data, falling back to basic check:', error);
-                    // Fallback: just get user contact and pokeball count, skip Pokemon collection
-                    try {
-                        const userId = await CatchPokemonService.getUserContactId(currentUser.email);
-                        const pokeballCount = await CatchPokemonService.getUserPokeballCount(currentUser.email);
-                        userData = {
-                            userId,
-                            email: currentUser.email,
-                            pokeballCount,
-                            ownedPokemonNumbers: [] // Empty array = skip duplicate check
-                        };
-                        console.log('🎯 MOBILE: Using fallback user data:', userData);
-                    } catch (fallbackError) {
-                        console.error('🎯 MOBILE: Even fallback failed:', fallbackError);
-                        throw new Error('Unable to connect to game server. Please try again.');
-                    }
-                }
+                // Get user data - either works or fails
+                const userData = await CatchPokemonService.getUserData(currentUser.email);
                 
                 // Check if Pokemon can be caught
                 const catchCheck = CatchPokemonService.canCatchPokemon(pokemonNumber, userData);
@@ -706,10 +686,6 @@
                 } else {
                     showNoPokeballs();
                 }
-            } else {
-                // Fallback - show no pokeballs state
-                showNoPokeballs();
-            }
             
             showUIState(UI_STATES.ENCOUNTER);
         }
@@ -717,13 +693,6 @@
         // Check pokeball count and display appropriate UI
         async function checkAndDisplayPokeballCount() {
             try {
-                // Check if CatchPokemonService is available
-                if (typeof CatchPokemonService === 'undefined') {
-                    console.warn('CatchPokemonService not available, defaulting to no pokeballs');
-                    showNoPokeballs();
-                    return;
-                }
-
                 // Get current user
                 const currentUser = AuthService.getCurrentUser();
                 if (!currentUser || !currentUser.email) {
@@ -748,7 +717,7 @@
 
             } catch (error) {
                 console.error('Error checking pokeball count:', error);
-                showNoPokeballs();
+                throw new Error('Unable to connect to game server. Please try again.');
             }
         }
 
@@ -816,49 +785,26 @@
                 // Show loading spinner while catching Pokemon
                 showLoadingSpinner('Catching Pokemon...');
                 
-                // Use existing catch service if available
-                if (typeof CatchPokemonService !== 'undefined' && window.currentUserData) {
-                    const result = await CatchPokemonService.catchPokemonOptimized(
-                        currentPokemonData.id, 
-                        window.currentUserData
-                    );
-                    
-                    hideLoadingSpinner();
-                    
-                    if (result.success) {
-                        // Always successful - pokeball was consumed and Pokemon caught
-                        showCatchSuccessMessage(currentPokemonData.name);
-                    } else {
-                        // This could happen if no pokeballs (shouldn't reach here with our UI logic)
-                        if (result.error.includes('No pokeballs available')) {
-                            alert(`❌ No Pokéballs available! Play the minigame to earn more.`);
-                            showUIState(UI_STATES.ENCOUNTER); // Go back to encounter to show minigame
-                        } else {
-                            alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
-                            returnToScanner();
-                        }
-                    }
-                } else if (typeof CatchPokemonService !== 'undefined') {
-                    // Fallback to non-optimized version if no user data cached
-                    const result = await CatchPokemonService.catchPokemon(currentPokemonData.id);
-                    
-                    hideLoadingSpinner();
-                    
-                    if (result.success) {
-                        showCatchSuccessMessage(currentPokemonData.name);
-                    } else {
-                        if (result.error.includes('No pokeballs available')) {
-                            alert(`❌ No Pokéballs available! Play the minigame to earn more.`);
-                            showUIState(UI_STATES.ENCOUNTER);
-                        } else {
-                            alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
-                            returnToScanner();
-                        }
-                    }
+                // Use the catch service - either works or fails
+                const result = await CatchPokemonService.catchPokemonOptimized(
+                    currentPokemonData.id, 
+                    window.currentUserData
+                );
+                
+                hideLoadingSpinner();
+                
+                if (result.success) {
+                    // Pokemon caught successfully
+                    showCatchSuccessMessage(currentPokemonData.name);
                 } else {
-                    // Fallback for when service isn't available
-                    hideLoadingSpinner();
-                    showCatchSuccessMessage(currentPokemonData.name, true);
+                    // Clear failure - no fallbacks
+                    if (result.error.includes('No pokeballs available')) {
+                        alert(`❌ No Pokéballs available! Play the minigame to earn more.`);
+                        showUIState(UI_STATES.ENCOUNTER);
+                    } else {
+                        alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
+                        returnToScanner();
+                    }
                 }
                 
             } catch (error) {
@@ -1300,26 +1246,13 @@
                     }
                 }
                 
-                // Fallback to PokeAPI
-                const fallbackResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`);
-                if (fallbackResponse.ok) {
-                    const pokemon = await fallbackResponse.json();
-                    document.getElementById('videoDebugInfo').textContent = '';
-                    return {
-                        id: pokemon.id,
-                        name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
-                        types: pokemon.types,
-                        sprites: pokemon.sprites,
-                        stats: pokemon.stats
-                    };
-                }
-                
-                throw new Error('Pokemon not found');
+                // No fallback - if our service doesn't work, fail clearly
+                throw new Error('Pokemon not found in our database');
                 
             } catch (error) {
                 console.error('Error loading Pokemon data:', error);
                 document.getElementById('videoDebugInfo').textContent = 'Failed to load Pokemon data';
-                return null;
+                throw error; // Don't return null, throw the error
             }
         }
 

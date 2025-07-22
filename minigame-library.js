@@ -199,19 +199,12 @@ class MinigameLibrary {
         const game = this.games[gameId];
         
         if (result.success) {
-            // Catch the Pokemon directly without consuming pokeballs
+            // Catch the Pokemon directly - either works or fails
             try {
-                // Check if the existing addPokeballReward function is available (catches Pokemon directly)
-                if (typeof addPokeballReward === 'function') {
-                    console.log('🎮 Minigame completed successfully - catching Pokemon directly');
-                    await addPokeballReward();
-                } else {
-                    console.error('🎮 Cannot catch Pokemon - addPokeballReward function not available');
-                    this.showMinigameSuccess(game, 'Pokemon catch failed');
-                }
+                console.log('🎮 Minigame completed successfully - catching Pokemon directly');
+                await addPokeballReward();
             } catch (error) {
                 console.error('Error catching Pokemon via minigame:', error);
-                // Show error message
                 this.showMinigameFailure(game, 'Pokemon catch failed');
             }
         } else {
@@ -328,105 +321,8 @@ class MinigameLibrary {
                 resolve({ success: true });
             };
             
-            // Use the existing timing game implementation from catch-pokemon.html
-            if (typeof startMinigame === 'function') {
-                startMinigame();
-            } else {
-                console.warn('⚠️ Existing timing game not available, showing simplified version');
-                // Restore original function if fallback
-                window.addPokeballReward = originalAddPokeballReward;
-                this.playSimpleTimingGame().then(resolve);
-            }
-        });
-    }
-
-    /**
-     * Fallback simple timing game if existing one not available
-     */
-    static async playSimpleTimingGame() {
-        return new Promise((resolve) => {
-            const gameModal = document.createElement('div');
-            gameModal.className = 'modal-overlay';
-            gameModal.id = 'timingChallengeGame';
-            
-            let targetPosition = 0;
-            let direction = 1;
-            let gameActive = false;
-            let gameInterval = null;
-            
-            gameModal.innerHTML = `
-                <div class="modal-content" style="max-width: 400px; text-align: center;">
-                    <h2 style="color: #e53935; margin: 0 0 20px 0;">🎯 Target Timing Challenge</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Click when the target reaches the green zone!</p>
-                    
-                    <div style="position: relative; width: 200px; height: 60px; margin: 0 auto 20px; background: linear-gradient(90deg, #ff5252 0%, #ff5252 35%, #4caf50 35%, #4caf50 65%, #ff5252 65%, #ff5252 100%); border-radius: 30px; border: 3px solid #333;">
-                        <div id="timingTarget" style="position: absolute; width: 20px; height: 20px; background: #2196f3; border-radius: 50%; top: 50%; transform: translateY(-50%); left: 0px; transition: left 0.05s ease;"></div>
-                    </div>
-                    
-                    <button id="timingClickBtn" class="btn-pokemon" style="background: #4caf50; margin: 10px;">
-                        🎯 Click Now!
-                    </button>
-                    
-                    <div style="margin-top: 20px;">
-                        <button class="btn-pokemon" onclick="MinigameLibrary.cancelGame('${gameModal.id}', false)" style="background: #666;">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(gameModal);
-            
-            const target = document.getElementById('timingTarget');
-            const clickBtn = document.getElementById('timingClickBtn');
-            
-            // Start the timing game
-            setTimeout(() => {
-                gameActive = true;
-                gameInterval = setInterval(() => {
-                    if (!gameActive) return;
-                    
-                    targetPosition += direction * 2;
-                    
-                    if (targetPosition >= 180) {
-                        direction = -1;
-                        targetPosition = 180;
-                    } else if (targetPosition <= 0) {
-                        direction = 1;
-                        targetPosition = 0;
-                    }
-                    
-                    target.style.left = targetPosition + 'px';
-                }, 50);
-            }, 1000);
-            
-            clickBtn.onclick = () => {
-                if (!gameActive) return;
-                
-                gameActive = false;
-                clearInterval(gameInterval);
-                
-                // Check if in green zone (70-130px range)
-                const inGreenZone = targetPosition >= 70 && targetPosition <= 130;
-                
-                if (inGreenZone) {
-                    this.showSuccessModal('timing-challenge', 'Perfect timing! Pokemon caught!');
-                    document.body.removeChild(gameModal);
-                    resolve(true);
-                } else {
-                    this.showFailureModal('timing-challenge', 'Missed the green zone! Try again?');
-                    document.body.removeChild(gameModal);
-                    resolve(false);
-                }
-            };
-            
-            // Store cleanup function
-            window.cancelTimingGame = () => {
-                gameActive = false;
-                if (gameInterval) clearInterval(gameInterval);
-                document.body.removeChild(gameModal);
-                resolve(false);
-            };
+            // Use the existing timing game - must work or fail
+            startMinigame();
         });
     }
 
