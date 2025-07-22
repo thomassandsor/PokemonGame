@@ -394,13 +394,13 @@
                 <!-- No Pokeballs Message -->
                 <div id="noPokeballs" class="no-pokeballs-message hidden">
                     ❌ No more Pokéballs!<br>
-                    <small>Try the minigame to earn more</small>
+                    <small>Play a minigame to earn them</small>
                 </div>
 
                 <!-- No Pokeballs Actions -->
                 <div id="noPokeballActions" class="modal-actions hidden">
-                    <button class="btn-pokemon catch" onclick="startMinigame()">
-                        🎮 Play Minigame
+                    <button class="btn-pokemon catch" onclick="MinigameLibrary.showMinigameSelection()">
+                        🎮 Choose Minigame
                     </button>
                     <button class="btn-pokemon run" onclick="runAway()">
                         🏃 Run Away
@@ -453,6 +453,9 @@
     
     <!-- Include Catch Pokemon Service -->
     <script src="catch-pokemon-service.js"></script>
+    
+    <!-- Include Minigame Library -->
+    <script src="minigame-library.js"></script>
     
     <!-- Include Pokeball Throw Logic -->
     <script src="throw-pokeball.js"></script>
