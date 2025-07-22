@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch Pokemon - QR Scanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    html, body {
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Pokemon-themed Scanner Frame */
+    .pokemon-scanner-frame {
+        position: relative;
+        width: 90vw;
+        max-width: 400px;
+        margin: 20px auto;
+        background: linear-gradient(145deg, #ffcc02, #3d7dca);
+        padding: 8px;
+        border-radius: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 4px solid #fff;
+    }
+
+    .pokemon-scanner-inner {
+        background: #000;
+        border-radius: 20px;
+        padding: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #qrVideo {
+        width: 100%;
+        height: 60vh;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 15px;
+        display: block;
+    }
+
+    .pokemon-scanner-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        border: 3px solid #ffcc02;
+        border-radius: 15px;
+        box-shadow: 0 0 0 4px rgba(255, 204, 2, 0.3);
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .pokemon-scanner-corners {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+        z-index: 11;
+    }
+
+    .corner {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 4px solid #ffcc02;
+    }
+
+    .corner.top-left {
+        top: -2px;
+        left: -2px;
+        border-right: none;
+        border-bottom: none;
+        border-top-left-radius: 10px;
+    }
+
+    .corner.top-right {
+        top: -2px;
+        right: -2px;
+        border-left: none;
+        border-bottom: none;
+        border-top-right-radius: 10px;
+    }
+
+    .corner.bottom-left {
+        bottom: -2px;
+        left: -2px;
+        border-right: none;
+        border-top: none;
+        border-bottom-left-radius: 10px;
+    }
+
+    .corner.bottom-right {
+        bottom: -2px;
+        right: -2px;
+        border-left: none;
+        border-top: none;
+        border-bottom-right-radius: 10px;
+    }
+
+    .pokemon-title {
+        text-align: center;
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        margin-bottom: 20px;
+    }
+
+    .scan-instruction {
+        text-align: center;
+        color: #fff;
+        font-size: 1.2rem;
+        margin-top: 15px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 10px;
+    }
+
+    /* Fullscreen Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.9);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: none;
+        overscroll-behavior: contain;
+    }
+
+    .modal-content {
+        width: 90vw;
+        max-width: 500px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .pokemon-encounter {
+        background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        border: 3px solid #fff;
+    }
+
+    .pokemon-sprite-large {
+        width: 60vw;
+        max-width: 250px;
+        height: auto;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+    }
+
+    .pokemon-name {
+        color: #fff;
+        font-size: 2rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        margin-bottom: 20px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .btn-pokemon {
+        font-size: 1.3rem;
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-pokemon.catch {
+        background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+        color: white;
+    }
+
+    .btn-pokemon.catch:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-pokemon.run {
+        background: linear-gradient(145deg, #feca57, #ff9ff3);
+        color: #333;
+    }
+
+    .btn-pokemon.run:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Throw Animation Container */
+    .throw-container {
+        text-align: center;
+        color: #fff;
+    }
+
+    .throw-instructions {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .catch-zone {
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .pokeball {
+        width: 80px;
+        height: 80px;
+        margin: 20px auto;
+        display: block;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .pokeball:hover {
+        transform: scale(1.1);
+    }
+
+    /* Animation for scanning pulse effect */
+    @keyframes scanPulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 204, 2, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(255, 204, 2, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 204, 2, 0); }
+    }
+
+    .pokemon-scanner-overlay.scanning {
+        animation: scanPulse 2s infinite;
+    }
+
+    /* Hidden by default */
+    .hidden {
+        display: none !important;
+    }
+    </style>
+</head>
+<body>
+    <!-- Pokemon QR Scanner -->
+    <div id="scannerContainer" class="container">
+        <div class="pokemon-title">🔍 Pokémon Scanner</div>
+        
+        <div class="pokemon-scanner-frame">
+            <div class="pokemon-scanner-inner">
+                <video id="qrVideo" playsinline autoplay></video>
+                <div class="pokemon-scanner-overlay scanning"></div>
+                <div class="pokemon-scanner-corners">
+                    <div class="corner top-left"></div>
+                    <div class="corner top-right"></div>
+                    <div class="corner bottom-left"></div>
+                    <div class="corner bottom-right"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scan-instruction">
+            Point your camera at a Pokémon QR code
+        </div>
+        
+        <div id="videoDebugInfo" style="color:#fff; text-align:center; margin-top:15px; font-size:0.9rem;"></div>
+    </div>
+
+    <!-- Pokemon Encounter Modal -->
+    <div id="encounterModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="pokemon-encounter">
+                <img id="encounterPokemonImage" class="pokemon-sprite-large" src="" alt="Pokemon">
+                <div id="encounterPokemonName" class="pokemon-name">Loading...</div>
+                <div class="modal-actions">
+                    <button class="btn-pokemon catch" onclick="startThrowAnimation()">
+                        ⚾ Catch!
+                    </button>
+                    <button class="btn-pokemon run" onclick="runAway()">
+                        🏃 Run Away
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pokeball Throw Animation -->
+    <div id="throwModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="throw-container">
+                <div class="throw-instructions">Swipe up to throw the Pokéball!</div>
+                <div class="catch-zone">
+                    <img id="throwPokemonSprite" class="pokemon-sprite-large" src="" alt="Target Pokemon">
+                </div>
+                <img id="pokeball" class="pokeball" src="assets/pokeball.svg" alt="Pokeball">
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Include jsQR library for QR code scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Include Auth Service -->
+    <script src="auth.js"></script>
+    
+    <!-- Include Catch Pokemon Service -->
+    <script src="catch-pokemon-service.js"></script>
+    
+    <!-- Include Pokeball Throw Logic -->
+    <script src="throw-pokeball.js"></script>
+    
+    <script>
+        // Global variables
+        let currentPokemonData = null;
+        let qrScanner = null;
+
+        // UI State Management
+        const UI_STATES = {
+            SCANNER: 'scanner',
+            ENCOUNTER: 'encounter', 
+            THROW: 'throw'
+        };
+
+        let currentState = UI_STATES.SCANNER;
+
+        // Show only the specified UI state
+        function showUIState(state) {
+            currentState = state;
+            
+            // Hide all containers
+            document.getElementById('scannerContainer').classList.add('hidden');
+            document.getElementById('encounterModal').classList.add('hidden');
+            document.getElementById('throwModal').classList.add('hidden');
+            
+            // Show the requested state
+            switch(state) {
+                case UI_STATES.SCANNER:
+                    document.getElementById('scannerContainer').classList.remove('hidden');
+                    // Restart scanner if it exists
+                    if (qrScanner && !qrScanner.scanning) {
+                        qrScanner.startScanning();
+                    }
+                    break;
+                    
+                case UI_STATES.ENCOUNTER:
+                    document.getElementById('encounterModal').classList.remove('hidden');
+                    break;
+                    
+                case UI_STATES.THROW:
+                    document.getElementById('throwModal').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        // Handle QR scan result
+        function onQRCodeDetected(pokemonNumber, rawData) {
+            console.log(`🎯 Pokemon #${pokemonNumber} detected!`);
+            
+            // Stop scanning
+            if (qrScanner) {
+                qrScanner.stopScanning();
+            }
+            
+            // Load and show Pokemon data
+            loadPokemonData(pokemonNumber).then(pokemonData => {
+                if (pokemonData) {
+                    currentPokemonData = pokemonData;
+                    showPokemonEncounter(pokemonData);
+                } else {
+                    alert('Failed to load Pokemon data. Please try again.');
+                    showUIState(UI_STATES.SCANNER);
+                }
+            });
+        }
+
+        // Show Pokemon encounter screen
+        function showPokemonEncounter(pokemonData) {
+            document.getElementById('encounterPokemonImage').src = 
+                pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
+            document.getElementById('encounterPokemonName').textContent = pokemonData.name;
+            
+            showUIState(UI_STATES.ENCOUNTER);
+        }
+
+        // Start throw animation
+        function startThrowAnimation() {
+            if (!currentPokemonData) {
+                alert('No Pokemon data available!');
+                return;
+            }
+            
+            // Set up throw screen
+            document.getElementById('throwPokemonSprite').src = 
+                currentPokemonData.sprites?.official_artwork || currentPokemonData.sprites?.front_default || '';
+            
+            showUIState(UI_STATES.THROW);
+            
+            // Initialize pokeball throw logic
+            const pokeballElem = document.getElementById('pokeball');
+            const targetElem = document.getElementById('throwPokemonSprite');
+            
+            // Use existing PokeballThrow class if available
+            if (typeof PokeballThrow !== 'undefined') {
+                new PokeballThrow({
+                    pokeballElem,
+                    targetElem,
+                    onThrow: async function() {
+                        await handleCatchPokemon();
+                    }
+                });
+            } else {
+                // Simple fallback - just catch on click
+                pokeballElem.onclick = async function() {
+                    await handleCatchPokemon();
+                };
+            }
+        }
+
+        // Handle running away
+        function runAway() {
+            console.log('🏃 Player chose to run away');
+            currentPokemonData = null;
+            showUIState(UI_STATES.SCANNER);
+        }
+
+        // Handle catching Pokemon
+        async function handleCatchPokemon() {
+            if (!currentPokemonData) {
+                alert('No Pokemon to catch!');
+                return;
+            }
+            
+            try {
+                // Use existing catch service if available
+                if (typeof CatchPokemonService !== 'undefined') {
+                    const result = await CatchPokemonService.catchPokemon(currentPokemonData.id);
+                    
+                    if (result.success) {
+                        alert(`🎉 ${currentPokemonData.name} has been caught!`);
+                    } else {
+                        alert(`❌ Failed to catch ${currentPokemonData.name}: ${result.error}`);
+                    }
+                } else {
+                    // Simple fallback
+                    alert(`🎉 ${currentPokemonData.name} has been caught! (Demo mode)`);
+                }
+                
+                // Reset and go back to scanner
+                currentPokemonData = null;
+                showUIState(UI_STATES.SCANNER);
+                
+            } catch (error) {
+                console.error('Catch error:', error);
+                alert(`❌ Error catching Pokemon: ${error.message}`);
+                showUIState(UI_STATES.SCANNER);
+            }
+        }
+
+        // Load Pokemon data
+        async function loadPokemonData(pokemonNumber) {
+            try {
+                document.getElementById('videoDebugInfo').textContent = 'Loading Pokemon data...';
+                
+                // Try to load from local JSON file first
+                const response = await fetch('/legacy-react/src/data/pokemon.json');
+                
+                if (response.ok) {
+                    const pokemonData = await response.json();
+                    const pokemon = pokemonData.find(p => p.id === pokemonNumber);
+                    
+                    if (pokemon) {
+                        document.getElementById('videoDebugInfo').textContent = '';
+                        return {
+                            id: pokemon.id,
+                            name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
+                            types: pokemon.types,
+                            sprites: pokemon.sprites,
+                            stats: pokemon.stats
+                        };
+                    }
+                }
+                
+                // Fallback to PokeAPI
+                const fallbackResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`);
+                if (fallbackResponse.ok) {
+                    const pokemon = await fallbackResponse.json();
+                    document.getElementById('videoDebugInfo').textContent = '';
+                    return {
+                        id: pokemon.id,
+                        name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
+                        types: pokemon.types,
+                        sprites: pokemon.sprites,
+                        stats: pokemon.stats
+                    };
+                }
+                
+                throw new Error('Pokemon not found');
+                
+            } catch (error) {
+                console.error('Error loading Pokemon data:', error);
+                document.getElementById('videoDebugInfo').textContent = 'Failed to load Pokemon data';
+                return null;
+            }
+        }
+
+        // QR Scanner Class
+        class QRScanner {
+            constructor() {
+                this.video = document.getElementById('qrVideo');
+                this.canvas = document.createElement('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.scanning = false;
+                this.stream = null;
+                
+                console.log('[QRScanner] Initializing...');
+                this.initializeScanner();
+            }
+            
+            async initializeScanner() {
+                try {
+                    // Check authentication if AuthService exists
+                    if (typeof AuthService !== 'undefined') {
+                        await AuthService.restoreAuthFromSession();
+                        
+                        if (!AuthService.isAuthenticated()) {
+                            document.getElementById('videoDebugInfo').innerHTML = 
+                                '<span style="color: #ff6b6b;">⚠️ Authentication required. Please log in.</span>';
+                            return;
+                        }
+                    }
+                    
+                    console.log('✅ Starting camera setup...');
+                    await this.setupCamera();
+                    
+                } catch (error) {
+                    console.error('Scanner initialization error:', error);
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #ff6b6b;">❌ Failed to initialize scanner</span>';
+                }
+            }
+            
+            async setupCamera() {
+                try {
+                    // Get camera permissions
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment' // Prefer back camera on mobile
+                        } 
+                    });
+                    
+                    this.video.srcObject = stream;
+                    this.stream = stream;
+                    
+                    // Wait for video to be ready
+                    this.video.addEventListener('loadedmetadata', () => {
+                        this.canvas.width = this.video.videoWidth;
+                        this.canvas.height = this.video.videoHeight;
+                        this.startScanning();
+                    });
+                    
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #4ecdc4;">📷 Camera ready - Point at a Pokémon QR code</span>';
+                        
+                } catch (error) {
+                    console.error('Camera setup error:', error);
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #ff6b6b;">❌ Camera access denied or not available</span>';
+                }
+            }
+            
+            startScanning() {
+                if (this.scanning) return;
+                
+                this.scanning = true;
+                console.log('🎯 Starting QR scan loop...');
+                document.getElementById('videoDebugInfo').innerHTML = 
+                    '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
+                    
+                this.scanLoop();
+            }
+            
+            stopScanning() {
+                this.scanning = false;
+                console.log('⏹️ Stopping QR scanner');
+                
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                }
+            }
+            
+            scanLoop() {
+                if (!this.scanning || !this.video) return;
+                
+                if (this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
+                    this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                    const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    // Scan for QR code using jsQR
+                    if (typeof jsQR !== 'undefined') {
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+                        
+                        if (code) {
+                            console.log('🎯 QR Code detected:', code.data);
+                            this.handleQRCode(code.data);
+                            return; // Stop scanning after successful detection
+                        }
+                    }
+                }
+                
+                if (this.scanning) {
+                    requestAnimationFrame(() => this.scanLoop());
+                }
+            }
+            
+            handleQRCode(data) {
+                // Extract Pokemon number from QR data
+                const pokemonNumber = this.extractPokemonNumber(data);
+                
+                if (pokemonNumber && pokemonNumber > 0 && pokemonNumber <= 1010) { // Valid Pokemon range
+                    onQRCodeDetected(pokemonNumber, data);
+                } else {
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #ff6b6b;">❌ Invalid Pokémon QR code</span>';
+                    
+                    // Resume scanning after 2 seconds
+                    setTimeout(() => {
+                        if (currentState === UI_STATES.SCANNER) {
+                            document.getElementById('videoDebugInfo').innerHTML = 
+                                '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
+                        }
+                    }, 2000);
+                }
+            }
+            
+            extractPokemonNumber(data) {
+                // Handle various QR code formats
+                console.log('Parsing QR data:', data);
+                
+                // Direct number
+                if (/^\d+$/.test(data)) {
+                    return parseInt(data);
+                }
+                
+                // Pokemon:123 format
+                if (data.toLowerCase().includes('pokemon')) {
+                    const match = data.match(/pokemon[:\s]*(\d+)/i);
+                    if (match) return parseInt(match[1]);
+                }
+                
+                // Extract any number from the string
+                const numberMatch = data.match(/(\d+)/);
+                if (numberMatch) {
+                    return parseInt(numberMatch[1]);
+                }
+                
+                return null;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎮 Pokemon Scanner - Starting...');
+            
+            // Show scanner UI initially
+            showUIState(UI_STATES.SCANNER);
+            
+            // Initialize QR scanner
+            qrScanner = new QRScanner();
+        });
+    </script>
+</body>
+</html>

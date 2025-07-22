@@ -17,8 +17,8 @@ class PokemonDevHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         # Add CORS headers for all responses
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, OData-MaxVersion, OData-Version, If-Match')
         super().end_headers()
 
     def do_OPTIONS(self):
@@ -36,24 +36,63 @@ class PokemonDevHandler(http.server.SimpleHTTPRequestHandler):
             # Serve static files
             super().do_GET()
     
-    def proxy_to_azure(self, parsed_path):
+    def do_POST(self):
+        parsed_path = urlparse(self.path)
+        
+        # Proxy API calls to Azure Functions
+        if parsed_path.path.startswith('/api/'):
+            self.proxy_to_azure(parsed_path, method='POST')
+        else:
+            self.send_response(405)
+            self.end_headers()
+    
+    def do_PATCH(self):
+        parsed_path = urlparse(self.path)
+        
+        # Proxy API calls to Azure Functions
+        if parsed_path.path.startswith('/api/'):
+            self.proxy_to_azure(parsed_path, method='PATCH')
+        else:
+            self.send_response(405)
+            self.end_headers()
+    
+    def proxy_to_azure(self, parsed_path, method='GET'):
         try:
             # Check if local Azure Functions are running
             local_functions_url = "http://localhost:7071"
             try:
-                import urllib.request
-                req = urllib.request.Request(f"{local_functions_url}/api/")
-                with urllib.request.urlopen(req, timeout=2) as response:
-                    # Local functions are running - use them
+                import socket
+                # Just test if port 7071 is open, don't make HTTP request
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                result = sock.connect_ex(('localhost', 7071))
+                sock.close()
+                
+                if result == 0:
+                    # Port 7071 is open - use local functions
                     azure_url = f"{local_functions_url}{self.path}"
-                    print(f"PROXY [LOCAL]: {self.path} -> {azure_url}")
+                    print(f"PROXY [LOCAL] {method}: {self.path} -> {azure_url}")
+                else:
+                    raise Exception("Port 7071 not open")
             except:
                 # Local functions not running - fallback to live Azure
                 azure_url = f"https://pokemongame-functions-2025.azurewebsites.net{self.path}"
-                print(f"PROXY [LIVE]: {self.path} -> {azure_url}")
+                print(f"PROXY [LIVE] {method}: {self.path} -> {azure_url}")
+            
+            # Prepare request data
+            data = None
+            if method in ['POST', 'PATCH', 'PUT']:
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    data = self.rfile.read(content_length)
             
             # Make request to Azure
-            req = urllib.request.Request(azure_url)
+            req = urllib.request.Request(azure_url, data=data, method=method)
+            
+            # Copy headers from client request
+            for header_name, header_value in self.headers.items():
+                if header_name.lower() not in ['host', 'connection']:
+                    req.add_header(header_name, header_value)
             
             with urllib.request.urlopen(req) as response:
                 # Send response back to client
@@ -70,7 +109,7 @@ class PokemonDevHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(response.read())
                 
         except Exception as e:
-            print(f"PROXY ERROR: {e}")
+            print(f"PROXY ERROR ({method}): {e}")
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
