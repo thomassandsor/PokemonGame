@@ -88,6 +88,16 @@ body {
   line-height: 1.4;
 }
 
+.pokemon-game-body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #333;
+  min-height: 100vh;
+  line-height: 1.4;
+}
+
 /* Typography Classes */
 .pokemon-title {
   font-family: var(--font-pokemon);
@@ -302,9 +312,11 @@ body {
 }
 
 .pokemon-btn-large {
-  padding: var(--space-lg) var(--space-2xl);
-  font-size: var(--font-size-lg);
-  min-width: 180px;
+  padding: 16px 32px;
+  font-size: 16px;
+  border-radius: 24px;
+  min-width: 200px;
+  font-weight: 600;
 }
 
 .pokemon-btn-sm {
@@ -403,10 +415,67 @@ body {
   box-shadow: var(--shadow-inset);
 }
 
+/* Main Page Navigation Grid */
+.pokemon-main-nav {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
+}
+
+.pokemon-main-nav-item {
+  background: var(--white);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: var(--space-lg);
+  text-decoration: none;
+  color: #333;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pokemon-main-nav-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--pokemon-blue);
+}
+
+.pokemon-main-nav-item .nav-icon {
+  font-size: 32px;
+  margin-bottom: var(--space-xs);
+}
+
+.pokemon-main-nav-item .nav-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.pokemon-main-nav-item .nav-description {
+  font-size: 13px;
+  color: #666;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
 @media (min-width: 768px) {
-  .pokemon-nav {
+  .pokemon-main-nav {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pokemon-main-nav {
     grid-template-columns: repeat(4, 1fr);
-    max-width: 800px;
+    max-width: 1000px;
   }
 }
 

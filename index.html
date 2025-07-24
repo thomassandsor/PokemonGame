@@ -6,51 +6,60 @@
     <title>Pokemon Game - Retro Adventure</title>
     <link rel="stylesheet" href="styles/pokemon-design-system.css">
 </head>
-<body>
+<body class="pokemon-game-body">
     <div class="pokemon-container">
-        <div class="pokemon-card-header">
-            <h1 class="pokemon-title">🎮 POKEMON GAME</h1>
-            <p class="pokemon-text">CATCH • TRAIN • BATTLE</p>
-        </div>
+        <!-- Clean Header -->
+        <header class="pokemon-header">
+            <div class="pokemon-header-content">
+                <h1 class="pokemon-title">Pokemon Game</h1>
+            </div>
+        </header>
 
-        <div id="userInfo" class="pokemon-card hidden">
-            <div class="pokemon-card-body text-center">
-                <h2 class="pokemon-subtitle">Welcome back, <span id="userName"></span>!</h2>
-                <p class="pokemon-text-small">Trainer ID: <span id="userEmail"></span></p>
-                <div class="pokemon-flex-center mt-lg">
-                    <button onclick="logout()" class="pokemon-btn pokemon-btn-danger">LOGOUT</button>
-                </div>
+        <!-- User Welcome Section -->
+        <div id="userInfo" class="pokemon-section hidden">
+            <h2 class="pokemon-subtitle">Welcome back, <span id="userName"></span>!</h2>
+            <p class="pokemon-text-small">Trainer ID: <span id="userEmail"></span></p>
+            <div class="pokemon-flex-center mt-lg">
+                <button onclick="logout()" class="pokemon-btn pokemon-btn-sm">Logout</button>
             </div>
         </div>
 
-        <nav class="pokemon-nav hidden" id="navButtons">
-            <a href="pokemon-unified.html?view=my" class="pokemon-nav-item">
-                📦 MY POKEMON
+        <!-- Navigation Grid -->
+        <nav class="pokemon-main-nav hidden" id="navButtons">
+            <a href="pokemon-unified.html?view=all" class="pokemon-main-nav-item">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">Browse Pokemon</div>
+                <div class="nav-description">Explore all Pokemon</div>
             </a>
-            <a href="pokemon-unified.html?view=all" class="pokemon-nav-item">
-                🔍 BROWSE
+            <a href="pokemon-unified.html?view=my" class="pokemon-main-nav-item">
+                <div class="nav-icon">📦</div>
+                <div class="nav-label">My Pokemon</div>
+                <div class="nav-description">View your collection</div>
             </a>
-            <a href="catch-pokemon.html" class="pokemon-nav-item">
-                ⚡ CATCH
+            <a href="catch-pokemon.html" class="pokemon-main-nav-item">
+                <div class="nav-icon">⚡</div>
+                <div class="nav-label">Catch Pokemon</div>
+                <div class="nav-description">Find new Pokemon</div>
             </a>
-            <a href="battle-arena.html" class="pokemon-nav-item">
-                ⚔️ BATTLE
+            <a href="battle-arena.html" class="pokemon-main-nav-item">
+                <div class="nav-icon">⚔️</div>
+                <div class="nav-label">Battle Arena</div>
+                <div class="nav-description">Challenge trainers</div>
             </a>
         </nav>
 
-        <div id="loginPrompt" class="pokemon-card">
-            <div class="pokemon-card-body text-center">
-                <h2 class="pokemon-subtitle">TRAINER LOGIN REQUIRED</h2>
-                <p class="pokemon-text mb-lg">Access your Pokemon collection and start your adventure!</p>
+        <!-- Login Section -->
+        <div id="loginPrompt" class="pokemon-section">
+            <div class="text-center">
+                <h2 class="pokemon-subtitle">Welcome to Pokemon Game</h2>
+                <p class="pokemon-text mb-lg">Login to access your Pokemon collection and start your adventure!</p>
                 
-                <div class="pokemon-flex-center">
-                    <button id="loginButton" onclick="login()" class="pokemon-btn pokemon-btn-microsoft pokemon-btn-large">
-                        🔑 LOGIN WITH MICROSOFT
-                    </button>
-                </div>
+                <button id="loginButton" onclick="login()" class="pokemon-btn pokemon-btn-microsoft pokemon-btn-large">
+                    Login with Microsoft
+                </button>
                 
-                <p class="pokemon-text-xs mt-lg">
-                    🔒 Secure authentication powered by Microsoft
+                <p class="pokemon-text-small mt-lg" style="color: #888;">
+                    Secure authentication powered by Microsoft
                 </p>
             </div>
         </div>
