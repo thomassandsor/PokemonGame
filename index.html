@@ -3,97 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .header {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin: 30px 0;
-        }
-        .nav-button {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-        .nav-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .user-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .login-prompt {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 10px;
-        }
-        #loginButton {
-            background: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-        #loginButton:hover {
-            background: #45a049;
-        }
-    </style>
+    <title>Pokemon Game - Retro Adventure</title>
+    <link rel="stylesheet" href="styles/pokemon-design-system.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎮 Pokemon Game</h1>
-            <p>Catch, train, and battle with your Pokemon!</p>
+    <div class="pokemon-container">
+        <div class="pokemon-card-header">
+            <h1 class="pokemon-title">🎮 POKEMON GAME</h1>
+            <p class="pokemon-text">CATCH • TRAIN • BATTLE</p>
         </div>
 
-        <div id="userInfo" class="user-info" style="display: none;">
-            <h2>Welcome, <span id="userName"></span>!</h2>
-            <p>Email: <span id="userEmail"></span></p>
-            <button onclick="logout()" class="nav-button">Logout</button>
+        <div id="userInfo" class="pokemon-card hidden">
+            <div class="pokemon-card-body text-center">
+                <h2 class="pokemon-subtitle">Welcome back, <span id="userName"></span>!</h2>
+                <p class="pokemon-text-small">Trainer ID: <span id="userEmail"></span></p>
+                <div class="pokemon-flex-center mt-lg">
+                    <button onclick="logout()" class="pokemon-btn pokemon-btn-danger">LOGOUT</button>
+                </div>
+            </div>
         </div>
 
-        <div class="nav-buttons" id="navButtons" style="display: none;">
-            <a href="my-pokemon.html" class="nav-button">My Pokemon</a>
-            <a href="pokemon-browser.html" class="nav-button">Browse Pokemon</a>
-            <a href="catch-pokemon.html" class="nav-button">Catch Pokemon</a>
-            <a href="battle-arena.html" class="nav-button">Battle</a>
-        </div>
+        <nav class="pokemon-nav hidden" id="navButtons">
+            <a href="pokemon-unified.html?view=my" class="pokemon-nav-item">
+                📦 MY POKEMON
+            </a>
+            <a href="pokemon-unified.html?view=all" class="pokemon-nav-item">
+                🔍 BROWSE
+            </a>
+            <a href="catch-pokemon.html" class="pokemon-nav-item">
+                ⚡ CATCH
+            </a>
+            <a href="battle-arena.html" class="pokemon-nav-item">
+                ⚔️ BATTLE
+            </a>
+        </nav>
 
-        <div id="loginPrompt" class="login-prompt">
-            <h2>Please Login to Continue</h2>
-            <p>You need to login to access your Pokemon collection and game features.</p>
-            <button id="loginButton" onclick="login()">Login with Microsoft</button>
+        <div id="loginPrompt" class="pokemon-card">
+            <div class="pokemon-card-body text-center">
+                <h2 class="pokemon-subtitle">TRAINER LOGIN REQUIRED</h2>
+                <p class="pokemon-text mb-lg">Access your Pokemon collection and start your adventure!</p>
+                
+                <div class="pokemon-flex-center">
+                    <button id="loginButton" onclick="login()" class="pokemon-btn pokemon-btn-microsoft pokemon-btn-large">
+                        🔑 LOGIN WITH MICROSOFT
+                    </button>
+                </div>
+                
+                <p class="pokemon-text-xs mt-lg">
+                    🔒 Secure authentication powered by Microsoft
+                </p>
+            </div>
         </div>
     </div>
 
@@ -179,16 +138,16 @@
             if (user) {
                 document.getElementById('userName').textContent = user.name;
                 document.getElementById('userEmail').textContent = user.email;
-                document.getElementById('userInfo').style.display = 'block';
-                document.getElementById('navButtons').style.display = 'flex';
-                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('navButtons').classList.remove('hidden');
+                document.getElementById('loginPrompt').classList.add('hidden');
             }
         }
 
         function showLoginPrompt() {
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('navButtons').style.display = 'none';
-            document.getElementById('loginPrompt').style.display = 'block';
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('navButtons').classList.add('hidden');
+            document.getElementById('loginPrompt').classList.remove('hidden');
         }
 
         function login() {

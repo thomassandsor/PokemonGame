@@ -203,7 +203,46 @@ class PokemonService {
             }
             
             console.log('POKEMON-SERVICE: Loading ALL Pokemon for caching...');
-            // Load a large batch to get all Pokemon (Dataverse default max is usually 5000)
+            
+            // Use local JSON file in development mode for better type data
+            if (this.isDevelopmentMode()) {
+                console.log('POKEMON-SERVICE: Development mode - loading from local JSON file');
+                try {
+                    const response = await fetch('/legacy-react/src/data/pokemon.json');
+                    if (response.ok) {
+                        const pokemonData = await response.json();
+                        console.log('POKEMON-SERVICE: Loaded from JSON file:', pokemonData.length, 'Pokemon');
+                        
+                        // Map JSON data to our expected format
+                        PokemonService._allPokemonCache = pokemonData.map(p => ({
+                            id: p.id,
+                            name: p.name,
+                            type1: p.types[0] || 'normal',
+                            type2: p.types[1] || null,
+                            types: p.types || ['normal'], // Keep original types array
+                            baseHp: p.stats?.find(s => s.name === 'hp')?.base_stat || 50,
+                            baseAttack: p.stats?.find(s => s.name === 'attack')?.base_stat || 50,
+                            baseDefence: p.stats?.find(s => s.name === 'defense')?.base_stat || 50,
+                            baseSpeed: p.stats?.find(s => s.name === 'speed')?.base_stat || 50,
+                            description: `${p.types.join('/')} type Pokemon`,
+                            generation: p.id <= 151 ? 1 : p.id <= 251 ? 2 : p.id <= 386 ? 3 : p.id <= 493 ? 4 : 5,
+                            legendary: false,
+                            height: p.height,
+                            weight: p.weight,
+                            abilities: p.abilities || [],
+                            sprites: p.sprites
+                        }));
+                        
+                        console.log('POKEMON-SERVICE: Cached', PokemonService._allPokemonCache.length, 'Pokemon from JSON');
+                        return;
+                    }
+                } catch (jsonError) {
+                    console.warn('POKEMON-SERVICE: Failed to load JSON file, falling back to Dataverse:', jsonError);
+                }
+            }
+            
+            // Production mode or JSON fallback: Load from Dataverse
+            console.log('POKEMON-SERVICE: Loading from Dataverse API');
             const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=1000`;
             
             const response = await fetch(url, {

@@ -40,12 +40,10 @@ async function loadPokemon() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const errorMessage = document.getElementById('errorMessage');
     const pokemonGrid = document.getElementById('pokemonGrid');
-    const pokemonStats = document.getElementById('pokemonStats');
     
     // Show loading
     loadingSpinner.style.display = 'block';
     errorMessage.style.display = 'none';
-    pokemonStats.style.display = 'none';
     
     try {
         console.log('POKEMON-BROWSER: Loading Pokemon from Dataverse...');
@@ -74,14 +72,9 @@ async function loadPokemon() {
         // Update UI
         if (currentOffset > 0) {
             // This was a "Load More" operation
-            updateStats();
         } else {
             // First load
-            updateStats();
         }
-        
-        // Show stats
-        pokemonStats.style.display = 'flex';
         
         // Show/hide load more button based on whether there are more records
         const loadMoreContainer = document.getElementById('loadMoreContainer');
@@ -153,39 +146,24 @@ function createPokemonCard(pokemon) {
     // Get Pokemon sprite from PokeAPI
     const pokemonSprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
     
-    // Get type colors
-    const primaryType = pokemon.type1?.toLowerCase() || 'normal';
-    const secondaryType = pokemon.type2?.toLowerCase();
+    // Get types from the correct data structure
+    const types = pokemon.types || [];
+    const primaryType = types[0]?.toLowerCase() || 'normal';
+    const secondaryType = types[1]?.toLowerCase() || null;
+    
+    // Format Pokemon number with leading zeros
+    const formattedNumber = `#${pokemon.id.toString().padStart(3, '0')}`;
     
     card.innerHTML = `
-        <div class="pokemon-image">
-            <img src="${pokemonSprite}" alt="${pokemon.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'">
+        <div class="pokemon-card-image">
+            <img src="${pokemonSprite}" alt="${pokemon.name}" onerror="this.style.display='none'; this.parentNode.textContent='?';">
         </div>
-        <div class="pokemon-info">
-            <h3 class="pokemon-name">#${pokemon.id} ${pokemon.name}</h3>
-            <div class="pokemon-types">
-                <span class="type-badge type-${primaryType}">${pokemon.type1}</span>
-                ${secondaryType ? `<span class="type-badge type-${secondaryType}">${pokemon.type2}</span>` : ''}
+        <div class="pokemon-card-info">
+            <div class="pokemon-card-number">${formattedNumber}</div>
+            <div class="pokemon-card-name">${pokemon.name}</div>
+            <div class="pokemon-card-types">
+                ${types.map(type => `<span class="pokemon-type-badge pokemon-type-${type.toLowerCase()}">${type}</span>`).join('')}
             </div>
-            <div class="pokemon-stats-preview">
-                <div class="stat-preview">
-                    <span class="stat-label">HP:</span>
-                    <span class="stat-value">${pokemon.baseHp}</span>
-                </div>
-                <div class="stat-preview">
-                    <span class="stat-label">ATK:</span>
-                    <span class="stat-value">${pokemon.baseAttack}</span>
-                </div>
-                <div class="stat-preview">
-                    <span class="stat-label">DEF:</span>
-                    <span class="stat-value">${pokemon.baseDefence}</span>
-                </div>
-                <div class="stat-preview">
-                    <span class="stat-label">SPD:</span>
-                    <span class="stat-value">${pokemon.baseSpeed}</span>
-                </div>
-            </div>
-            ${pokemon.legendary ? '<div class="legendary-badge">⭐ Legendary</div>' : ''}
         </div>
     `;
     
@@ -202,8 +180,7 @@ function filterPokemon() {
             pokemon.id.toString().includes(searchTerm);
         
         const matchesType = !selectedType || 
-            pokemon.type1?.toLowerCase() === selectedType ||
-            pokemon.type2?.toLowerCase() === selectedType;
+            (pokemon.types && pokemon.types.some(type => type.toLowerCase() === selectedType));
         
         return matchesSearch && matchesType;
     });
@@ -212,12 +189,6 @@ function filterPokemon() {
     const pokemonGrid = document.getElementById('pokemonGrid');
     pokemonGrid.innerHTML = '';
     displayPokemon();
-    updateStats();
-}
-
-function updateStats() {
-    document.getElementById('totalCount').textContent = allPokemon.length;
-    document.getElementById('showingCount').textContent = filteredPokemon.length;
 }
 
 function showPokemonDetails(pokemon) {

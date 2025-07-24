@@ -499,19 +499,19 @@
         function browsePokemon() {
             trackAction('Browse_Pokemon');
             console.log('🔍 Redirecting to Pokemon Browser...');
-            window.location.href = 'pokemon-browser.html';
+            window.location.href = 'pokemon-unified.html?view=all';
         }
 
         function evolutionLab() {
             trackAction('Evolution_Lab');
             if (isAuthenticated) {
                 console.log('🧬 Redirecting to My Pokemon...');
-                window.location.href = 'my-pokemon.html';
+                window.location.href = 'pokemon-unified.html?view=my';
             } else {
                 if (confirm('🧬 Evolution Lab requires login to manage your Pokemon.\n\nWould you like to login now?\n\nClick OK to login, Cancel to browse Pokemon instead.')) {
                     window.location.href = 'auth.html';
                 } else {
-                    window.location.href = 'pokemon-browser.html';
+                    window.location.href = 'pokemon-unified.html?view=all';
                 }
             }
         }

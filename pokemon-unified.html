@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Collection - Pokemon Game</title>
+    <link rel="stylesheet" href="styles/pokemon-design-system.css">
+    <link rel="stylesheet" href="styles/pokemon-unified.css">
+</head>
+<body class="pokemon-game-body">
+    <div class="pokemon-container">
+        <!-- Navigation Header -->
+        <nav class="pokemon-header">
+            <div class="pokemon-header-content">
+                <button class="pokemon-btn pokemon-btn-sm" onclick="goBack()">
+                    <span class="nav-icon">←</span>
+                    Back
+                </button>
+                <h1 class="pokemon-title">Pokemon Collection</h1>
+                <div class="trainer-info">
+                    <div class="trainer-name" id="trainerName">Welcome, Trainer!</div>
+                    <div class="pokemon-stats">
+                        <span>My Pokemon: <span id="myPokemonCount">0</span></span>
+                        <span>Level: <span id="trainerLevel">1</span></span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- View Toggle -->
+        <div class="pokemon-section">
+            <div class="view-toggle">
+                <button id="allPokemonBtn" class="toggle-btn active" onclick="switchView('all')">
+                    📖 All Pokemon
+                </button>
+                <button id="myPokemonBtn" class="toggle-btn" onclick="switchView('my')">
+                    🎯 My Pokemon
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter (for All Pokemon view) -->
+        <div id="searchFilterSection" class="pokemon-section">
+            <div class="pokemon-search-container">
+                <input type="text" id="searchInput" placeholder="Search Pokemon..." class="pokemon-input">
+            </div>
+            
+            <div class="pokemon-filters">
+                <select id="typeFilter" class="pokemon-select">
+                    <option value="">All Types</option>
+                    <option value="normal">Normal</option>
+                    <option value="fire">Fire</option>
+                    <option value="water">Water</option>
+                    <option value="electric">Electric</option>
+                    <option value="grass">Grass</option>
+                    <option value="ice">Ice</option>
+                    <option value="fighting">Fighting</option>
+                    <option value="poison">Poison</option>
+                    <option value="ground">Ground</option>
+                    <option value="flying">Flying</option>
+                    <option value="psychic">Psychic</option>
+                    <option value="bug">Bug</option>
+                    <option value="rock">Rock</option>
+                    <option value="ghost">Ghost</option>
+                    <option value="dragon">Dragon</option>
+                    <option value="dark">Dark</option>
+                    <option value="steel">Steel</option>
+                    <option value="fairy">Fairy</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="pokemon-content">
+            <div id="loadingSpinner" class="pokemon-loading">
+                <div class="pokemon-spinner">🔄</div>
+                <p class="pokemon-text-center" id="loadingText">Loading Pokemon...</p>
+            </div>
+
+            <div id="errorMessage" class="pokemon-error" style="display: none;">
+                <div class="pokemon-error-icon">⚠️</div>
+                <p id="errorText" class="pokemon-text-center"></p>
+            </div>
+
+            <!-- Empty State for My Pokemon -->
+            <div id="emptyState" class="pokemon-empty-state" style="display: none;">
+                <div class="empty-icon">📱</div>
+                <h3>No Pokemon Yet</h3>
+                <p>You haven't caught any Pokemon yet. Start your adventure!</p>
+                <button onclick="switchView('all')" class="pokemon-btn">
+                    Browse All Pokemon
+                </button>
+            </div>
+
+            <div id="pokemonGrid" class="pokemon-grid" style="display: none;">
+                <!-- Pokemon cards will be populated here -->
+            </div>
+
+            <div id="loadMoreContainer" class="pokemon-section" style="display: none;">
+                <button id="loadMoreBtn" class="pokemon-btn" onclick="loadMorePokemon()">
+                    Load More Pokemon
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Footer -->
+        <div class="navigation">
+            <button onclick="window.location.href='index.html'" class="nav-button">
+                🏠 Home
+            </button>
+            <button onclick="logout()" class="nav-button logout">
+                🚪 Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Pokemon Detail Modal -->
+    <div id="pokemonModal" class="pokemon-modal-overlay" style="display: none;">
+        <div class="pokemon-modal">
+            <div class="pokemon-modal-header">
+                <h3 id="modalTitle" class="pokemon-modal-title">Pokemon Details</h3>
+                <button class="pokemon-btn pokemon-btn-sm" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="pokemon-modal-body">
+                <div class="pokemon-detail-layout">
+                    <div class="pokemon-image-section">
+                        <img id="modalImage" src="" alt="Pokemon" class="pokemon-detail-image">
+                    </div>
+                    <div class="pokemon-info-section">
+                        <div id="modalDetails" class="pokemon-details">
+                            <!-- Details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pokemon-modal-footer">
+                <button class="pokemon-btn" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="pokemon-service.js"></script>
+    <script src="pokemon-unified.js"></script>
+</body>
+</html>

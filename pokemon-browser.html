@@ -4,135 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokemon Browser - Pokemon Game</title>
-    <link rel="stylesheet" href="styles/pokemon-retro.css">
-    <link rel="stylesheet" href="styles/pokemon-browser.css">
+    <script>
+        // Redirect to unified Pokemon page with All Pokemon view
+        window.location.href = 'pokemon-unified.html?view=all';
+    </script>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Navigation Header -->
-        <nav class="pokemon-nav">
-            <div class="nav-left">
-                <button class="nav-button" onclick="goBack()">
-                    <span class="nav-icon">←</span>
-                    Back
-                </button>
-            </div>
-            <div class="nav-center">
-                <h1 class="page-title">Pokemon Browser</h1>
-            </div>
-            <div class="nav-right">
-                <button class="nav-button" onclick="goToMyPokemon()">
-                    <span class="nav-icon">🎯</span>
-                    My Pokemon
-                </button>
-            </div>
-        </nav>
-
-        <!-- Search and Filter -->
-        <div class="search-section">
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search Pokemon..." class="search-input">
-                <button class="search-button" onclick="searchPokemon()">
-                    <span class="search-icon">🔍</span>
-                </button>
-            </div>
-            
-            <div class="filter-container">
-                <select id="typeFilter" class="filter-select">
-                    <option value="">All Types</option>
-                    <option value="normal">Normal</option>
-                    <option value="fire">Fire</option>
-                    <option value="water">Water</option>
-                    <option value="electric">Electric</option>
-                    <option value="grass">Grass</option>
-                    <option value="ice">Ice</option>
-                    <option value="fighting">Fighting</option>
-                    <option value="poison">Poison</option>
-                    <option value="ground">Ground</option>
-                    <option value="flying">Flying</option>
-                    <option value="psychic">Psychic</option>
-                    <option value="bug">Bug</option>
-                    <option value="rock">Rock</option>
-                    <option value="ghost">Ghost</option>
-                    <option value="dragon">Dragon</option>
-                    <option value="dark">Dark</option>
-                    <option value="steel">Steel</option>
-                    <option value="fairy">Fairy</option>
-                </select>
-                
-                <select id="generationFilter" class="filter-select">
-                    <option value="">All Generations</option>
-                    <option value="1">Generation I</option>
-                    <option value="2">Generation II</option>
-                    <option value="3">Generation III</option>
-                    <option value="4">Generation IV</option>
-                    <option value="5">Generation V</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Content Area -->
-        <div class="content-area">
-            <div id="loadingSpinner" class="loading-container">
-                <div class="pokemon-spinner">🔄</div>
-                <p>Loading Pokemon database...</p>
-            </div>
-
-            <div id="errorMessage" class="error-container" style="display: none;">
-                <div class="error-icon">⚠️</div>
-                <p id="errorText"></p>
-            </div>
-
-            <div id="pokemonStats" class="pokemon-stats" style="display: none;">
-                <div class="stat-item">
-                    <span class="stat-label">Total Pokemon:</span>
-                    <span id="totalCount" class="stat-value">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Showing:</span>
-                    <span id="showingCount" class="stat-value">0</span>
-                </div>
-            </div>
-
-            <div id="pokemonGrid" class="pokemon-grid" style="display: none;">
-                <!-- Pokemon cards will be populated here -->
-            </div>
-
-            <div id="loadMoreContainer" class="load-more-container" style="display: none;">
-                <button id="loadMoreBtn" class="pokemon-button secondary" onclick="loadMorePokemon()">
-                    Load More Pokemon
-                </button>
-            </div>
-        </div>
+    <div style="text-align: center; padding: 50px;">
+        <h2>Redirecting to Pokemon Collection...</h2>
+        <p>If you are not redirected automatically, <a href="pokemon-unified.html?view=all">click here</a>.</p>
     </div>
-
-    <!-- Pokemon Detail Modal -->
-    <div id="pokemonModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Pokemon Details</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="pokemon-detail-container">
-                    <div class="pokemon-image-section">
-                        <img id="modalImage" src="" alt="Pokemon" class="modal-pokemon-image">
-                    </div>
-                    <div class="pokemon-info-section">
-                        <div id="modalDetails" class="pokemon-details">
-                            <!-- Details will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="pokemon-button secondary" onclick="closeModal()">Close</button>
-            </div>
-        </div>
     </div>
-
-    <script src="auth.js"></script>
-    <script src="pokemon-service.js"></script>
-    <script src="pokemon-browser.js"></script>
 </body>
 </html>
