@@ -44,19 +44,28 @@ class CatchPokemonService {
     }
     
     /**
-     * Catch a Pokemon via minigame completion (no pokeball consumption) - Optimized version
+     * Catch a Pokemon via minigame completion (no pokeball consumption)
      * @param {number} pokemonNumber - Pokemon ID from QR code
-     * @param {Object} userData - Pre-fetched user data from getUserData()
+     * @param {Object} userData - Optional pre-fetched user data from getUserData()
      * @returns {Promise<Object>} Result of catch operation
      */
-    static async catchPokemonMinigameOptimized(pokemonNumber, userData) {
+    static async catchPokemonViaMinigame(pokemonNumber, userData = null) {
         let currentStep = 'initialization';
         console.time('🎮 MINIGAME-CATCH: Total catch time');
         try {
-            console.log('🎮 MINIGAME-CATCH: Starting optimized minigame catch for Pokemon #' + pokemonNumber);
+            console.log('🎮 MINIGAME-CATCH: Starting minigame catch for Pokemon #' + pokemonNumber);
             
-            // Trust that duplicate check was already done during QR scan - no extra API calls
-            console.log('🎮 MINIGAME-CATCH: Using pre-fetched user data:', userData.userId);
+            // Use pre-fetched user data if available, otherwise fetch it
+            let userInfo = userData;
+            if (!userInfo) {
+                currentStep = 'user_data_fetch';
+                userInfo = await this.getUserData();
+                if (!userInfo || !userInfo.userId) {
+                    throw new Error('Unable to get user information');
+                }
+            }
+            
+            console.log('🎮 MINIGAME-CATCH: Using user data:', userInfo.userId);
             
             currentStep = 'pokemon_lookup';
             // Find the master Pokemon record
@@ -72,8 +81,8 @@ class CatchPokemonService {
             
             currentStep = 'entry_creation';
             // Create Pokedex entry with lookup relationships
-            console.log('🎮 MINIGAME-CATCH: Creating entry with userId:', userData.userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
-            const pokedexEntry = this.createPokedexEntry(userData.userId, masterPokemon, { minigame: true });
+            console.log('🎮 MINIGAME-CATCH: Creating entry with userId:', userInfo.userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
+            const pokedexEntry = this.createPokedexEntry(userInfo.userId, masterPokemon, { minigame: true });
             console.log('🎮 MINIGAME-CATCH: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
             
             currentStep = 'database_insert';
@@ -188,99 +197,6 @@ class CatchPokemonService {
         }
     }
 
-    /**
-     * Catch a Pokemon via minigame completion (no pokeball consumption)
-     * @param {number} pokemonNumber - Pokemon ID from QR code
-     * @returns {Promise<Object>} Result of catch operation
-     */
-    static async catchPokemonMinigame(pokemonNumber) {
-        let currentStep = 'initialization';
-        console.time('🎮 MINIGAME-CATCH: Total catch time');
-        try {
-            console.log('🎮 MINIGAME-CATCH: Starting minigame catch for Pokemon #' + pokemonNumber);
-            
-            currentStep = 'authentication';
-            // Get current user info
-            const currentUser = AuthService.getCurrentUser();
-            if (!currentUser || !currentUser.email) {
-                throw new Error('User not authenticated');
-            }
-            
-            console.log('🎮 MINIGAME-CATCH: User authenticated:', currentUser.email);
-            
-            currentStep = 'user_lookup';
-            // Step 1: Get user's contact ID from Dataverse
-            const userId = await this.getUserContactId(currentUser.email);
-            if (!userId) {
-                throw new Error('Unable to find user in system');
-            }
-            
-            console.log('🎮 MINIGAME-CATCH: Found user contact ID:', userId);
-            
-            currentStep = 'pokemon_lookup';
-            // Step 2: Find the master Pokemon record
-            const masterPokemon = await this.getMasterPokemon(pokemonNumber);
-            if (!masterPokemon) {
-                throw new Error(`Pokemon #${pokemonNumber} not found in master data`);
-            }
-            
-            console.log('🎮 MINIGAME-CATCH: Found master Pokemon:', masterPokemon.pokemon_name);
-            
-            currentStep = 'duplicate_check';
-            // Step 3: Check if user already has this Pokemon
-            const existingPokemon = await this.checkExistingPokemon(userId, masterPokemon.pokemon_pokemonid);
-            if (existingPokemon) {
-                throw new Error(`You already have ${masterPokemon.pokemon_name} in your collection!`);
-            }
-
-            // Skip pokeball check and consumption for minigame catches
-            console.log('🎮 MINIGAME-CATCH: Skipping pokeball consumption - minigame reward');
-            
-            currentStep = 'entry_creation';
-            // Step 4: Create Pokedex entry with lookup relationships
-            console.log('🎮 MINIGAME-CATCH: Creating entry with userId:', userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
-            const pokedexEntry = this.createPokedexEntry(userId, masterPokemon, { minigame: true });
-            console.log('🎮 MINIGAME-CATCH: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
-            
-            currentStep = 'database_insert';
-            console.time('🎮 MINIGAME-CATCH: Database insert timing');
-            const result = await this.addToPokedex(pokedexEntry);
-            console.timeEnd('🎮 MINIGAME-CATCH: Database insert timing');
-            
-            console.log('🎮 MINIGAME-CATCH: Successfully caught Pokemon via minigame!');
-            console.timeEnd('🎮 MINIGAME-CATCH: Total catch time');
-            
-            return {
-                success: true,
-                pokemon: {
-                    id: result.pokemon_pokedexid,
-                    name: masterPokemon.pokemon_name,
-                    number: pokemonNumber
-                }
-            };
-            
-        } catch (error) {
-            console.error('🎮 MINIGAME-CATCH: Error catching Pokemon:', error);
-            console.error('🎮 MINIGAME-CATCH: Error details:', {
-                pokemonNumber,
-                currentStep,
-                errorName: error.name,
-                errorMessage: error.message,
-                errorStack: error.stack,
-                timestamp: new Date().toISOString()
-            });
-            return {
-                success: false,
-                error: `${error.message} (Failed at: ${currentStep})`,
-                debug: {
-                    step: currentStep,
-                    pokemonNumber,
-                    errorType: error.name,
-                    timestamp: new Date().toISOString()
-                }
-            };
-        }
-    }
     
     /**
      * Catch a Pokemon and add it to user's Pokedex

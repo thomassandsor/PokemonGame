@@ -68,6 +68,7 @@ class MinigameLibrary {
      * @returns {Promise<Object>} Game result with success status and rewards
      */
     static async startMinigame(gameId) {
+        console.log(`🎮 DEBUG: startMinigame called with gameId: ${gameId}`);
         const game = this.games[gameId];
         if (!game) {
             throw new Error(`Minigame '${gameId}' not found`);
@@ -77,14 +78,19 @@ class MinigameLibrary {
         
         switch (gameId) {
             case 'timing-challenge':
+                console.log('🎮 DEBUG: Calling playTimingChallenge');
                 return await this.playTimingChallenge();
             case 'memory-match':
+                console.log('🎮 DEBUG: Calling playMemoryMatch');
                 return await this.playMemoryMatch();
             case 'reflex-challenge':
+                console.log('🎮 DEBUG: Calling playReflexChallenge');
                 return await this.playReflexChallenge();
             case 'pattern-sequence':
+                console.log('🎮 DEBUG: Calling playPatternSequence');
                 return await this.playPatternSequence();
             case 'pokemon-quiz':
+                console.log('🎮 DEBUG: Calling playPokemonQuiz');
                 return await this.playPokemonQuiz();
             default:
                 throw new Error(`Minigame '${gameId}' not implemented`);
@@ -95,6 +101,9 @@ class MinigameLibrary {
      * Show minigame selection modal
      */
     static showMinigameSelection() {
+        console.log('🎮 DEBUG: showMinigameSelection called');
+        // Add a visible alert for debugging
+        alert('DEBUG: Minigame selection is about to show');
         const games = Object.values(this.games);
         
         const selectionModal = document.createElement('div');
@@ -163,10 +172,13 @@ class MinigameLibrary {
      * Select and start a specific minigame
      */
     static async selectMinigame(gameId) {
+        console.log(`🎮 DEBUG: selectMinigame called with gameId: ${gameId}`);
         this.closeMinigameSelection();
         
         try {
+            console.log(`🎮 DEBUG: Starting minigame: ${gameId}`);
             const result = await this.startMinigame(gameId);
+            console.log(`🎮 DEBUG: Minigame ${gameId} completed with result:`, result);
             await this.handleMinigameResult(result, gameId);
         } catch (error) {
             console.error('Minigame error:', error);
@@ -178,7 +190,9 @@ class MinigameLibrary {
      * Select and start a random minigame
      */
     static async selectRandomMinigame() {
+        console.log('🎮 DEBUG: selectRandomMinigame called');
         const randomGame = this.getRandomMinigame();
+        console.log(`🎮 DEBUG: Random game selected: ${randomGame.id}`);
         await this.selectMinigame(randomGame.id);
     }
 
@@ -200,13 +214,8 @@ class MinigameLibrary {
         
         if (result.success) {
             // Catch the Pokemon directly - either works or fails
-            try {
-                console.log('🎮 Minigame completed successfully - catching Pokemon directly');
-                await addPokeballReward();
-            } catch (error) {
-                console.error('Error catching Pokemon via minigame:', error);
-                this.showMinigameFailure(game, 'Pokemon catch failed');
-            }
+            console.log('🎮 Minigame completed successfully - catching Pokemon directly');
+            await catchPokemonViaMinigame();
         } else {
             // Show failure message with retry option
             this.showMinigameFailure(game, result.reason);
@@ -217,7 +226,7 @@ class MinigameLibrary {
      * Show minigame success modal
      */
     static showMinigameSuccess(game, statusMessage) {
-        // The success is handled by the existing addPokeballReward() function
+        // The success is handled by the existing catchPokemonViaMinigame() function
         // which shows the Pokemon catch success message and redirects appropriately
         // This function is only called if there's an error, so we don't need to show anything
         console.log('🎮 Minigame success - Pokemon catch handled by existing flow');
@@ -304,25 +313,110 @@ class MinigameLibrary {
      * Target Timing Game - Click when target is in green zone (existing game)
      */
     static async playTimingChallenge() {
+        console.log('🎮 DEBUG: playTimingChallenge started');
         return new Promise((resolve) => {
-            console.log('🎯 Starting timing challenge (using existing implementation)');
+            console.log('🎯 Starting timing challenge');
             
-            // Hook into the existing timing game success callback
-            const originalAddPokeballReward = window.addPokeballReward;
+            // Create minigame modal
+            const gameModal = document.createElement('div');
+            gameModal.className = 'modal-overlay';
+            gameModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
             
-            // Override the reward function temporarily to resolve our promise
-            window.addPokeballReward = async function() {
-                console.log('🎯 Timing challenge completed via existing game');
-                // Restore original function
-                window.addPokeballReward = originalAddPokeballReward;
-                // Call original function to catch Pokemon
-                await originalAddPokeballReward();
-                // Resolve with success
-                resolve({ success: true });
+            gameModal.innerHTML = `
+                <div style="text-align: center; color: white; padding: 40px; background: linear-gradient(145deg, #4ecdc4, #44a08d); border-radius: 20px; max-width: 90vw;">
+                    <h2 style="margin-bottom: 20px; font-size: 1.5rem;">🎯 Catch the Moving Target!</h2>
+                    <p style="margin-bottom: 20px;">Click the button when the target is in the green zone!</p>
+                    
+                    <div style="position: relative; width: 200px; height: 20px; background: #ccc; margin: 20px auto; border-radius: 10px;">
+                        <div style="position: absolute; width: 60px; height: 20px; background: #4CAF50; left: 70px; border-radius: 10px;"></div>
+                        <div id="timingTarget" style="position: absolute; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; top: 0; transition: left 0.1s;"></div>
+                    </div>
+                    
+                    <button id="timingCatchButton" style="background: linear-gradient(145deg, #feca57, #ff9ff3); color: #333; font-size: 1.2rem; font-weight: bold; padding: 15px 30px; border: none; border-radius: 25px; cursor: pointer; margin: 10px;">
+                        🎯 CATCH!
+                    </button>
+                    
+                    <div id="timingResult" style="margin-top: 15px; padding: 10px; border-radius: 10px; font-weight: bold; display: none;"></div>
+                </div>
+            `;
+            
+            document.body.appendChild(gameModal);
+            
+            // Game variables
+            let targetPosition = 0;
+            let direction = 1;
+            let gameActive = true;
+            let gameInterval;
+            
+            const target = document.getElementById('timingTarget');
+            const catchButton = document.getElementById('timingCatchButton');
+            const result = document.getElementById('timingResult');
+            
+            // Start the moving target
+            gameInterval = setInterval(() => {
+                if (!gameActive) return;
+                
+                targetPosition += direction * 3;
+                
+                // Bounce at edges
+                if (targetPosition >= 180) {
+                    direction = -1;
+                    targetPosition = 180;
+                } else if (targetPosition <= 0) {
+                    direction = 1;
+                    targetPosition = 0;
+                }
+                
+                target.style.left = targetPosition + 'px';
+            }, 50);
+            
+            // Handle catch attempt
+            catchButton.onclick = () => {
+                console.log('🎮 DEBUG: Timing challenge catch button clicked');
+                if (!gameActive) return;
+                
+                gameActive = false;
+                clearInterval(gameInterval);
+                
+                // Check if target is in green zone (70px to 130px)
+                const isInGreenZone = targetPosition >= 70 && targetPosition <= 130;
+                console.log(`🎮 DEBUG: Target position: ${targetPosition}, isInGreenZone: ${isInGreenZone}`);
+                
+                result.style.display = 'block';
+                
+                if (isInGreenZone) {
+                    console.log('🎮 DEBUG: Timing challenge SUCCESS');
+                    result.style.background = 'rgba(76, 175, 80, 0.3)';
+                    result.style.color = '#4CAF50';
+                    result.textContent = '🎉 Perfect! Catching Pokemon...';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(gameModal);
+                        resolve({ success: true });
+                    }, 1500);
+                } else {
+                    console.log('🎮 DEBUG: Timing challenge FAILED');
+                    result.style.background = 'rgba(244, 67, 54, 0.3)';
+                    result.style.color = '#f44336';
+                    result.textContent = '❌ Missed! Try again?';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(gameModal);
+                        resolve({ success: false, reason: 'missed_target' });
+                    }, 2000);
+                }
             };
-            
-            // Use the existing timing game - must work or fail
-            startMinigame();
         });
     }
 

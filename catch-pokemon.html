@@ -290,58 +290,6 @@
         margin-bottom: 20px;
         text-align: center;
     }
-
-    /* Minigame styles */
-    .minigame-container {
-        background: linear-gradient(145deg, #4ecdc4, #44a08d);
-        border-radius: 15px;
-        padding: 20px;
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .minigame-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #fff;
-        margin-bottom: 15px;
-    }
-
-    .minigame-button {
-        background: linear-gradient(145deg, #feca57, #ff9ff3);
-        color: #333;
-        font-size: 1.2rem;
-        font-weight: bold;
-        padding: 15px 30px;
-        border: none;
-        border-radius: 25px;
-        cursor: pointer;
-        margin: 10px;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .minigame-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .minigame-result {
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 10px;
-        font-weight: bold;
-    }
-
-    .minigame-result.success {
-        background: rgba(76, 175, 80, 0.3);
-        color: #4CAF50;
-    }
-
-    .minigame-result.failure {
-        background: rgba(244, 67, 54, 0.3);
-        color: #f44336;
-    }
     </style>
 </head>
 <body>
@@ -405,22 +353,6 @@
                     <button class="btn-pokemon run" onclick="runAway()">
                         🏃 Run Away
                     </button>
-                </div>
-
-                <!-- Minigame Container -->
-                <div id="minigameContainer" class="minigame-container hidden">
-                    <div class="minigame-title">🎯 Catch the Moving Target!</div>
-                    <div id="minigameInstructions">
-                        Click the button when the target is in the green zone!
-                    </div>
-                    <div style="position: relative; width: 200px; height: 20px; background: #ccc; margin: 20px auto; border-radius: 10px;">
-                        <div style="position: absolute; width: 60px; height: 20px; background: #4CAF50; left: 70px; border-radius: 10px;"></div>
-                        <div id="minigameTarget" style="position: absolute; width: 20px; height: 20px; background: #ff6b6b; border-radius: 50%; top: 0; transition: left 0.1s;"></div>
-                    </div>
-                    <button id="minigameClickButton" class="minigame-button" onclick="minigameClick()">
-                        🎯 CATCH!
-                    </button>
-                    <div id="minigameResult" class="minigame-result hidden"></div>
                 </div>
             </div>
         </div>
@@ -560,9 +492,39 @@
             }
         }
 
+        // Guard to prevent multiple simultaneous availability checks
+        let isCheckingAvailability = false;
+
+        // Guard to prevent multiple simultaneous QR processing
+        let isProcessingQR = false;
+        let lastGlobalQRTime = 0;
+
         // Handle QR scan result
         function onQRCodeDetected(pokemonNumber, rawData) {
-            console.log(`🎯 Pokemon #${pokemonNumber} detected!`);
+            console.log('Pokemon detected:', pokemonNumber);
+            
+            // Global debounce to prevent rapid fire QR detections
+            const now = Date.now();
+            if (lastGlobalQRTime && (now - lastGlobalQRTime) < 3000) {
+                console.log('🚫 Global QR debounce: Too soon after last detection, ignoring');
+                return;
+            }
+            lastGlobalQRTime = now;
+            
+            // Prevent multiple simultaneous QR processing
+            if (isProcessingQR) {
+                console.log('QR processing already in progress, ignoring duplicate');
+                return;
+            }
+            
+            // Prevent multiple simultaneous checks
+            if (isCheckingAvailability) {
+                console.log('Availability check already in progress, ignoring duplicate');
+                return;
+            }
+            
+            isProcessingQR = true;
+            isCheckingAvailability = true;
             
             // Store Pokemon number globally for use after minigame
             window.currentPokemonNumber = pokemonNumber;
@@ -578,6 +540,8 @@
             // Check user data and Pokemon availability upfront
             checkPokemonAvailability(pokemonNumber).then(result => {
                 hideLoadingSpinner();
+                isCheckingAvailability = false;
+                isProcessingQR = false; // Reset QR processing guard
                 
                 if (!result.canCatch) {
                     // Show appropriate error message and return to scanner
@@ -614,6 +578,8 @@
             }).catch(error => {
                 console.error('Error checking Pokemon availability:', error);
                 hideLoadingSpinner();
+                isCheckingAvailability = false;
+                isProcessingQR = false; // Reset QR processing guard
                 alert(`Failed to check Pokemon availability: ${error.message}`);
                 showUIState(UI_STATES.SCANNER);
             });
@@ -682,10 +648,10 @@
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
                     document.getElementById('noPokeballActions').classList.add('hidden');
-                    document.getElementById('minigameContainer').classList.add('hidden');
                 } else {
                     showNoPokeballs();
                 }
+            }
             
             showUIState(UI_STATES.ENCOUNTER);
         }
@@ -710,7 +676,6 @@
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
                     document.getElementById('noPokeballActions').classList.add('hidden');
-                    document.getElementById('minigameContainer').classList.add('hidden');
                 } else {
                     showNoPokeballs();
                 }
@@ -728,7 +693,6 @@
             document.getElementById('defaultActions').classList.add('hidden');
             document.getElementById('noPokeballs').classList.remove('hidden');
             document.getElementById('noPokeballActions').classList.remove('hidden');
-            document.getElementById('minigameContainer').classList.add('hidden');
         }
 
         // Start throw animation
@@ -860,13 +824,6 @@
             `;
             
             document.body.appendChild(successOverlay);
-            
-            // Auto-remove success message after 4 seconds
-            setTimeout(() => {
-                if (document.body.contains(successOverlay)) {
-                    returnToMainMenu();
-                }
-            }, 4000);
         }
 
         // Return to main menu and clean up
@@ -956,90 +913,14 @@
             showUIState(UI_STATES.SCANNER);
         }
 
-        // Minigame functionality
-        let minigameInterval = null;
-        let minigameTargetPosition = 0;
-        let minigameDirection = 1;
-        let minigameActive = false;
-
-        // Start the minigame
-        function startMinigame() {
-            console.log('🎮 Starting pokeball minigame');
-            
-            // Hide other actions and show minigame
-            document.getElementById('noPokeballActions').classList.add('hidden');
-            document.getElementById('minigameContainer').classList.remove('hidden');
-            
-            // Reset minigame state
-            minigameTargetPosition = 0;
-            minigameDirection = 1;
-            minigameActive = true;
-            
-            const target = document.getElementById('minigameTarget');
-            const result = document.getElementById('minigameResult');
-            result.classList.add('hidden');
-            
-            // Start the moving target
-            minigameInterval = setInterval(() => {
-                if (!minigameActive) return;
-                
-                minigameTargetPosition += minigameDirection * 3;
-                
-                // Bounce at edges
-                if (minigameTargetPosition >= 180) {
-                    minigameDirection = -1;
-                    minigameTargetPosition = 180;
-                } else if (minigameTargetPosition <= 0) {
-                    minigameDirection = 1;
-                    minigameTargetPosition = 0;
-                }
-                
-                target.style.left = minigameTargetPosition + 'px';
-            }, 50);
-        }
-
-        // Handle minigame click
-        function minigameClick() {
-            if (!minigameActive) return;
-            
-            // Stop the game
-            minigameActive = false;
-            clearInterval(minigameInterval);
-            
-            // Check if target is in green zone (70px to 130px)
-            const isInGreenZone = minigameTargetPosition >= 70 && minigameTargetPosition <= 130;
-            
-            const result = document.getElementById('minigameResult');
-            result.classList.remove('hidden', 'success', 'failure');
-            
-            if (isInGreenZone) {
-                // Success! Give user a pokeball
-                result.classList.add('success');
-                result.textContent = '🎉 Perfect! You earned a Pokéball!';
-                
-                // Add pokeball to user's inventory
-                addPokeballReward();
-                
-            } else {
-                // Failed - allow retry
-                result.classList.add('failure');
-                result.textContent = '❌ Missed! Try again?';
-                
-                setTimeout(() => {
-                    document.getElementById('minigameContainer').classList.add('hidden');
-                    document.getElementById('noPokeballActions').classList.remove('hidden');
-                }, 2000);
-            }
-        }
-
         // Minigame completion guard to prevent duplicates
         let isMinigameCatchInProgress = false;
 
         // Minigame completed - actually catch the Pokemon (no pokeball consumption)
-        async function addPokeballReward() {
+        async function catchPokemonViaMinigame() {
             // Prevent multiple simultaneous calls that could create duplicates
             if (isMinigameCatchInProgress) {
-                console.log('🎮 Minigame catch already in progress, ignoring duplicate call');
+                console.log('Minigame catch already in progress, ignoring duplicate call');
                 return;
             }
             
@@ -1052,10 +933,9 @@
                     return;
                 }
 
-                console.log('🎮 Minigame completed successfully - catching Pokemon without consuming pokeballs');
+                console.log('Minigame completed successfully - catching Pokemon without consuming pokeballs');
                 
                 // Hide ALL UI elements immediately to prevent "No Pokeballs" screen from showing
-                document.getElementById('minigameContainer').classList.add('hidden');
                 document.getElementById('noPokeballActions').classList.add('hidden');
                 document.getElementById('encounterModal').classList.add('hidden');
                 document.getElementById('throwModal').classList.add('hidden');
@@ -1105,17 +985,10 @@
                 document.body.appendChild(loadingOverlay);
                 
                 // Actually catch the Pokemon using the special minigame catch method
-                let result;
-                if (window.currentUserData) {
-                    // Use optimized version with pre-fetched user data
-                    result = await CatchPokemonService.catchPokemonMinigameOptimized(
-                        window.currentPokemonNumber, 
-                        window.currentUserData
-                    );
-                } else {
-                    // Fallback to non-optimized version
-                    result = await CatchPokemonService.catchPokemonMinigame(window.currentPokemonNumber);
-                }
+                const result = await CatchPokemonService.catchPokemonViaMinigame(
+                    window.currentPokemonNumber, 
+                    window.currentUserData
+                );
                 
                 // Remove loading overlay
                 const loadingEl = document.getElementById('minigameLoadingOverlay');
@@ -1124,15 +997,15 @@
                 }
                 
                 if (result.success) {
-                    console.log('🎮 Pokemon caught successfully via minigame:', result.pokemon.name);
-                    console.time('🎮 Success message display time');
+                    console.log('Pokemon caught successfully via minigame:', result.pokemon.name);
+                    console.time('Success message display time');
                     // Show the same success message as normal catch but with "Back to Menu" button
                     showMinigameSuccessMessage(result.pokemon.name);
-                    console.timeEnd('🎮 Success message display time');
+                    console.timeEnd('Success message display time');
                     // Reset guard flag on success
                     isMinigameCatchInProgress = false;
                 } else {
-                    console.error('🎮 Minigame catch failed:', result.error);
+                    console.error('Minigame catch failed:', result.error);
                     alert(`Failed to catch Pokemon: ${result.error}`);
                     // Return to scanner on failure
                     window.currentPokemonNumber = null;
@@ -1162,7 +1035,7 @@
 
         // Show minigame completion success message (same as catch success but different button)
         function showMinigameSuccessMessage(pokemonName) {
-            console.log('🎮 Starting to create success overlay...');
+            console.log('Starting to create success overlay...');
             
             // Create a nice success overlay (same style as normal catch)
             const successOverlay = document.createElement('div');
@@ -1264,6 +1137,9 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.scanning = false;
                 this.stream = null;
+                this.animationId = null; // Track animation frame ID
+                this.scannerId = null; // Unique scanner session ID
+                this.lastQRTime = 0; // Timestamp of last QR detection
                 
                 console.log('[QRScanner] Initializing...');
                 this.initializeScanner();
@@ -1271,6 +1147,8 @@
             
             async initializeScanner() {
                 try {
+                    console.log('🔧 Initializing QR scanner...');
+                    
                     // Check authentication if AuthService exists
                     if (typeof AuthService !== 'undefined') {
                         await AuthService.restoreAuthFromSession();
@@ -1282,42 +1160,94 @@
                         }
                     }
                     
-                    console.log('✅ Starting camera setup...');
+                    console.log('✅ Authentication OK, starting camera setup...');
                     await this.setupCamera();
+                    console.log('✅ Scanner initialization complete');
                     
                 } catch (error) {
                     console.error('Scanner initialization error:', error);
                     document.getElementById('videoDebugInfo').innerHTML = 
-                        '<span style="color: #ff6b6b;">❌ Failed to initialize scanner</span>';
+                        `<span style="color: #ff6b6b;">❌ Scanner init failed: ${error.message}</span>`;
                 }
             }
             
             async setupCamera() {
                 try {
-                    // Get camera permissions
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'environment' // Prefer back camera on mobile
-                        } 
-                    });
+                    console.log('🎥 Setting up camera...');
+                    
+                    // Check if getUserMedia is available
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('Camera not supported on this device');
+                    }
+                    
+                    // Try multiple camera configurations for better mobile compatibility
+                    let stream = null;
+                    const constraints = [
+                        // First try: Prefer back camera
+                        { video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } },
+                        // Fallback: Any camera
+                        { video: { width: { ideal: 640 }, height: { ideal: 480 } } },
+                        // Last resort: Basic video
+                        { video: true }
+                    ];
+                    
+                    for (let i = 0; i < constraints.length; i++) {
+                        try {
+                            console.log(`🎥 Trying camera constraint ${i + 1}:`, constraints[i]);
+                            stream = await navigator.mediaDevices.getUserMedia(constraints[i]);
+                            console.log(`✅ Camera constraint ${i + 1} worked!`);
+                            break;
+                        } catch (err) {
+                            console.log(`❌ Camera constraint ${i + 1} failed:`, err.message);
+                            if (i === constraints.length - 1) {
+                                throw err; // Re-throw the last error
+                            }
+                        }
+                    }
+                    
+                    if (!stream) {
+                        throw new Error('Could not access camera with any configuration');
+                    }
                     
                     this.video.srcObject = stream;
                     this.stream = stream;
                     
-                    // Wait for video to be ready
-                    this.video.addEventListener('loadedmetadata', () => {
-                        this.canvas.width = this.video.videoWidth;
-                        this.canvas.height = this.video.videoHeight;
-                        this.startScanning();
+                    // Wait for video to be ready with better mobile support
+                    return new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => {
+                            reject(new Error('Camera setup timeout'));
+                        }, 10000); // 10 second timeout
+                        
+                        const onReady = () => {
+                            clearTimeout(timeout);
+                            console.log(`📹 Video ready: ${this.video.videoWidth}x${this.video.videoHeight}`);
+                            
+                            this.canvas.width = this.video.videoWidth || 640;
+                            this.canvas.height = this.video.videoHeight || 480;
+                            
+                            document.getElementById('videoDebugInfo').innerHTML = 
+                                '<span style="color: #4ecdc4;">📷 Camera ready - Point at a Pokémon QR code</span>';
+                            
+                            // Start scanning after a small delay to ensure video is fully ready
+                            setTimeout(() => {
+                                this.startScanning();
+                                resolve();
+                            }, 500);
+                        };
+                        
+                        if (this.video.readyState >= 2) {
+                            onReady();
+                        } else {
+                            this.video.addEventListener('loadedmetadata', onReady, { once: true });
+                            this.video.addEventListener('canplay', onReady, { once: true });
+                        }
                     });
-                    
-                    document.getElementById('videoDebugInfo').innerHTML = 
-                        '<span style="color: #4ecdc4;">📷 Camera ready - Point at a Pokémon QR code</span>';
                         
                 } catch (error) {
                     console.error('Camera setup error:', error);
                     document.getElementById('videoDebugInfo').innerHTML = 
-                        '<span style="color: #ff6b6b;">❌ Camera access denied or not available</span>';
+                        `<span style="color: #ff6b6b;">❌ Camera error: ${error.message}</span>`;
+                    throw error;
                 }
             }
             
@@ -1325,7 +1255,8 @@
                 if (this.scanning) return;
                 
                 this.scanning = true;
-                console.log('🎯 Starting QR scan loop...');
+                this.scannerId = Date.now(); // Create unique session ID
+                console.log('🎯 Starting QR scan loop... Session ID:', this.scannerId);
                 document.getElementById('videoDebugInfo').innerHTML = 
                     '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
                     
@@ -1334,7 +1265,15 @@
             
             stopScanning() {
                 this.scanning = false;
-                console.log('⏹️ Stopping QR scanner');
+                this.scannerId = null; // Invalidate session
+                console.log('⏹️ Stopping QR scanner - Session invalidated');
+                
+                // Cancel any pending animation frame
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                    console.log('🛑 Cancelled pending animation frame');
+                }
                 
                 if (this.stream) {
                     this.stream.getTracks().forEach(track => track.stop());
@@ -1342,44 +1281,111 @@
             }
             
             scanLoop() {
-                if (!this.scanning || !this.video) return;
+                // STRONG SESSION VALIDATION - multiple checks to ensure we should continue
+                const currentSessionId = this.scannerId;
                 
-                if (this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
-                    this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
-                    const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                // Check 1: Basic scanning state
+                if (!this.scanning) {
+                    console.log('🛑 Scan loop terminated - scanning=false');
+                    this.animationId = null;
+                    return;
+                }
+                
+                // Check 2: Session validity
+                if (!currentSessionId || this.scannerId !== currentSessionId) {
+                    console.log('🛑 Scan loop terminated - session invalid');
+                    this.animationId = null;
+                    return;
+                }
+                
+                // Check 3: Video availability
+                if (!this.video) {
+                    console.log('🛑 Scan loop terminated - no video');
+                    this.animationId = null;
+                    return;
+                }
+                
+                // Check 4: Video readiness with mobile-friendly checks
+                if (this.video.readyState === this.video.HAVE_ENOUGH_DATA && 
+                    this.video.videoWidth > 0 && this.video.videoHeight > 0) {
                     
-                    // Scan for QR code using jsQR
-                    if (typeof jsQR !== 'undefined') {
-                        const code = jsQR(imageData.data, imageData.width, imageData.height);
-                        
-                        if (code) {
-                            console.log('🎯 QR Code detected:', code.data);
-                            this.handleQRCode(code.data);
-                            return; // Stop scanning after successful detection
+                    try {
+                        // Update canvas size if video dimensions changed (mobile rotation)
+                        if (this.canvas.width !== this.video.videoWidth || this.canvas.height !== this.video.videoHeight) {
+                            this.canvas.width = this.video.videoWidth;
+                            this.canvas.height = this.video.videoHeight;
+                            console.log(`📹 Canvas resized to ${this.canvas.width}x${this.canvas.height}`);
                         }
+                        
+                        this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                        
+                        // Scan for QR code using jsQR
+                        if (typeof jsQR !== 'undefined') {
+                            const code = jsQR(imageData.data, imageData.width, imageData.height);
+                            
+                            if (code) {
+                                console.log('🎯 QR Code detected:', code.data);
+                                this.handleQRCode(code.data);
+                                return; // Stop scanning after successful detection
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error in scan loop:', error);
+                        // Continue scanning despite errors
                     }
                 }
                 
-                if (this.scanning) {
-                    requestAnimationFrame(() => this.scanLoop());
+                // FINAL CHECK before scheduling next frame - triple validation
+                if (this.scanning && this.scannerId === currentSessionId && currentSessionId !== null) {
+                    // Use setTimeout for mobile compatibility (more predictable than requestAnimationFrame on mobile)
+                    this.animationId = requestAnimationFrame(() => this.scanLoop());
+                } else {
+                    console.log('🛑 Final check failed - stopping scan loop');
+                    this.animationId = null;
                 }
             }
             
             handleQRCode(data) {
+                // IMMEDIATE COMPLETE STOP - no more frames should execute
+                this.scanning = false;
+                const oldSessionId = this.scannerId;
+                this.scannerId = null; // Invalidate session immediately
+                
+                // Cancel any pending animation frame immediately
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                
+                console.log(`🛑 QR scanner COMPLETELY STOPPED - Session ${oldSessionId} invalidated`);
+                
+                // Add timestamp to prevent rapid duplicate processing
+                const now = Date.now();
+                if (this.lastQRTime && (now - this.lastQRTime) < 2000) {
+                    console.log('🚫 QR detected too soon after last one, ignoring');
+                    return;
+                }
+                this.lastQRTime = now;
+                
                 // Extract Pokemon number from QR data
                 const pokemonNumber = this.extractPokemonNumber(data);
                 
                 if (pokemonNumber && pokemonNumber > 0 && pokemonNumber <= 1010) { // Valid Pokemon range
+                    console.log('✅ Valid Pokemon QR detected, processing...');
+                    // Call immediately without delay to prevent any more scan loops
                     onQRCodeDetected(pokemonNumber, data);
                 } else {
+                    console.log('❌ Invalid Pokemon QR code, will resume scanning');
                     document.getElementById('videoDebugInfo').innerHTML = 
                         '<span style="color: #ff6b6b;">❌ Invalid Pokémon QR code</span>';
                     
-                    // Resume scanning after 2 seconds
+                    // Resume scanning after 2 seconds for invalid codes
                     setTimeout(() => {
-                        if (currentState === UI_STATES.SCANNER) {
+                        if (currentState === UI_STATES.SCANNER && !this.scanning) {
                             document.getElementById('videoDebugInfo').innerHTML = 
                                 '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
+                            this.startScanning(); // Use startScanning to create new session
                         }
                     }, 2000);
                 }
@@ -1412,7 +1418,7 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('🎮 Pokemon Scanner - Starting...');
+            console.log('Pokemon Scanner - Starting...');
             
             // Show scanner UI initially
             showUIState(UI_STATES.SCANNER);
