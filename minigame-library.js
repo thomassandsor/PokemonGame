@@ -101,9 +101,7 @@ class MinigameLibrary {
      * Show minigame selection modal
      */
     static showMinigameSelection() {
-        console.log('🎮 DEBUG: showMinigameSelection called');
-        // Add a visible alert for debugging
-        alert('DEBUG: Minigame selection is about to show');
+        console.log('🎮 Starting minigame selection...');
         const games = Object.values(this.games);
         
         const selectionModal = document.createElement('div');

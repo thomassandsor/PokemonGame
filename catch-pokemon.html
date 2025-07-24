@@ -136,10 +136,12 @@
         background: rgba(0,0,0,0.9);
         z-index: 9999;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
+        padding-top: 10vh; /* Add some top padding but much less than center */
         touch-action: none;
         overscroll-behavior: contain;
+        box-sizing: border-box;
     }
 
     .modal-content {
@@ -289,6 +291,32 @@
         border-radius: 10px;
         margin-bottom: 20px;
         text-align: center;
+    }
+
+    /* Mobile-specific adjustments */
+    @media (max-height: 700px) {
+        .modal-overlay {
+            padding-top: 5vh; /* Even less padding on shorter screens */
+        }
+        
+        .pokemon-sprite-large {
+            width: 50vw;
+            max-width: 200px;
+        }
+        
+        .pokemon-name {
+            font-size: 1.6rem;
+        }
+    }
+
+    @media (max-height: 600px) {
+        .modal-overlay {
+            padding-top: 2vh; /* Minimal padding on very short screens */
+        }
+        
+        .pokemon-encounter {
+            padding: 20px;
+        }
     }
     </style>
 </head>
