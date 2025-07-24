@@ -1,6 +1,15 @@
 // Pokemon Catch Service - Handles adding Pokemon to user's Pokedex
 class CatchPokemonService {
-    static baseUrl = '/api/dataverse';
+    // Environment-aware base URL configuration
+    static get baseUrl() {
+        // Check if we're running in production (Azure Static Web Apps)
+        if (window.location.hostname.includes('azurestaticapps.net')) {
+            // Production: Use Azure Functions URL
+            return 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+        }
+        // Development: Use local proxy
+        return '/api/dataverse';
+    }
     
     /**
      * Fetch with timeout for mobile reliability
@@ -10,17 +19,38 @@ class CatchPokemonService {
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         
         try {
+            console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
+            console.log(`🌍 Environment: ${window.location.hostname.includes('azurestaticapps.net') ? 'Production' : 'Development'}`);
+            
             const response = await fetch(url, {
                 ...options,
                 signal: controller.signal
             });
+            
             clearTimeout(timeoutId);
+            
+            console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+            
+            if (!response.ok) {
+                // Log more details about the error for debugging
+                let errorDetails = `HTTP ${response.status}`;
+                try {
+                    const errorText = await response.text();
+                    console.error(`❌ API Error Details:`, errorText);
+                    errorDetails += ` - ${errorText}`;
+                } catch (e) {
+                    console.error(`❌ API Error (no details available)`);
+                }
+                throw new Error(errorDetails);
+            }
+            
             return response;
         } catch (error) {
             clearTimeout(timeoutId);
             if (error.name === 'AbortError') {
                 throw new Error('Request timed out - please check your connection');
             }
+            console.error(`🚨 Fetch error for ${url}:`, error);
             throw error;
         }
     }
