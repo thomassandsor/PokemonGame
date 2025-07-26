@@ -91,26 +91,46 @@
     </div>
 
     <!-- Pokemon Detail Modal -->
-    <div id="pokemonModal" class="pokemon-modal-overlay" style="display: none;">
-        <div class="pokemon-modal">
-            <div class="pokemon-modal-header">
-                <h3 id="modalTitle" class="pokemon-modal-title">Pokemon Details</h3>
-                <button class="pokemon-btn pokemon-btn-sm" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="pokemon-modal-body">
-                <div class="pokemon-detail-layout">
-                    <div class="pokemon-image-section">
-                        <img id="modalImage" src="" alt="Pokemon" class="pokemon-detail-image">
-                    </div>
-                    <div class="pokemon-info-section">
-                        <div id="modalDetails" class="pokemon-details">
-                            <!-- Details will be populated here -->
+    <div id="pokemonModal" class="pokemon-card-modal" style="display: none;">
+        <button class="pokemon-card-modal-close" onclick="closeModal()">&times;</button>
+        <div class="pokemon-card-modal-content">
+            <div class="pokemon-trading-card">
+                <!-- Trading Card Header -->
+                <div id="pokemonCardHeader" class="pokemon-trading-card-header normal">
+                    <div class="pokemon-trading-card-hp" id="pokemonHP">HP 39</div>
+                    <div class="pokemon-trading-card-name" id="modalPokemonName">Pokemon Name</div>
+                </div>
+                
+                <!-- Pokemon Image -->
+                <div class="pokemon-trading-card-image-container">
+                    <img id="modalImage" class="pokemon-trading-card-image" src="" alt="Pokemon">
+                </div>
+                
+                <!-- Type Badges -->
+                <div id="pokemonTypes" class="pokemon-trading-card-types">
+                    <!-- Type badges will be added here dynamically -->
+                </div>
+                
+                <!-- Pokemon Stats -->
+                <div class="pokemon-trading-card-stats" id="pokemonStatsContainer">
+                    <!-- Stats will be populated dynamically -->
+                </div>
+                
+                <!-- Additional Pokemon Info -->
+                <div style="padding: 0 var(--space-md) var(--space-md);">
+                    <div style="background: rgba(255, 255, 255, 0.9); border: 2px solid #2d3436; border-radius: 10px; padding: var(--space-md);">
+                        <div id="pokemonInfoContainer">
+                            <!-- Additional info will be populated here -->
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="pokemon-modal-footer">
-                <button class="pokemon-btn" onclick="closeModal()">Close</button>
+                
+                <!-- Action Buttons -->
+                <div class="pokemon-trading-card-actions">
+                    <button class="pokemon-button-retro secondary" onclick="closeModal()">
+                        CLOSE
+                    </button>
+                </div>
             </div>
         </div>
     </div>

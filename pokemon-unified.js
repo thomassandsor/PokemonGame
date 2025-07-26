@@ -439,18 +439,23 @@ async function loadMorePokemon() {
 
 function showPokemonDetails(pokemon) {
     const modal = document.getElementById('pokemonModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalImage = document.getElementById('modalImage');
-    const modalDetails = document.getElementById('modalDetails');
     
-    modalTitle.textContent = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
-    modalImage.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    modalImage.alt = pokemon.name;
+    // Set Pokemon name and image
+    document.getElementById('modalPokemonName').textContent = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+    document.getElementById('modalImage').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
+    document.getElementById('modalImage').alt = pokemon.name;
     
     // Check if this Pokemon is caught
     const caughtPokemon = myPokemon.find(myP => 
         myP.name && myP.name.toLowerCase() === pokemon.name.toLowerCase()
     );
+    
+    // Calculate and display HP (use actual stats if available)
+    let hpValue = pokemon.baseHp || pokemon.hp || Math.floor(Math.random() * 50) + 30;
+    if (caughtPokemon && caughtPokemon.hp) {
+        hpValue = caughtPokemon.hp;
+    }
+    document.getElementById('pokemonHP').textContent = `HP ${hpValue}`;
     
     // Get types - handle both the new types array and legacy type1/type2 properties
     let types = pokemon.types || [];
@@ -461,52 +466,134 @@ function showPokemonDetails(pokemon) {
         types = ['normal']; // fallback
     }
     
-    const formattedNumber = `#${pokemon.id.toString().padStart(3, '0')}`;
+    // Set type-based header color and display type badges
+    const typesContainer = document.getElementById('pokemonTypes');
+    const cardHeader = document.getElementById('pokemonCardHeader');
+    typesContainer.innerHTML = '';
     
-    let detailsHtml = `
-        <div class="pokemon-detail-row">
-            <strong>Number:</strong> ${formattedNumber}
-        </div>
-        <div class="pokemon-detail-row">
-            <strong>Name:</strong> ${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
-        </div>
-        <div class="pokemon-detail-row">
-            <strong>Types:</strong> ${types.map(type => `<span class="pokemon-type-badge pokemon-type-${type.toLowerCase()}">${type}</span>`).join(' ')}
-        </div>
-    `;
-    
-    if (caughtPokemon) {
-        detailsHtml += `
-            <div class="pokemon-detail-section">
-                <h4>🎯 Your Pokemon</h4>
-                <div class="pokemon-detail-row">
-                    <strong>Level:</strong> ${caughtPokemon.level || 1}
-                </div>
-                <div class="pokemon-detail-row">
-                    <strong>HP:</strong> ${caughtPokemon.hp || 50}
-                </div>
-                <div class="pokemon-detail-row">
-                    <strong>Attack:</strong> ${caughtPokemon.attack || 25}
-                </div>
-                <div class="pokemon-detail-row">
-                    <strong>Defense:</strong> ${caughtPokemon.defense || 25}
-                </div>
-                <div class="pokemon-detail-row">
-                    <strong>Date Caught:</strong> ${caughtPokemon.dateCaught || 'Unknown'}
-                </div>
-                ${caughtPokemon.isShiny ? '<div class="pokemon-detail-row"><strong>✨ Shiny Pokemon!</strong></div>' : ''}
-            </div>
-        `;
+    if (types.length > 0) {
+        // Set header to primary type
+        const primaryType = types[0].toLowerCase();
+        cardHeader.className = `pokemon-trading-card-header ${primaryType}`;
+        
+        // Add type badges
+        types.forEach(typeName => {
+            const typeBadge = document.createElement('span');
+            typeBadge.className = `pokemon-trading-card-type-badge ${typeName.toLowerCase()}`;
+            typeBadge.textContent = typeName.toUpperCase();
+            typesContainer.appendChild(typeBadge);
+        });
     } else {
-        detailsHtml += `
-            <div class="pokemon-detail-section">
-                <p class="not-caught">You haven't caught this Pokemon yet!</p>
-            </div>
-        `;
+        cardHeader.className = 'pokemon-trading-card-header normal';
     }
     
-    modalDetails.innerHTML = detailsHtml;
-    modal.style.display = 'flex';
+    // Populate Pokemon stats
+    const statsContainer = document.getElementById('pokemonStatsContainer');
+    statsContainer.innerHTML = '';
+    
+    // Main stats to display - use caught Pokemon stats if available
+    let statsToShow = [
+        { name: 'Attack', value: pokemon.baseAttack || pokemon.attack, key: 'attack' },
+        { name: 'Defense', value: pokemon.baseDefence || pokemon.defense, key: 'defense' },
+        { name: 'Speed', value: pokemon.baseSpeed || pokemon.speed, key: 'speed' }
+    ];
+    
+    // If Pokemon is caught, use caught Pokemon stats
+    if (caughtPokemon) {
+        statsToShow = [
+            { name: 'Attack', value: caughtPokemon.attack || pokemon.baseAttack || pokemon.attack },
+            { name: 'Defense', value: caughtPokemon.defense || pokemon.baseDefence || pokemon.defense },
+            { name: 'Speed', value: caughtPokemon.speed || pokemon.baseSpeed || pokemon.speed }
+        ];
+    }
+    
+    statsToShow.forEach(stat => {
+        if (stat.value !== undefined && stat.value !== null) {
+            const statRow = document.createElement('div');
+            statRow.className = 'pokemon-trading-card-stats-row';
+            statRow.innerHTML = `
+                <span class="pokemon-trading-card-stat-name">${stat.name}</span>
+                <span class="pokemon-trading-card-stat-value">${stat.value}</span>
+            `;
+            statsContainer.appendChild(statRow);
+        }
+    });
+    
+    // If no stats available, show placeholders
+    if (statsContainer.children.length === 0) {
+        const placeholderStats = [
+            { name: 'Attack', value: Math.floor(Math.random() * 40) + 40 },
+            { name: 'Defense', value: Math.floor(Math.random() * 40) + 35 },
+            { name: 'Speed', value: Math.floor(Math.random() * 40) + 45 }
+        ];
+        
+        placeholderStats.forEach(stat => {
+            const statRow = document.createElement('div');
+            statRow.className = 'pokemon-trading-card-stats-row';
+            statRow.innerHTML = `
+                <span class="pokemon-trading-card-stat-name">${stat.name}</span>
+                <span class="pokemon-trading-card-stat-value">${stat.value}</span>
+            `;
+            statsContainer.appendChild(statRow);
+        });
+    }
+    
+    // Caught status container
+    const caughtStatusContainer = document.getElementById('caughtStatusContainer');
+    const formattedNumber = `#${pokemon.id.toString().padStart(3, '0')}`;
+    
+    if (caughtPokemon) {
+        caughtStatusContainer.innerHTML = `
+            <div style="text-align: center; color: #27ae60; font-weight: bold; font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">
+                ✅ CAUGHT!
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
+                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Level:</span>
+                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.level || 1}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
+                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Date Caught:</span>
+                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.dateCaught || 'Unknown'}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Shiny:</span>
+                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.isShiny ? '✨ Yes' : 'No'}</span>
+            </div>
+        `;
+        caughtStatusContainer.style.display = 'block';
+    } else {
+        caughtStatusContainer.innerHTML = `
+            <div style="text-align: center; color: #e74c3c; font-weight: bold; font-size: var(--font-size-lg);">
+                ❌ NOT CAUGHT
+            </div>
+        `;
+        caughtStatusContainer.style.display = 'block';
+    }
+    
+    // Populate additional info
+    const infoContainer = document.getElementById('pokemonInfoContainer');
+    infoContainer.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
+            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">ID:</span>
+            <span style="font-size: var(--font-size-sm); color: #2d3436;">${formattedNumber}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
+            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Generation:</span>
+            <span style="font-size: var(--font-size-sm); color: #2d3436;">${pokemon.generation || 'Unknown'}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Legendary:</span>
+            <span style="font-size: var(--font-size-sm); color: #2d3436;">${pokemon.legendary ? 'Yes' : 'No'}</span>
+        </div>
+        ${pokemon.description ? `
+        <div style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 2px solid #2d3436;">
+            <div style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436; margin-bottom: var(--space-xs);">Description:</div>
+            <div style="font-size: var(--font-size-sm); color: #2d3436; line-height: 1.4;">${pokemon.description}</div>
+        </div>
+        ` : ''}
+    `;
+    
+    modal.style.display = 'block';
 }
 
 function viewMyPokemonDetails(pokemonName) {

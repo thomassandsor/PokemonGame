@@ -475,37 +475,41 @@
     </div> <!-- End pokemon-container -->
 
     <!-- Pokemon Encounter Modal -->
-    <div id="encounterModal" class="pokemon-modal-overlay hidden">
-        <div class="pokemon-retro-card">
-            <!-- Type-based header (will be set by JavaScript) -->
-            <div id="pokemonTypeHeader" class="pokemon-type-header normal"></div>
-            
-            <div class="pokemon-modal-body" style="padding: var(--space-md);">
-                <!-- Pokemon Card Layout -->
-                <div style="text-align: center;">
-                    <!-- Pokemon Image -->
-                    <div class="pokemon-image-retro">
-                        <img id="encounterPokemonImage" src="" alt="Pokemon" 
-                             style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto;">
-                    </div>
-                    
-                    <!-- Pokemon Name -->
-                    <h2 id="encounterPokemonName" class="pokemon-name-retro">
-                        Loading...
-                    </h2>
-                    
-                    <!-- Pokemon Type Badges -->
-                    <div id="pokemonTypes" style="margin: var(--space-sm) 0;">
-                        <!-- Type badges will be added here dynamically -->
-                    </div>
-                    
-                    <!-- Pokeball Count Display -->
+    <div id="encounterModal" class="pokemon-card-modal hidden">
+        <button class="pokemon-card-modal-close" onclick="runAway()">&times;</button>
+        <div class="pokemon-card-modal-content">
+            <div class="pokemon-trading-card">
+                <!-- Trading Card Header -->
+                <div id="pokemonCardHeader" class="pokemon-trading-card-header normal">
+                    <div class="pokemon-trading-card-hp" id="pokemonHP">HP 39</div>
+                    <div class="pokemon-trading-card-name" id="encounterPokemonName">Loading...</div>
+                </div>
+                
+                <!-- Pokemon Image -->
+                <div class="pokemon-trading-card-image-container">
+                    <img id="encounterPokemonImage" class="pokemon-trading-card-image" src="" alt="Pokemon">
+                </div>
+                
+                <!-- Type Badges -->
+                <div id="pokemonTypes" class="pokemon-trading-card-types">
+                    <!-- Type badges will be added here dynamically -->
+                </div>
+                
+                <!-- Pokemon Stats -->
+                <div class="pokemon-trading-card-stats" id="pokemonStatsContainer">
+                    <!-- Stats will be populated dynamically -->
+                </div>
+                
+                <!-- Pokeball Count Display -->
+                <div style="padding: 0 var(--space-md) var(--space-md);">
                     <div id="pokeballCountDisplay" class="pokemon-stats-retro">
                         POKEBALLS: <span id="pokeballCount">0</span>
                     </div>
-                    
-                    <!-- Action Buttons -->
-                    <div id="defaultActions" style="display: flex; gap: var(--space-md); margin-top: var(--space-lg);">
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="pokemon-trading-card-actions">
+                    <div id="defaultActions" style="display: flex; gap: var(--space-md); width: 100%; justify-content: center;">
                         <button class="pokemon-button-retro success" onclick="startThrowAnimation()">
                             CATCH!
                         </button>
@@ -515,19 +519,21 @@
                     </div>
 
                     <!-- No Pokeballs Message -->
-                    <div id="noPokeballs" class="hidden pokemon-alert-retro">
-                        <div style="font-size: var(--font-size-lg); margin-bottom: var(--space-xs); font-weight: bold;">NO MORE POKEBALLS!</div>
-                        <div style="font-size: var(--font-size-sm);">Complete minigame to cath POKEMON</div>
-                    </div>
-
-                    <!-- No Pokeballs Actions -->
-                    <div id="noPokeballActions" style="display: flex; gap: var(--space-md); margin-top: var(--space-lg);" class="hidden">
-                        <button class="pokemon-button-retro success" onclick="MinigameLibrary.showMinigameSelection()">
-                            MINIGAME
-                        </button>
-                        <button class="pokemon-button-retro secondary" onclick="runAway()">
-                            RUN AWAY
-                        </button>
+                    <div id="noPokeballs" class="hidden" style="text-align: center; width: 100%;">
+                        <div class="pokemon-alert-retro" style="margin-bottom: var(--space-md);">
+                            <div style="font-size: var(--font-size-lg); margin-bottom: var(--space-xs); font-weight: bold;">NO MORE POKEBALLS!</div>
+                            <div style="font-size: var(--font-size-sm);">Complete minigame to catch POKEMON</div>
+                        </div>
+                        
+                        <!-- No Pokeballs Actions -->
+                        <div id="noPokeballActions" style="display: flex; gap: var(--space-md); justify-content: center;">
+                            <button class="pokemon-button-retro success" onclick="MinigameLibrary.showMinigameSelection()">
+                                MINIGAME
+                            </button>
+                            <button class="pokemon-button-retro secondary" onclick="runAway()">
+                                RUN AWAY
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -842,30 +848,78 @@
 
         // Show Pokemon encounter screen
         async function showPokemonEncounter(pokemonData, userData = null) {
+            // Set Pokemon image and name
             document.getElementById('encounterPokemonImage').src = 
                 pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
             document.getElementById('encounterPokemonName').textContent = pokemonData.name;
             
+            // Calculate and display HP (base HP stat or estimate)
+            const hpStat = pokemonData.stats?.find(stat => stat.stat?.name === 'hp' || stat.name === 'hp');
+            const hpValue = hpStat ? hpStat.base_stat || hpStat.value : Math.floor(Math.random() * 50) + 30;
+            document.getElementById('pokemonHP').textContent = `HP ${hpValue}`;
+            
             // Set type-based header color and display type badges
             const typesContainer = document.getElementById('pokemonTypes');
-            const typeHeader = document.getElementById('pokemonTypeHeader');
+            const cardHeader = document.getElementById('pokemonCardHeader');
             typesContainer.innerHTML = '';
             
             if (pokemonData.types && pokemonData.types.length > 0) {
                 // Set header to primary type
                 const primaryType = pokemonData.types[0].type?.name || pokemonData.types[0];
-                typeHeader.className = `pokemon-type-header ${primaryType}`;
+                cardHeader.className = `pokemon-trading-card-header ${primaryType}`;
                 
                 // Add type badges
                 pokemonData.types.forEach(typeInfo => {
                     const typeName = typeInfo.type?.name || typeInfo;
                     const typeBadge = document.createElement('span');
-                    typeBadge.className = `pokemon-type-badge-retro ${typeName}`;
+                    typeBadge.className = `pokemon-trading-card-type-badge ${typeName}`;
                     typeBadge.textContent = typeName.toUpperCase();
                     typesContainer.appendChild(typeBadge);
                 });
             } else {
-                typeHeader.className = 'pokemon-type-header normal';
+                cardHeader.className = 'pokemon-trading-card-header normal';
+            }
+            
+            // Populate Pokemon stats
+            const statsContainer = document.getElementById('pokemonStatsContainer');
+            statsContainer.innerHTML = '';
+            
+            if (pokemonData.stats && pokemonData.stats.length > 0) {
+                // Show main stats: Attack, Defense, Speed
+                const mainStats = ['attack', 'defense', 'speed'];
+                mainStats.forEach(statName => {
+                    const statData = pokemonData.stats.find(stat => 
+                        (stat.stat?.name || stat.name) === statName
+                    );
+                    
+                    if (statData) {
+                        const statValue = statData.base_stat || statData.value || 0;
+                        const statRow = document.createElement('div');
+                        statRow.className = 'pokemon-trading-card-stats-row';
+                        statRow.innerHTML = `
+                            <span class="pokemon-trading-card-stat-name">${statName.charAt(0).toUpperCase() + statName.slice(1)}</span>
+                            <span class="pokemon-trading-card-stat-value">${statValue}</span>
+                        `;
+                        statsContainer.appendChild(statRow);
+                    }
+                });
+            } else {
+                // Fallback: show placeholder stats
+                const placeholderStats = [
+                    { name: 'Attack', value: Math.floor(Math.random() * 40) + 40 },
+                    { name: 'Defense', value: Math.floor(Math.random() * 40) + 35 },
+                    { name: 'Speed', value: Math.floor(Math.random() * 40) + 45 }
+                ];
+                
+                placeholderStats.forEach(stat => {
+                    const statRow = document.createElement('div');
+                    statRow.className = 'pokemon-trading-card-stats-row';
+                    statRow.innerHTML = `
+                        <span class="pokemon-trading-card-stat-name">${stat.name}</span>
+                        <span class="pokemon-trading-card-stat-value">${stat.value}</span>
+                    `;
+                    statsContainer.appendChild(statRow);
+                });
             }
             
             // Use pre-fetched user data if available, otherwise fetch it
@@ -896,7 +950,6 @@
                     
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
-                    document.getElementById('noPokeballActions').classList.add('hidden');
                 } else {
                     showNoPokeballs();
                 }
@@ -926,7 +979,6 @@
                     
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
-                    document.getElementById('noPokeballActions').classList.add('hidden');
                 } else {
                     showNoPokeballs();
                 }
@@ -947,7 +999,6 @@
             // Hide default actions and show no pokeballs options
             document.getElementById('defaultActions').classList.add('hidden');
             document.getElementById('noPokeballs').classList.remove('hidden');
-            document.getElementById('noPokeballActions').classList.remove('hidden');
         }
 
         // Start throw animation
