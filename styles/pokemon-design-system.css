@@ -576,6 +576,38 @@ body {
   transition: width var(--transition-slow);
 }
 
+/* Alert Components */
+.pokemon-alert {
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+  border: 2px solid transparent;
+}
+
+.pokemon-alert-warning {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: var(--pokemon-yellow);
+  color: var(--white);
+}
+
+.pokemon-alert-danger {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: #dc3545;
+  color: var(--white);
+}
+
+.pokemon-alert-success {
+  background: rgba(40, 167, 69, 0.2);
+  border-color: #28a745;
+  color: var(--white);
+}
+
+.pokemon-alert-info {
+  background: rgba(23, 162, 184, 0.2);
+  border-color: #17a2b8;
+  color: var(--white);
+}
+
 /* Modal Components */
 .pokemon-modal {
   position: fixed;
@@ -1103,4 +1135,273 @@ body {
   .pokemon-grid {
     grid-template-columns: repeat(5, 1fr);
   }
+}
+
+/* =================================
+   CATCHING SYSTEM COMPONENTS
+   ================================= */
+
+/* Modal overlays for catching system */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  touch-action: none;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  width: 90vw;
+  max-width: 500px;
+  text-align: center;
+  background: var(--white);
+  border-radius: 25px;
+  padding: var(--space-xl);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Pokemon encounter styling */
+.pokemon-encounter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.pokemon-sprite-large {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border-radius: 15px;
+  background: var(--gradient-retro-bg);
+  padding: var(--space-md);
+}
+
+.pokemon-name {
+  font-size: var(--font-size-2xl);
+  font-weight: bold;
+  color: var(--pokemon-blue);
+  text-transform: capitalize;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Pokeball count display */
+.pokeball-count {
+  background: var(--gradient-yellow-blue);
+  color: var(--white);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: var(--font-size-lg);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal action buttons */
+.modal-actions {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* No pokeballs message */
+.no-pokeballs-message {
+  background: linear-gradient(145deg, #ff6b6b, #ff5252);
+  color: var(--white);
+  padding: var(--space-lg);
+  border-radius: 15px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Scanner-specific components */
+.pokemon-scanner-frame {
+  position: relative;
+  width: 90vw;
+  max-width: 400px;
+  margin: var(--space-lg) auto;
+  background: var(--gradient-yellow-blue);
+  padding: 8px;
+  border-radius: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 4px solid var(--white);
+}
+
+.pokemon-scanner-inner {
+  background: var(--black);
+  border-radius: 20px;
+  padding: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* QR Video styling */
+#qrVideo {
+  width: 100%;
+  height: 60vh;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 15px;
+  display: block;
+}
+
+/* Scanner overlay and corners */
+.pokemon-scanner-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 3px solid var(--pokemon-yellow);
+  border-radius: 15px;
+  box-shadow: 0 0 0 4px rgba(255, 222, 0, 0.3);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pokemon-scanner-corners {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  pointer-events: none;
+  z-index: 11;
+}
+
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 4px solid var(--pokemon-yellow);
+}
+
+.corner.top-left {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 10px;
+}
+
+.corner.top-right {
+  top: -2px;
+  right: -2px;
+  border-left: none;
+  border-bottom: none;
+  border-top-right-radius: 10px;
+}
+
+.corner.bottom-left {
+  bottom: -2px;
+  left: -2px;
+  border-right: none;
+  border-top: none;
+  border-bottom-left-radius: 10px;
+}
+
+.corner.bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 10px;
+}
+
+/* Scan instruction text */
+.scan-instruction {
+  text-align: center;
+  color: var(--white);
+  font-size: var(--font-size-lg);
+  margin-top: 15px;
+  padding: var(--space-md);
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+}
+
+/* Utility classes for catching system */
+.hidden {
+  display: none !important;
+}
+
+.scanning {
+  animation: scanPulse 2s infinite;
+}
+
+@keyframes scanPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Throw animation container */
+.throw-container {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.throw-instructions {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  color: var(--white);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+.catch-zone {
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--pokemon-yellow);
+  box-shadow: 0 0 20px rgba(255, 222, 0, 0.5);
+}
+
+.pokeball {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.pokeball:hover {
+  transform: scale(1.1);
+}
+
+/* Success/Error overlays */
+.success-overlay, .error-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.success-overlay .modal-content {
+  background: linear-gradient(145deg, #4CAF50, #45a049);
+  color: var(--white);
+}
+
+.error-overlay .modal-content {
+  background: linear-gradient(145deg, #ff6b6b, #ff5252);
+  color: var(--white);
 }

@@ -340,13 +340,25 @@ class CatchPokemonService {
             
             // First get user contact info with pokeball count
             const contactUrl = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid,pokemon_pokeballs`;
+            console.log('🎯 CATCH-SERVICE: Contact URL:', contactUrl);
+            
             const contactResponse = await this.fetchWithTimeout(contactUrl);
+            console.log('🎯 CATCH-SERVICE: Contact response status:', contactResponse.status);
             
             if (!contactResponse.ok) {
                 throw new Error(`HTTP ${contactResponse.status}: ${contactResponse.statusText}`);
             }
             
-            const contactData = await contactResponse.json();
+            console.log('🎯 CATCH-SERVICE: Parsing contact response as JSON...');
+            let contactData;
+            try {
+                contactData = await contactResponse.json();
+                console.log('🎯 CATCH-SERVICE: Contact data:', contactData);
+            } catch (jsonError) {
+                console.error('🎯 CATCH-SERVICE: Failed to parse contact response as JSON:', jsonError);
+                throw new Error(`Failed to parse contact data response: ${jsonError.message}`);
+            }
+            
             if (!contactData.value || contactData.value.length === 0) {
                 throw new Error('User not found');
             }
@@ -354,6 +366,8 @@ class CatchPokemonService {
             const contact = contactData.value[0];
             const userId = contact.contactid;
             const pokeballCount = contact.pokemon_pokeballs || 0;
+            
+            console.log('🎯 CATCH-SERVICE: User basic info:', { userId, pokeballCount });
             
             // Get user's Pokemon collection using simple approach without $expand
             console.log('🎯 CATCH-SERVICE: Fetching user Pokemon collection...');
@@ -370,12 +384,21 @@ class CatchPokemonService {
                 }
                 
                 const pokemonResponse = await this.fetchWithTimeout(pokemonUrl);
+                console.log('🎯 CATCH-SERVICE: Pokemon response status:', pokemonResponse.status);
+                
                 if (!pokemonResponse.ok) {
                     throw new Error(`Pokemon query failed: HTTP ${pokemonResponse.status}: ${pokemonResponse.statusText}`);
                 }
                 
-                const pokemonData = await pokemonResponse.json();
-                console.log('🎯 CATCH-SERVICE: Pokemon collection raw data:', pokemonData);
+                console.log('🎯 CATCH-SERVICE: Parsing Pokemon response as JSON...');
+                let pokemonData;
+                try {
+                    pokemonData = await pokemonResponse.json();
+                    console.log('🎯 CATCH-SERVICE: Pokemon collection raw data:', pokemonData);
+                } catch (jsonError) {
+                    console.error('🎯 CATCH-SERVICE: Failed to parse Pokemon response as JSON:', jsonError);
+                    throw new Error(`Failed to parse Pokemon collection response: ${jsonError.message}`);
+                }
                 
                 if (pokemonData.value && pokemonData.value.length > 0) {
                     // Get the master Pokemon IDs that user owns
@@ -395,8 +418,20 @@ class CatchPokemonService {
                             console.log('🎯 CATCH-SERVICE: Master Pokemon lookup URL:', masterUrl);
                             
                             const masterResponse = await this.fetchWithTimeout(masterUrl);
+                            console.log('🎯 CATCH-SERVICE: Master response status:', masterResponse.status);
+                            
                             if (masterResponse.ok) {
-                                const masterData = await masterResponse.json();
+                                console.log('🎯 CATCH-SERVICE: Parsing master response as JSON...');
+                                let masterData;
+                                try {
+                                    masterData = await masterResponse.json();
+                                    console.log('🎯 CATCH-SERVICE: Master data:', masterData);
+                                } catch (jsonError) {
+                                    console.error('🎯 CATCH-SERVICE: Failed to parse master response as JSON:', jsonError);
+                                    console.warn('🎯 CATCH-SERVICE: Master Pokemon lookup failed due to JSON parse error, duplicate check may not work');
+                                    ownedPokemonNumbers = [];
+                                    return; // Exit this block and continue
+                                }
                                 ownedPokemonNumbers = masterData.value.map(pokemon => pokemon.pokemon_id).filter(id => id);
                                 console.log('🎯 CATCH-SERVICE: Owned Pokemon numbers:', ownedPokemonNumbers);
                             } else {
@@ -412,23 +447,26 @@ class CatchPokemonService {
                 ownedPokemonNumbers = []; // Fall back to empty array
             }
             
-            console.log('🎯 CATCH-SERVICE: User data retrieved:', {
-                userId,
-                pokeballCount,
-                ownedPokemonCount: ownedPokemonNumbers.length,
-                ownedPokemonNumbers: ownedPokemonNumbers
-            });
-            
-            return {
+            const result = {
                 userId,
                 email,
                 pokeballCount,
                 ownedPokemonNumbers
             };
             
+            console.log('🎯 CATCH-SERVICE: Final user data result:', result);
+            
+            return result;
+            
         } catch (error) {
             console.error('🎯 CATCH-SERVICE: Error getting user data:', error);
-            throw error;
+            console.error('🎯 CATCH-SERVICE: Error details:', {
+                message: error.message,
+                stack: error.stack,
+                name: error.name,
+                email: email
+            });
+            throw new Error(`Failed to get user data for ${email}: ${error.message}`);
         }
     }
 

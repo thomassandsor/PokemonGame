@@ -4,30 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catch Pokemon - QR Scanner</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-    html, body {
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
-        font-family: 'Arial', sans-serif;
+    <link rel="stylesheet" href="styles/pokemon-design-system.css">    <style>
+    /* Page-specific styles for clean Pokemon card design */
+    
+    /* Simple pokeball hover effect */
+    #pokeball:hover {
+        transform: scale(1.05);
     }
-
-    /* Pokemon-themed Scanner Frame */
-    .pokemon-scanner-frame {
-        position: relative;
-        width: 90vw;
-        max-width: 400px;
-        margin: 20px auto;
-        background: linear-gradient(145deg, #ffcc02, #3d7dca);
-        padding: 8px;
-        border-radius: 25px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        border: 4px solid #fff;
-    }
-
+    
     .pokemon-scanner-inner {
         background: #000;
         border-radius: 20px;
@@ -52,9 +36,9 @@
         transform: translate(-50%, -50%);
         width: 200px;
         height: 200px;
-        border: 3px solid #ffcc02;
+        border: 3px solid var(--pokemon-yellow);
         border-radius: 15px;
-        box-shadow: 0 0 0 4px rgba(255, 204, 2, 0.3);
+        box-shadow: 0 0 0 4px rgba(255, 222, 0, 0.3);
         pointer-events: none;
         z-index: 10;
     }
@@ -74,7 +58,7 @@
         position: absolute;
         width: 20px;
         height: 20px;
-        border: 4px solid #ffcc02;
+        border: 4px solid var(--pokemon-yellow);
     }
 
     .corner.top-left {
@@ -109,15 +93,6 @@
         border-bottom-right-radius: 10px;
     }
 
-    .pokemon-title {
-        text-align: center;
-        color: #fff;
-        font-size: 1.8rem;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        margin-bottom: 20px;
-    }
-
     .scan-instruction {
         text-align: center;
         color: #fff;
@@ -128,125 +103,218 @@
         border-radius: 10px;
     }
 
-    /* Fullscreen Modal Overlay */
+    /* Retro Nintendo/Game Boy Pokemon Card Style */
     .modal-overlay {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
         width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.9);
+        background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
         z-index: 9999;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
-        padding-top: 10vh; /* Add some top padding but much less than center */
-        touch-action: none;
-        overscroll-behavior: contain;
+        padding: var(--space-lg);
         box-sizing: border-box;
     }
 
-    .modal-content {
-        width: 90vw;
-        max-width: 500px;
-        text-align: center;
+    /* Center all page content */
+    .pokemon-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        min-height: 100vh;
+        width: 100%;
+        max-width: 100vw;
+        margin: 0 auto;
+        padding: var(--space-md);
+        box-sizing: border-box;
     }
 
-    .pokemon-encounter {
-        background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+    /* Retro Pokemon Card */
+    .pokemon-retro-card {
+        background: #f8f9fa;
+        border: 4px solid #2d3436;
         border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        border: 3px solid #fff;
+        box-shadow: 
+            0 8px 16px rgba(0,0,0,0.3),
+            inset 0 2px 0 rgba(255,255,255,0.8);
+        max-width: 350px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
     }
 
-    .pokemon-sprite-large {
-        width: 60vw;
-        max-width: 250px;
-        height: auto;
-        margin-bottom: 20px;
-        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+    /* Type-based card headers */
+    .pokemon-type-header {
+        height: 8px;
+        width: 100%;
     }
 
-    .pokemon-name {
-        color: #fff;
-        font-size: 2rem;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        margin-bottom: 20px;
-    }
+    .pokemon-type-header.fire { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+    .pokemon-type-header.water { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+    .pokemon-type-header.grass { background: linear-gradient(90deg, #00b894, #00a085); }
+    .pokemon-type-header.electric { background: linear-gradient(90deg, #fdcb6e, #f39c12); }
+    .pokemon-type-header.psychic { background: linear-gradient(90deg, #fd79a8, #e84393); }
+    .pokemon-type-header.fighting { background: linear-gradient(90deg, #e17055, #d63031); }
+    .pokemon-type-header.normal { background: linear-gradient(90deg, #ddd, #999); }
+    .pokemon-type-header.flying { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+    .pokemon-type-header.poison { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+    .pokemon-type-header.ground { background: linear-gradient(90deg, #f39c12, #e67e22); }
+    .pokemon-type-header.rock { background: linear-gradient(90deg, #95a5a6, #7f8c8d); }
+    .pokemon-type-header.bug { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+    .pokemon-type-header.ghost { background: linear-gradient(90deg, #9b59b6, #663399); }
+    .pokemon-type-header.steel { background: linear-gradient(90deg, #bdc3c7, #95a5a6); }
+    .pokemon-type-header.fire { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+    .pokemon-type-header.ice { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+    .pokemon-type-header.dragon { background: linear-gradient(90deg, #6c5ce7, #5f3dc4); }
+    .pokemon-type-header.dark { background: linear-gradient(90deg, #2d3436, #636e72); }
+    .pokemon-type-header.fairy { background: linear-gradient(90deg, #fd79a8, #e84393); }
 
-    .modal-actions {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-
-    .btn-pokemon {
-        font-size: 1.3rem;
-        padding: 12px 30px;
-        border-radius: 25px;
-        border: none;
-        font-weight: bold;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-pokemon.catch {
-        background: linear-gradient(145deg, #ff6b6b, #ee5a52);
-        color: white;
-    }
-
-    .btn-pokemon.catch:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-pokemon.run {
-        background: linear-gradient(145deg, #feca57, #ff9ff3);
-        color: #333;
-    }
-
-    .btn-pokemon.run:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Throw Animation Container */
-    .throw-container {
-        text-align: center;
-        color: #fff;
-    }
-
-    .throw-instructions {
-        font-size: 1.4rem;
-        font-weight: bold;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    }
-
-    .catch-zone {
-        margin: 30px 0;
+    /* Pokemon Image Container */
+    .pokemon-image-retro {
+        background: #ffffff;
+        border: 3px solid #2d3436;
+        border-radius: 12px;
+        padding: var(--space-md);
+        margin: var(--space-md);
         position: relative;
     }
 
-    .pokeball {
-        width: 80px;
-        height: 80px;
-        margin: 20px auto;
-        display: block;
-        cursor: pointer;
-        transition: transform 0.3s ease;
+    .pokemon-image-retro::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #ddd, #fff, #ddd);
     }
 
-    .pokeball:hover {
-        transform: scale(1.1);
+    /* Pokemon Name Styling */
+    .pokemon-name-retro {
+        font-family: 'Courier New', monospace;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #2d3436;
+        margin: var(--space-md) 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+        text-shadow: 1px 1px 0 #fff;
+    }
+
+    /* Type Badge Retro */
+    .pokemon-type-badge-retro {
+        display: inline-block;
+        padding: var(--space-xs) var(--space-sm);
+        border: 2px solid #2d3436;
+        border-radius: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: var(--font-size-sm);
+        font-weight: bold;
+        text-transform: uppercase;
+        margin: 0 var(--space-xs);
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .pokemon-type-badge-retro.fire { background: #e74c3c; }
+    .pokemon-type-badge-retro.water { background: #3498db; }
+    .pokemon-type-badge-retro.grass { background: #2ecc71; }
+    .pokemon-type-badge-retro.electric { background: #f1c40f; color: #2d3436; text-shadow: none; }
+    .pokemon-type-badge-retro.psychic { background: #9b59b6; }
+    .pokemon-type-badge-retro.fighting { background: #e67e22; }
+    .pokemon-type-badge-retro.normal { background: #95a5a6; }
+    .pokemon-type-badge-retro.flying { background: #6c5ce7; }
+    .pokemon-type-badge-retro.poison { background: #8e44ad; }
+    .pokemon-type-badge-retro.ground { background: #f39c12; color: #2d3436; text-shadow: none; }
+    .pokemon-type-badge-retro.rock { background: #7f8c8d; }
+    .pokemon-type-badge-retro.bug { background: #27ae60; }
+    .pokemon-type-badge-retro.ghost { background: #663399; }
+    .pokemon-type-badge-retro.steel { background: #bdc3c7; color: #2d3436; text-shadow: none; }
+    .pokemon-type-badge-retro.ice { background: #74b9ff; }
+    .pokemon-type-badge-retro.dragon { background: #5f3dc4; }
+    .pokemon-type-badge-retro.dark { background: #2d3436; }
+    .pokemon-type-badge-retro.fairy { background: #fd79a8; }
+
+    /* Pokeball Count Retro */
+    .pokemon-stats-retro {
+        background: #fff;
+        border: 3px solid #2d3436;
+        border-radius: 8px;
+        padding: var(--space-sm) var(--space-md);
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        font-size: var(--font-size-base);
+        color: #2d3436;
+        margin: var(--space-md) 0;
+        display: inline-block;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .pokemon-stats-retro.no-pokeballs {
+        background: #ff6b6b;
+        color: #fff;
+        border-color: #e74c3c;
+    }
+
+    /* Retro Button Styling */
+    .pokemon-button-retro {
+        background: #74b9ff;
+        color: #fff;
+        border: 3px solid #2d3436;
+        border-radius: 8px;
+        padding: var(--space-md) var(--space-lg);
+        font-family: 'Courier New', monospace;
+        font-size: var(--font-size-base);
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        box-shadow: 
+            0 4px 0 #2d3436,
+            0 4px 8px rgba(0,0,0,0.3);
+        flex: 1;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .pokemon-button-retro:hover {
+        transform: translateY(2px);
+        box-shadow: 
+            0 2px 0 #2d3436,
+            0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .pokemon-button-retro:active {
+        transform: translateY(4px);
+        box-shadow: none;
+    }
+
+    .pokemon-button-retro.secondary {
+        background: #95a5a6;
+    }
+
+    .pokemon-button-retro.danger {
+        background: #e74c3c;
+    }
+
+    .pokemon-button-retro.success {
+        background: #2ecc71;
+    }
+
+    /* Alert Retro */
+    .pokemon-alert-retro {
+        background: #ff6b6b;
+        color: #fff;
+        border: 3px solid #e74c3c;
+        border-radius: 8px;
+        padding: var(--space-md);
+        margin: var(--space-sm) 0;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
 
     /* Animation for scanning pulse effect */
@@ -263,34 +331,6 @@
     /* Hidden by default */
     .hidden {
         display: none !important;
-    }
-
-    /* Pokeball count display */
-    .pokeball-count {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 1rem;
-        font-weight: bold;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-
-    .pokeball-count.empty {
-        background: rgba(255, 107, 107, 0.3);
-        color: #ff6b6b;
-    }
-
-    /* No pokeballs message */
-    .no-pokeballs-message {
-        background: rgba(255, 107, 107, 0.2);
-        border: 2px solid #ff6b6b;
-        color: #fff;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        text-align: center;
     }
 
     /* Mobile-specific adjustments */
@@ -318,83 +358,211 @@
             padding: 20px;
         }
     }
+
+    /* Enhanced Mobile-specific adjustments and responsive design */
+    @media (max-width: 768px) {
+        .pokemon-container {
+            padding: var(--space-sm);
+        }
+        
+        .pokemon-retro-card {
+            max-width: 320px;
+            margin: var(--space-sm);
+        }
+        
+        .pokemon-image-retro {
+            margin: var(--space-sm);
+            padding: var(--space-sm);
+        }
+        
+        .pokemon-image-retro img,
+        .pokemon-image-retro #throwPokemonSprite {
+            width: 130px;
+            height: 130px;
+        }
+        
+        .pokemon-button-retro {
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--font-size-sm);
+        }
+        
+        .pokemon-name-retro {
+            font-size: 1.4rem;
+        }
+    }
+
+    @media (max-height: 700px) {
+        .modal-overlay {
+            padding: var(--space-md);
+        }
+        
+        .pokemon-retro-card {
+            max-width: 300px;
+        }
+        
+        .pokemon-image-retro img,
+        .pokemon-image-retro #throwPokemonSprite {
+            width: 110px;
+            height: 110px;
+        }
+        
+        .pokemon-name-retro {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-height: 600px) {
+        .modal-overlay {
+            padding: var(--space-sm);
+        }
+        
+        .pokemon-modal-body {
+            padding: var(--space-sm) !important;
+        }
+        
+        .pokemon-image-retro {
+            margin: var(--space-xs);
+            padding: var(--space-xs);
+        }
+        
+        .pokemon-image-retro img,
+        .pokemon-image-retro #throwPokemonSprite {
+            width: 90px;
+            height: 90px;
+        }
+    }
+
+    /* Simple hover effects for desktop (no complex animations) */
+    @media (min-width: 769px) {
+        .pokemon-button-retro:hover {
+            transform: translateY(1px);
+        }
+    }
     </style>
 </head>
-<body>
-    <!-- Pokemon QR Scanner -->
-    <div id="scannerContainer" class="container">
-        <div class="pokemon-title">🔍 Pokémon Scanner</div>
-        
-        <div class="pokemon-scanner-frame">
-            <div class="pokemon-scanner-inner">
-                <video id="qrVideo" playsinline autoplay></video>
-                <div class="pokemon-scanner-overlay scanning"></div>
-                <div class="pokemon-scanner-corners">
-                    <div class="corner top-left"></div>
-                    <div class="corner top-right"></div>
-                    <div class="corner bottom-left"></div>
-                    <div class="corner bottom-right"></div>
-                </div>
+<body class="pokemon-game-body">
+    <div class="pokemon-container">
+        <!-- Clean Header -->
+        <header class="pokemon-header">
+            <div class="pokemon-header-content">
+                <h1 class="pokemon-title">Catch Pokemon</h1>
             </div>
-        </div>
-        
-        <div class="scan-instruction">
-            Point your camera at a Pokémon QR code
-        </div>
-        
-        <div id="videoDebugInfo" style="color:#fff; text-align:center; margin-top:15px; font-size:0.9rem;"></div>
-    </div>
+        </header>
+
+        <!-- Pokemon QR Scanner -->
+        <div id="scannerContainer" class="pokemon-section">
+            <div class="pokemon-card">
+                <div class="pokemon-scanner-frame">
+                    <div class="pokemon-scanner-inner">
+                        <video id="qrVideo" playsinline autoplay></video>
+                        <div class="pokemon-scanner-overlay scanning"></div>
+                        <div class="pokemon-scanner-corners">
+                            <div class="corner top-left"></div>
+                            <div class="corner top-right"></div>
+                            <div class="corner bottom-left"></div>
+                            <div class="corner bottom-right"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pokemon-text text-center" style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(0, 0, 0, 0.6); border-radius: var(--radius-md); color: white;">
+                    📱 Point your camera at a Pokémon QR code
+                </div>
+            
+                <div id="videoDebugInfo" class="pokemon-text-small text-center" style="color: var(--pokemon-blue); margin-top: var(--space-md);"></div>
+            </div>
+        </div> <!-- End pokemon-section -->
+    </div> <!-- End pokemon-container -->
 
     <!-- Pokemon Encounter Modal -->
-    <div id="encounterModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="pokemon-encounter">
-                <img id="encounterPokemonImage" class="pokemon-sprite-large" src="" alt="Pokemon">
-                <div id="encounterPokemonName" class="pokemon-name">Loading...</div>
-                
-                <!-- Pokeball Count Display -->
-                <div id="pokeballCountDisplay" class="pokeball-count">
-                    ⚾ Pokéballs: <span id="pokeballCount">0</span>
-                </div>
-                
-                <!-- Default Actions (when pokeballs available) -->
-                <div id="defaultActions" class="modal-actions">
-                    <button class="btn-pokemon catch" onclick="startThrowAnimation()">
-                        ⚾ Catch!
-                    </button>
-                    <button class="btn-pokemon run" onclick="runAway()">
-                        🏃 Run Away
-                    </button>
-                </div>
+    <div id="encounterModal" class="pokemon-modal-overlay hidden">
+        <div class="pokemon-retro-card">
+            <!-- Type-based header (will be set by JavaScript) -->
+            <div id="pokemonTypeHeader" class="pokemon-type-header normal"></div>
+            
+            <div class="pokemon-modal-body" style="padding: var(--space-md);">
+                <!-- Pokemon Card Layout -->
+                <div style="text-align: center;">
+                    <!-- Pokemon Image -->
+                    <div class="pokemon-image-retro">
+                        <img id="encounterPokemonImage" src="" alt="Pokemon" 
+                             style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto;">
+                    </div>
+                    
+                    <!-- Pokemon Name -->
+                    <h2 id="encounterPokemonName" class="pokemon-name-retro">
+                        Loading...
+                    </h2>
+                    
+                    <!-- Pokemon Type Badges -->
+                    <div id="pokemonTypes" style="margin: var(--space-sm) 0;">
+                        <!-- Type badges will be added here dynamically -->
+                    </div>
+                    
+                    <!-- Pokeball Count Display -->
+                    <div id="pokeballCountDisplay" class="pokemon-stats-retro">
+                        POKEBALLS: <span id="pokeballCount">0</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div id="defaultActions" style="display: flex; gap: var(--space-md); margin-top: var(--space-lg);">
+                        <button class="pokemon-button-retro success" onclick="startThrowAnimation()">
+                            CATCH!
+                        </button>
+                        <button class="pokemon-button-retro secondary" onclick="runAway()">
+                            RUN AWAY
+                        </button>
+                    </div>
 
-                <!-- No Pokeballs Message -->
-                <div id="noPokeballs" class="no-pokeballs-message hidden">
-                    ❌ No more Pokéballs!<br>
-                    <small>Play a minigame to earn them</small>
-                </div>
+                    <!-- No Pokeballs Message -->
+                    <div id="noPokeballs" class="hidden pokemon-alert-retro">
+                        <div style="font-size: var(--font-size-lg); margin-bottom: var(--space-xs); font-weight: bold;">NO MORE POKEBALLS!</div>
+                        <div style="font-size: var(--font-size-sm);">Complete minigame to cath POKEMON</div>
+                    </div>
 
-                <!-- No Pokeballs Actions -->
-                <div id="noPokeballActions" class="modal-actions hidden">
-                    <button class="btn-pokemon catch" onclick="MinigameLibrary.showMinigameSelection()">
-                        🎮 Choose Minigame
-                    </button>
-                    <button class="btn-pokemon run" onclick="runAway()">
-                        🏃 Run Away
-                    </button>
+                    <!-- No Pokeballs Actions -->
+                    <div id="noPokeballActions" style="display: flex; gap: var(--space-md); margin-top: var(--space-lg);" class="hidden">
+                        <button class="pokemon-button-retro success" onclick="MinigameLibrary.showMinigameSelection()">
+                            MINIGAME
+                        </button>
+                        <button class="pokemon-button-retro secondary" onclick="runAway()">
+                            RUN AWAY
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Pokeball Throw Animation -->
-    <div id="throwModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="throw-container">
-                <div class="throw-instructions">Swipe up to throw the Pokéball!</div>
-                <div class="catch-zone">
-                    <img id="throwPokemonSprite" class="pokemon-sprite-large" src="" alt="Target Pokemon">
+    <div id="throwModal" class="pokemon-modal-overlay hidden">
+        <div class="pokemon-retro-card">
+            <!-- Type-based header -->
+            <div id="throwTypeHeader" class="pokemon-type-header normal"></div>
+            
+            <div class="pokemon-modal-body" style="padding: var(--space-md);">
+                <div style="text-align: center;">
+                    <!-- Instructions -->
+                    <div class="pokemon-stats-retro" style="margin-bottom: var(--space-lg);">
+                        SWIPE UP TO THROW!
+                    </div>
+                    
+                    <!-- Target Pokemon -->
+                    <div class="pokemon-image-retro" style="margin-bottom: var(--space-lg);">
+                        <img id="throwPokemonSprite" src="" alt="Target Pokemon" 
+                             style="width: 140px; height: 140px; object-fit: contain; display: block; margin: 0 auto;">
+                    </div>
+                    
+                    <!-- Pokeball Container -->
+                    <div style="background: #fff; border: 4px solid #2d3436; border-radius: 50%; padding: var(--space-lg); display: inline-block; margin: var(--space-md) 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <img id="pokeball" src="assets/pokeball.svg" alt="Pokeball" 
+                             style="width: 60px; height: 60px; cursor: pointer;">
+                    </div>
+                    
+                    <div style="color: #2d3436; font-family: 'Courier New', monospace; font-weight: bold; font-size: var(--font-size-base); margin-top: var(--space-md);">
+                        AIM AND THROW YOUR POKEBALL!
+                    </div>
                 </div>
-                <img id="pokeball" class="pokeball" src="assets/pokeball.svg" alt="Pokeball">
             </div>
         </div>
     </div>
@@ -527,7 +695,7 @@
         let isProcessingQR = false;
         let lastGlobalQRTime = 0;
 
-        // Handle QR scan result
+        // Handle QR scan result with robust error handling
         function onQRCodeDetected(pokemonNumber, rawData) {
             console.log('Pokemon detected:', pokemonNumber);
             
@@ -565,31 +733,39 @@
             // Show loading spinner while checking user data and Pokemon availability
             showLoadingSpinner('Checking Pokemon availability...');
             
-            // Check user data and Pokemon availability upfront
-            checkPokemonAvailability(pokemonNumber).then(result => {
-                hideLoadingSpinner();
-                isCheckingAvailability = false;
-                isProcessingQR = false; // Reset QR processing guard
-                
-                if (!result.canCatch) {
-                    // Show appropriate error message and return to scanner
-                    if (result.reason === 'duplicate') {
-                        showDuplicatePokemonModal(pokemonNumber, result.message);
-                    } else if (result.reason === 'user_not_found') {
-                        alert(`❌ ${result.message}\n\nPlease make sure you're logged in properly.`);
-                        showUIState(UI_STATES.SCANNER);
-                    } else {
-                        alert(`❌ ${result.message}`);
-                        showUIState(UI_STATES.SCANNER);
+            // Use setTimeout to ensure async call doesn't block the UI
+            setTimeout(async () => {
+                try {
+                    // Check user data and Pokemon availability upfront
+                    console.log('🔍 Starting Pokemon availability check...');
+                    const result = await checkPokemonAvailability(pokemonNumber);
+                    console.log('✅ Pokemon availability check completed:', result);
+                    
+                    hideLoadingSpinner();
+                    isCheckingAvailability = false;
+                    isProcessingQR = false; // Reset QR processing guard
+                    
+                    if (!result.canCatch) {
+                        // Show appropriate error message and return to scanner
+                        if (result.reason === 'duplicate') {
+                            showDuplicatePokemonModal(pokemonNumber, result.message);
+                        } else if (result.reason === 'user_not_found') {
+                            alert(`❌ ${result.message}\n\nPlease make sure you're logged in properly.`);
+                            showUIState(UI_STATES.SCANNER);
+                        } else {
+                            alert(`❌ ${result.message}`);
+                            showUIState(UI_STATES.SCANNER);
+                        }
+                        return;
                     }
-                    return;
-                }
-                
-                // Store user data for later use
-                window.currentUserData = result.userData;
-                
-                // Pokemon can be caught - load Pokemon data and show encounter
-                loadPokemonData(pokemonNumber).then(pokemonData => {
+                    
+                    // Store user data for later use
+                    window.currentUserData = result.userData;
+                    
+                    // Pokemon can be caught - load Pokemon data and show encounter
+                    console.log('✅ Pokemon can be caught, loading Pokemon data...');
+                    const pokemonData = await loadPokemonData(pokemonNumber);
+                    
                     if (pokemonData) {
                         currentPokemonData = pokemonData;
                         showPokemonEncounter(pokemonData, result.userData);
@@ -597,28 +773,38 @@
                         alert('Failed to load Pokemon data. Please try again.');
                         showUIState(UI_STATES.SCANNER);
                     }
-                }).catch(error => {
-                    console.error('Error loading Pokemon data:', error);
-                    alert('Failed to load Pokemon data. Please try again.');
+                    
+                } catch (error) {
+                    console.error('❌ Error in QR processing:', error);
+                    hideLoadingSpinner();
+                    isCheckingAvailability = false;
+                    isProcessingQR = false; // Reset QR processing guard
+                    
+                    // Show user-friendly error message
+                    const errorMessage = error.message || 'Unknown error occurred';
+                    alert(`❌ Failed to check Pokemon availability: ${errorMessage}\n\nPlease try again.`);
                     showUIState(UI_STATES.SCANNER);
-                });
-                
-            }).catch(error => {
-                console.error('Error checking Pokemon availability:', error);
-                hideLoadingSpinner();
-                isCheckingAvailability = false;
-                isProcessingQR = false; // Reset QR processing guard
-                alert(`Failed to check Pokemon availability: ${error.message}`);
-                showUIState(UI_STATES.SCANNER);
-            });
+                }
+            }, 100); // Small delay to ensure UI updates properly
         }
 
         // Check if Pokemon can be caught by user
         async function checkPokemonAvailability(pokemonNumber) {
             try {
+                console.log('🔍 Checking Pokemon availability for number:', pokemonNumber);
+                
+                // Validate that required services are available
+                if (typeof AuthService === 'undefined') {
+                    throw new Error('AuthService not loaded');
+                }
+                if (typeof CatchPokemonService === 'undefined') {
+                    throw new Error('CatchPokemonService not loaded');
+                }
+                
                 // Get current user
                 const currentUser = AuthService.getCurrentUser();
                 if (!currentUser || !currentUser.email) {
+                    console.error('❌ User not authenticated:', currentUser);
                     return {
                         canCatch: false,
                         reason: 'user_not_found',
@@ -626,11 +812,17 @@
                     };
                 }
                 
+                console.log('✅ User found:', currentUser.email);
+                
                 // Get user data - either works or fails
+                console.log('📡 Fetching user data...');
                 const userData = await CatchPokemonService.getUserData(currentUser.email);
+                console.log('✅ User data retrieved:', userData);
                 
                 // Check if Pokemon can be caught
+                console.log('🎯 Checking if Pokemon can be caught...');
                 const catchCheck = CatchPokemonService.canCatchPokemon(pokemonNumber, userData);
+                console.log('✅ Catch check result:', catchCheck);
                 
                 return {
                     ...catchCheck,
@@ -638,7 +830,12 @@
                 };
                 
             } catch (error) {
-                console.error('Error checking Pokemon availability:', error);
+                console.error('❌ Error checking Pokemon availability:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
                 throw error;
             }
         }
@@ -648,6 +845,28 @@
             document.getElementById('encounterPokemonImage').src = 
                 pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
             document.getElementById('encounterPokemonName').textContent = pokemonData.name;
+            
+            // Set type-based header color and display type badges
+            const typesContainer = document.getElementById('pokemonTypes');
+            const typeHeader = document.getElementById('pokemonTypeHeader');
+            typesContainer.innerHTML = '';
+            
+            if (pokemonData.types && pokemonData.types.length > 0) {
+                // Set header to primary type
+                const primaryType = pokemonData.types[0].type?.name || pokemonData.types[0];
+                typeHeader.className = `pokemon-type-header ${primaryType}`;
+                
+                // Add type badges
+                pokemonData.types.forEach(typeInfo => {
+                    const typeName = typeInfo.type?.name || typeInfo;
+                    const typeBadge = document.createElement('span');
+                    typeBadge.className = `pokemon-type-badge-retro ${typeName}`;
+                    typeBadge.textContent = typeName.toUpperCase();
+                    typesContainer.appendChild(typeBadge);
+                });
+            } else {
+                typeHeader.className = 'pokemon-type-header normal';
+            }
             
             // Use pre-fetched user data if available, otherwise fetch it
             let userInfo = userData;
@@ -672,7 +891,9 @@
                 
                 if (catchCheck.canCatch) {
                     // User has pokeballs - show normal catch option
-                    document.getElementById('pokeballCountDisplay').classList.remove('empty');
+                    const pokeballDisplay = document.getElementById('pokeballCountDisplay');
+                    pokeballDisplay.className = 'pokemon-stats-retro';
+                    
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
                     document.getElementById('noPokeballActions').classList.add('hidden');
@@ -700,7 +921,9 @@
                 // Update UI based on pokeball count
                 if (pokeballCount > 0) {
                     // User has pokeballs - show normal catch option
-                    document.getElementById('pokeballCountDisplay').classList.remove('empty');
+                    const pokeballDisplay = document.getElementById('pokeballCountDisplay');
+                    pokeballDisplay.className = 'pokemon-stats-retro';
+                    
                     document.getElementById('defaultActions').classList.remove('hidden');
                     document.getElementById('noPokeballs').classList.add('hidden');
                     document.getElementById('noPokeballActions').classList.add('hidden');
@@ -717,7 +940,11 @@
         // Show no pokeballs UI
         function showNoPokeballs() {
             document.getElementById('pokeballCount').textContent = '0';
-            document.getElementById('pokeballCountDisplay').classList.add('empty');
+            // Change pokeball count to alert styling
+            const pokeballDisplay = document.getElementById('pokeballCountDisplay');
+            pokeballDisplay.className = 'pokemon-stats-retro no-pokeballs';
+            
+            // Hide default actions and show no pokeballs options
             document.getElementById('defaultActions').classList.add('hidden');
             document.getElementById('noPokeballs').classList.remove('hidden');
             document.getElementById('noPokeballActions').classList.remove('hidden');
@@ -733,6 +960,15 @@
             // Set up throw screen
             document.getElementById('throwPokemonSprite').src = 
                 currentPokemonData.sprites?.official_artwork || currentPokemonData.sprites?.front_default || '';
+            
+            // Set type-based header for throw modal
+            const throwTypeHeader = document.getElementById('throwTypeHeader');
+            if (currentPokemonData.types && currentPokemonData.types.length > 0) {
+                const primaryType = currentPokemonData.types[0].type?.name || currentPokemonData.types[0];
+                throwTypeHeader.className = `pokemon-type-header ${primaryType}`;
+            } else {
+                throwTypeHeader.className = 'pokemon-type-header normal';
+            }
             
             showUIState(UI_STATES.THROW);
             
@@ -842,10 +1078,8 @@
                     </p>
                     ${pokeballInfo}
                     <button onclick="returnToMainMenu()" 
-                            style="background: linear-gradient(145deg, #4CAF50, #45a049); 
-                                   color: white; padding: 15px 30px; border: none; 
-                                   border-radius: 25px; font-size: 1.1rem; cursor: pointer;
-                                   margin-top: 20px;">
+                            class="pokemon-btn pokemon-btn-success pokemon-btn-lg"
+                            style="margin-top: 20px;">
                         Return to Main Menu
                     </button>
                 </div>
@@ -887,16 +1121,12 @@
                         Try scanning a different Pokémon QR code to catch a new one!
                     </p>
                     <button onclick="closeDuplicateModal()" 
-                            style="background: linear-gradient(145deg, #2196F3, #1976D2); 
-                                   color: white; padding: 15px 30px; border: none; 
-                                   border-radius: 25px; font-size: 1.1rem; cursor: pointer;
-                                   margin-right: 10px;">
+                            class="pokemon-btn pokemon-btn-primary"
+                            style="margin-right: 10px;">
                         Continue Scanning
                     </button>
                     <button onclick="returnToMainMenu()" 
-                            style="background: linear-gradient(145deg, #6c757d, #5a6268); 
-                                   color: white; padding: 15px 30px; border: none; 
-                                   border-radius: 25px; font-size: 1.1rem; cursor: pointer;">
+                            class="pokemon-btn pokemon-btn-secondary">
                         Main Menu
                     </button>
                 </div>
@@ -1179,13 +1409,18 @@
                     
                     // Check authentication if AuthService exists
                     if (typeof AuthService !== 'undefined') {
+                        console.log('🔑 Restoring authentication...');
                         await AuthService.restoreAuthFromSession();
                         
                         if (!AuthService.isAuthenticated()) {
+                            console.error('❌ Authentication failed');
                             document.getElementById('videoDebugInfo').innerHTML = 
                                 '<span style="color: #ff6b6b;">⚠️ Authentication required. Please log in.</span>';
                             return;
                         }
+                        console.log('✅ Authentication restored successfully');
+                    } else {
+                        console.warn('⚠️ AuthService not available');
                     }
                     
                     console.log('✅ Authentication OK, starting camera setup...');
@@ -1446,13 +1681,35 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Pokemon Scanner - Starting...');
+            console.log('Pokemon Scanner - DOM Content Loaded');
             
-            // Show scanner UI initially
-            showUIState(UI_STATES.SCANNER);
-            
-            // Initialize QR scanner
-            qrScanner = new QRScanner();
+            // Wait a bit for all scripts to load
+            setTimeout(() => {
+                console.log('Pokemon Scanner - Starting initialization...');
+                
+                // Check if required services are loaded
+                if (typeof AuthService === 'undefined') {
+                    console.error('❌ AuthService not loaded');
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #ff6b6b;">❌ Authentication service not loaded</span>';
+                    return;
+                }
+                
+                if (typeof CatchPokemonService === 'undefined') {
+                    console.error('❌ CatchPokemonService not loaded');
+                    document.getElementById('videoDebugInfo').innerHTML = 
+                        '<span style="color: #ff6b6b;">❌ Pokemon service not loaded</span>';
+                    return;
+                }
+                
+                console.log('✅ All services loaded successfully');
+                
+                // Show scanner UI initially
+                showUIState(UI_STATES.SCANNER);
+                
+                // Initialize QR scanner
+                qrScanner = new QRScanner();
+            }, 500); // Give scripts time to load
         });
     </script>
 </body>
