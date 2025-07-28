@@ -221,6 +221,9 @@ namespace PokemonGame.API
                     }
                 }
                 
+                // Initialize userInfo for OAuth exception handling
+                UserInfo? userInfo = null;
+                
                 // �🔒 CRITICAL SECURITY: Validate authentication token (except for internal OAuth calls)
                 if (!isInternalOAuthCall)
                 {
@@ -257,7 +260,7 @@ namespace PokemonGame.API
                 }
                 
                 var token = authValue.Substring(7); // Remove "Bearer " prefix
-                var userInfo = await ValidateTokenAsync(token);
+                userInfo = await ValidateTokenAsync(token);
                 
                 if (userInfo == null || !userInfo.IsValid)
                 {
@@ -275,6 +278,7 @@ namespace PokemonGame.API
                 }
                 
                 _logger.LogInformation($"✅ SECURITY: Authenticated user {userInfo.Email} accessing {restOfPath}");
+                } // End of authentication check block (!isInternalOAuthCall)
                 
                 // Get configuration from environment variables
                 var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
@@ -315,9 +319,9 @@ namespace PokemonGame.API
                     return errorResponse;
                 }
 
-                // 🔒 CRITICAL SECURITY: Get user's contact ID for data isolation (except for contact lookups)
+                // 🔒 CRITICAL SECURITY: Get user's contact ID for data isolation (except for internal OAuth calls and contact lookups)
                 string? userContactId = null;
-                if (restOfPath.Contains("pokemon_pokedexes"))
+                if (!isInternalOAuthCall && userInfo != null && restOfPath.Contains("pokemon_pokedexes"))
                 {
                     userContactId = await GetUserContactIdAsync(userInfo.Email, accessToken, dataverseUrl);
                     if (string.IsNullOrEmpty(userContactId))
@@ -336,9 +340,18 @@ namespace PokemonGame.API
                     }
                 }
 
-                // 🔒 SECURITY: Enforce data isolation - modify query to restrict user access
+                // 🔒 SECURITY: Enforce data isolation - modify query to restrict user access (skip for OAuth calls)
                 var originalQuery = req.Url.Query;
-                var secureQuery = "?" + EnforceDataIsolation(restOfPath, originalQuery?.TrimStart('?') ?? "", userContactId ?? "", userInfo.Email);
+                string secureQuery;
+                if (isInternalOAuthCall || userInfo == null)
+                {
+                    // For OAuth calls, use original query without modification
+                    secureQuery = originalQuery ?? "";
+                }
+                else
+                {
+                    secureQuery = "?" + EnforceDataIsolation(restOfPath, originalQuery?.TrimStart('?') ?? "", userContactId ?? "", userInfo.Email);
+                }
                 
                 // Build the target URL - remove /api/data/v9.2 from dataverseUrl if it exists and add it properly
                 var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
@@ -394,7 +407,7 @@ namespace PokemonGame.API
                 await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Backend call failure", details = ex.Message }));
                 return errorResponse;
             }
-        }
+        } // End of Run method
         
         private async Task<string?> GetAccessTokenAsync(string clientId, string clientSecret, string tenantId, string dataverseUrl)
         {
