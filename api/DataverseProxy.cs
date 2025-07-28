@@ -33,52 +33,74 @@ namespace PokemonGame.API
             _logger = logger;
         }
 
-        // 🔒 SECURITY: Validate user authentication token
-        private Task<UserInfo?> ValidateTokenAsync(string bearerToken)
+        // 🔒 SECURITY: Validate Microsoft access token
+        private async Task<UserInfo?> ValidateTokenAsync(string bearerToken)
         {
             try
             {
-                // Validate JWT token format
-                var tokenHandler = new JwtSecurityTokenHandler();
-                if (!tokenHandler.CanReadToken(bearerToken))
+                // First, try to validate as a Microsoft access token by calling Microsoft Graph
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", bearerToken);
+                
+                var response = await httpClient.GetAsync("https://graph.microsoft.com/v1.0/me");
+                
+                if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("🚨 SECURITY: Invalid token format provided");
-                    return Task.FromResult<UserInfo?>(null);
-                }
-                
-                // Decode JWT token 
-                var jwtToken = tokenHandler.ReadJwtToken(bearerToken);
-                
-                // Basic validation - check if token is expired
-                if (jwtToken.ValidTo < DateTime.UtcNow)
-                {
-                    _logger.LogWarning("🚨 SECURITY: Expired token provided");
-                    return Task.FromResult<UserInfo?>(null);
-                }
-                
-                // Extract user email from token claims
-                var emailClaim = jwtToken.Claims.FirstOrDefault(c => 
-                    c.Type == "email" || 
-                    c.Type == "preferred_username" || 
-                    c.Type == "upn")?.Value;
+                    // Token is valid, extract user info from Microsoft Graph
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var userProfile = JsonSerializer.Deserialize<JsonElement>(jsonContent);
                     
-                if (string.IsNullOrEmpty(emailClaim))
-                {
-                    _logger.LogWarning("🚨 SECURITY: No email claim found in token");
-                    return Task.FromResult<UserInfo?>(null);
+                    var email = userProfile.TryGetProperty("mail", out var mailProp) ? mailProp.GetString() :
+                              userProfile.TryGetProperty("userPrincipalName", out var upnProp) ? upnProp.GetString() : null;
+                    
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        _logger.LogInformation($"✅ SECURITY: Microsoft token validated for user: {email}");
+                        return new UserInfo
+                        {
+                            Email = email,
+                            IsValid = true
+                        };
+                    }
                 }
                 
-                _logger.LogInformation($"✅ SECURITY: Token validated for user: {emailClaim}");
-                return Task.FromResult<UserInfo?>(new UserInfo
+                // Fallback: Try to validate as JWT token (for backward compatibility)
+                var tokenHandler = new JwtSecurityTokenHandler();
+                if (tokenHandler.CanReadToken(bearerToken))
                 {
-                    Email = emailClaim,
-                    IsValid = true
-                });
+                    var jwtToken = tokenHandler.ReadJwtToken(bearerToken);
+                    
+                    // Basic validation - check if token is expired
+                    if (jwtToken.ValidTo < DateTime.UtcNow)
+                    {
+                        _logger.LogWarning("🚨 SECURITY: Expired JWT token provided");
+                        return null;
+                    }
+                    
+                    // Extract user email from token claims
+                    var emailClaim = jwtToken.Claims.FirstOrDefault(c => 
+                        c.Type == "email" || 
+                        c.Type == "preferred_username" || 
+                        c.Type == "upn")?.Value;
+                        
+                    if (!string.IsNullOrEmpty(emailClaim))
+                    {
+                        _logger.LogInformation($"✅ SECURITY: JWT token validated for user: {emailClaim}");
+                        return new UserInfo
+                        {
+                            Email = emailClaim,
+                            IsValid = true
+                        };
+                    }
+                }
+                
+                _logger.LogWarning("🚨 SECURITY: Token validation failed - neither Microsoft Graph nor JWT validation succeeded");
+                return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "🚨 SECURITY: Token validation failed");
-                return Task.FromResult<UserInfo?>(null);
+                return null;
             }
         }
 

@@ -2,6 +2,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace PokemonGame.Api.Auth
@@ -16,7 +17,7 @@ namespace PokemonGame.Api.Auth
         }
 
         [Function("WhoAmI")]
-        public HttpResponseData WhoAmI([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+        public async Task<HttpResponseData> WhoAmI([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
         {
             _logger.LogInformation("WhoAmI endpoint called");
 
@@ -67,8 +68,14 @@ namespace PokemonGame.Api.Auth
                     });
                 }
 
-                // Decode the simple token
-                var userInfo = DecodeSessionToken(token);
+                // First, try to validate as Microsoft access token
+                var userInfo = await ValidateMicrosoftToken(token);
+                if (userInfo == null)
+                {
+                    // Fallback: Try to decode as session token (for backward compatibility)
+                    userInfo = DecodeSessionToken(token);
+                }
+                
                 if (userInfo == null)
                 {
                     return CreateJsonResponse(req, HttpStatusCode.Unauthorized, new { 
@@ -149,6 +156,48 @@ namespace PokemonGame.Api.Auth
         {
             // TODO: Query your database using email as the key
             return DateTime.UtcNow.AddDays(-Math.Abs(email.GetHashCode()) % 7); // Mock: Within last week
+        }
+
+        // Validate Microsoft access token by calling Microsoft Graph
+        private async Task<UserSession?> ValidateMicrosoftToken(string token)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                
+                var response = await httpClient.GetAsync("https://graph.microsoft.com/v1.0/me");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var userProfile = JsonSerializer.Deserialize<JsonElement>(jsonContent);
+                    
+                    var email = userProfile.TryGetProperty("mail", out var mailProp) ? mailProp.GetString() :
+                              userProfile.TryGetProperty("userPrincipalName", out var upnProp) ? upnProp.GetString() : null;
+                    
+                    var name = userProfile.TryGetProperty("displayName", out var nameProp) ? nameProp.GetString() :
+                             userProfile.TryGetProperty("givenName", out var givenProp) ? givenProp.GetString() : email;
+                    
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        _logger.LogInformation($"Microsoft token validated for user: {email}");
+                        return new UserSession
+                        {
+                            email = email,
+                            name = name ?? email,
+                            loginTime = DateTime.UtcNow
+                        };
+                    }
+                }
+                
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to validate Microsoft token");
+                return null;
+            }
         }
 
         private HttpResponseData CreateJsonResponse(HttpRequestData req, HttpStatusCode statusCode, object data)

@@ -131,7 +131,8 @@ namespace PokemonGame.Api.OAuth
                     gameUrl = "http://localhost:8080";
                 }
                 
-                var sessionToken = CreateSessionToken(userEmail, firstName);
+                // Use the real Microsoft access token instead of a fake session token
+                var sessionToken = tokenResponse.access_token;
                 
                 var response = req.CreateResponse(HttpStatusCode.Redirect);
                 // Include profile creation result in the redirect URL for debugging
