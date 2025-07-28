@@ -12,7 +12,7 @@ class CatchPokemonService {
     }
     
     /**
-     * Fetch with timeout for mobile reliability
+     * Fetch with timeout and authentication for mobile reliability
      */
     static async fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
         const controller = new AbortController();
@@ -22,10 +22,26 @@ class CatchPokemonService {
             console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
             console.log(`🌍 Environment: ${window.location.hostname.includes('azurestaticapps.net') ? 'Production' : 'Development'}`);
             
-            const response = await fetch(url, {
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser || !authUser.token) {
+                console.error('CATCH-SERVICE: No authenticated user or token found');
+                throw new Error('Authentication required to access Pokemon data');
+            }
+            
+            // Add authentication headers
+            const secureOptions = {
                 ...options,
-                signal: controller.signal
-            });
+                signal: controller.signal,
+                headers: {
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email,
+                    ...options.headers
+                }
+            };
+            
+            const response = await fetch(url, secureOptions);
             
             clearTimeout(timeoutId);
             

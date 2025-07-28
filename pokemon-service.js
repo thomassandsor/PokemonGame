@@ -11,16 +11,34 @@ class PokemonService {
         try {
             console.log('POKEMON-SERVICE: Loading caught Pokemon for:', email);
             
+            // Get authentication token first
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser || !authUser.token) {
+                console.error('POKEMON-SERVICE: No authenticated user or token found');
+                throw new Error('Authentication required to access Pokemon data');
+            }
+            
             // ALWAYS try to get real data first, regardless of development mode
             console.log('POKEMON-SERVICE: Attempting to load REAL data from Dataverse...');
             
             // First, get the user's contact ID from their email
             console.log('POKEMON-SERVICE: Looking up user contact ID for email:', email);
+            
+            
             const contactUrl = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
             
             let userId;
             try {
-                const contactResponse = await fetch(contactUrl);
+                const contactResponse = await fetch(contactUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    headers: {
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'Content-Type': 'application/json',
+                        'X-User-Email': authUser.email  // Additional verification
+                    }
+                });
                 if (!contactResponse.ok) {
                     console.error('POKEMON-SERVICE: Failed to lookup user contact:', contactResponse.status);
                     return [];
@@ -40,14 +58,20 @@ class PokemonService {
             }
 
             // Get Pokemon from pokedex table - this will work in Azure deployment
-            console.log('POKEMON-SERVICE: Making request to Dataverse...');
+            console.log('POKEMON-SERVICE: Making authenticated request to Dataverse...');
+            
             const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'`;
             console.log('POKEMON-SERVICE: URL:', url);
             
             const response = await fetch(url, {
                 method: 'GET',
                 mode: 'cors',
-                credentials: 'omit'
+                credentials: 'omit',
+                headers: {
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email  // Additional verification
+                }
             });
 
             if (response.ok) {
@@ -127,6 +151,13 @@ class PokemonService {
             console.log('POKEMON-SERVICE: Using confirmed table name: pokemon_pokemons');
             console.log('POKEMON-SERVICE: Pagination - offset:', offset, 'limit:', limit);
             
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser || !authUser.token) {
+                console.error('POKEMON-SERVICE: No authenticated user or token found');
+                throw new Error('Authentication required to access Pokemon data');
+            }
+            
             // HYBRID APPROACH: Since $skip causes 400 errors, use a workaround
             if (offset === 0) {
                 // First page: Use only $top (which works)
@@ -136,7 +167,12 @@ class PokemonService {
                 const response = await fetch(url, {
                     method: 'GET',
                     mode: 'cors',
-                    credentials: 'omit'
+                    credentials: 'omit',
+                    headers: {
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'Content-Type': 'application/json',
+                        'X-User-Email': authUser.email
+                    }
                 });
 
                 if (response.ok) {
@@ -243,12 +279,25 @@ class PokemonService {
             
             // Production mode or JSON fallback: Load from Dataverse
             console.log('POKEMON-SERVICE: Loading from Dataverse API');
+            
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser || !authUser.token) {
+                console.error('POKEMON-SERVICE: No authenticated user or token found');
+                throw new Error('Authentication required to access Pokemon data');
+            }
+            
             const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=1000`;
             
             const response = await fetch(url, {
                 method: 'GET',
                 mode: 'cors',
-                credentials: 'omit'
+                credentials: 'omit',
+                headers: {
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                }
             });
 
             if (response.ok) {

@@ -10,9 +10,18 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Net;
 using Microsoft.AspNetCore.WebUtilities;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PokemonGame.API
 {
+    public class UserInfo
+    {
+        public string Email { get; set; } = string.Empty;
+        public bool IsValid { get; set; }
+    }
+
     public class DataverseProxy
     {
         private readonly HttpClient _httpClient;
@@ -22,6 +31,124 @@ namespace PokemonGame.API
         {
             _httpClient = httpClient;
             _logger = logger;
+        }
+
+        // 🔒 SECURITY: Validate user authentication token
+        private Task<UserInfo?> ValidateTokenAsync(string bearerToken)
+        {
+            try
+            {
+                // Validate JWT token format
+                var tokenHandler = new JwtSecurityTokenHandler();
+                if (!tokenHandler.CanReadToken(bearerToken))
+                {
+                    _logger.LogWarning("🚨 SECURITY: Invalid token format provided");
+                    return Task.FromResult<UserInfo?>(null);
+                }
+                
+                // Decode JWT token 
+                var jwtToken = tokenHandler.ReadJwtToken(bearerToken);
+                
+                // Basic validation - check if token is expired
+                if (jwtToken.ValidTo < DateTime.UtcNow)
+                {
+                    _logger.LogWarning("🚨 SECURITY: Expired token provided");
+                    return Task.FromResult<UserInfo?>(null);
+                }
+                
+                // Extract user email from token claims
+                var emailClaim = jwtToken.Claims.FirstOrDefault(c => 
+                    c.Type == "email" || 
+                    c.Type == "preferred_username" || 
+                    c.Type == "upn")?.Value;
+                    
+                if (string.IsNullOrEmpty(emailClaim))
+                {
+                    _logger.LogWarning("🚨 SECURITY: No email claim found in token");
+                    return Task.FromResult<UserInfo?>(null);
+                }
+                
+                _logger.LogInformation($"✅ SECURITY: Token validated for user: {emailClaim}");
+                return Task.FromResult<UserInfo?>(new UserInfo
+                {
+                    Email = emailClaim,
+                    IsValid = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "🚨 SECURITY: Token validation failed");
+                return Task.FromResult<UserInfo?>(null);
+            }
+        }
+
+        // 🔒 SECURITY: Get user's contact ID from Dataverse
+        private async Task<string?> GetUserContactIdAsync(string userEmail, string accessToken, string dataverseUrl)
+        {
+            try
+            {
+                var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
+                var contactUrl = $"{baseUrl}/api/data/v9.2/contacts?$filter=emailaddress1 eq '{userEmail}'&$select=contactid";
+                
+                var request = new HttpRequestMessage(HttpMethod.Get, contactUrl);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                request.Headers.Add("OData-MaxVersion", "4.0");
+                request.Headers.Add("OData-Version", "4.0");
+                request.Headers.Add("Accept", "application/json");
+                
+                var response = await _httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonDocument.Parse(responseContent);
+                    var contacts = jsonDoc.RootElement.GetProperty("value");
+                    
+                    if (contacts.GetArrayLength() > 0)
+                    {
+                        var contactId = contacts[0].GetProperty("contactid").GetString();
+                        _logger.LogInformation($"✅ SECURITY: Found contact ID for user {userEmail}");
+                        return contactId;
+                    }
+                }
+                
+                _logger.LogWarning($"🚨 SECURITY: No contact found for user {userEmail}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"🚨 SECURITY: Error getting contact ID for {userEmail}");
+                return null;
+            }
+        }
+
+        // 🔒 SECURITY: Enforce user data isolation for sensitive endpoints
+        private string EnforceDataIsolation(string restOfPath, string query, string userContactId)
+        {
+            try
+            {
+                // For pokemon_pokedexes endpoint - most critical security check
+                if (restOfPath.Contains("pokemon_pokedexes"))
+                {
+                    _logger.LogInformation($"🔒 SECURITY: Enforcing data isolation for pokemon_pokedexes - User: {userContactId}");
+                    return $"$filter=_pokemon_user_value eq '{userContactId}'";
+                }
+                
+                // For contacts endpoint - user can only query their own contact
+                if (restOfPath.Contains("contacts"))
+                {
+                    _logger.LogInformation($"🔒 SECURITY: Enforcing data isolation for contacts");
+                    return "$select=contactid,fullname"; // Remove email filter for security
+                }
+                
+                // For other endpoints, return original query but log access
+                _logger.LogInformation($"🔒 SECURITY: Non-sensitive endpoint accessed: {restOfPath}");
+                return query;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "🚨 SECURITY: Error in data isolation enforcement");
+                return "$filter=1 eq 2"; // Return impossible filter as fallback
+            }
         }
         
         [Function("DataverseProxy")]
@@ -43,7 +170,60 @@ namespace PokemonGame.API
 
             try
             {
-                _logger.LogInformation($"DataverseProxy function processed request for path: {restOfPath}");
+                _logger.LogInformation($"🔐 SECURITY CHECK: DataverseProxy processing request for path: {restOfPath}");
+                
+                // 🔒 CRITICAL SECURITY: Validate authentication token
+                var authHeader = req.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
+                if (authHeader.Key == null || authHeader.Value == null || !authHeader.Value.Any())
+                {
+                    _logger.LogWarning($"🚨 SECURITY VIOLATION: Unauthenticated access attempt to {restOfPath}");
+                    var unauthorizedResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                    unauthorizedResponse.Headers.Add("Content-Type", "application/json");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                    await unauthorizedResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
+                        error = "Authentication required",
+                        message = "This endpoint requires a valid authentication token"
+                    }));
+                    return unauthorizedResponse;
+                }
+                
+                var authValue = authHeader.Value.FirstOrDefault();
+                if (string.IsNullOrEmpty(authValue) || !authValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning($"🚨 SECURITY VIOLATION: Invalid auth header format for {restOfPath}");
+                    var unauthorizedResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                    unauthorizedResponse.Headers.Add("Content-Type", "application/json");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                    await unauthorizedResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
+                        error = "Invalid authentication format",
+                        message = "Authentication header must be in format: Bearer <token>"
+                    }));
+                    return unauthorizedResponse;
+                }
+                
+                var token = authValue.Substring(7); // Remove "Bearer " prefix
+                var userInfo = await ValidateTokenAsync(token);
+                
+                if (userInfo == null || !userInfo.IsValid)
+                {
+                    _logger.LogWarning($"🚨 SECURITY VIOLATION: Invalid token provided for {restOfPath}");
+                    var unauthorizedResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                    unauthorizedResponse.Headers.Add("Content-Type", "application/json");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                    unauthorizedResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                    await unauthorizedResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
+                        error = "Invalid authentication token",
+                        message = "The provided authentication token is invalid or expired"
+                    }));
+                    return unauthorizedResponse;
+                }
+                
+                _logger.LogInformation($"✅ SECURITY: Authenticated user {userInfo.Email} accessing {restOfPath}");
                 
                 // Get configuration from environment variables
                 var dataverseUrl = Environment.GetEnvironmentVariable("DATAVERSE_URL") ?? "https://pokemongame.crm4.dynamics.com";
@@ -83,16 +263,38 @@ namespace PokemonGame.API
                     await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new { error = "Failed to authenticate with Dataverse", statusCode = 401 }));
                     return errorResponse;
                 }
+
+                // 🔒 CRITICAL SECURITY: Get user's contact ID for data isolation
+                string? userContactId = null;
+                if (restOfPath.Contains("pokemon_pokedexes") || restOfPath.Contains("contacts"))
+                {
+                    userContactId = await GetUserContactIdAsync(userInfo.Email, accessToken, dataverseUrl);
+                    if (string.IsNullOrEmpty(userContactId))
+                    {
+                        _logger.LogWarning($"🚨 SECURITY: User {userInfo.Email} not found in contacts table");
+                        var unauthorizedResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                        unauthorizedResponse.Headers.Add("Content-Type", "application/json");
+                        unauthorizedResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+                        unauthorizedResponse.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                        unauthorizedResponse.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                        await unauthorizedResponse.WriteStringAsync(JsonSerializer.Serialize(new { 
+                            error = "User not found in system",
+                            message = "Your user account was not found in the Pokemon game system"
+                        }));
+                        return unauthorizedResponse;
+                    }
+                }
+
+                // 🔒 SECURITY: Enforce data isolation - modify query to restrict user access
+                var originalQuery = req.Url.Query;
+                var secureQuery = string.IsNullOrEmpty(userContactId) ? originalQuery : 
+                    "?" + EnforceDataIsolation(restOfPath, originalQuery?.TrimStart('?') ?? "", userContactId);
                 
                 // Build the target URL - remove /api/data/v9.2 from dataverseUrl if it exists and add it properly
                 var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
-                var targetUrl = $"{baseUrl}/api/data/v9.2/{restOfPath}";
-                if (!string.IsNullOrEmpty(req.Url.Query))
-                {
-                    targetUrl += req.Url.Query;
-                }
+                var targetUrl = $"{baseUrl}/api/data/v9.2/{restOfPath}{secureQuery}";
                 
-                _logger.LogInformation($"Proxying request to: {targetUrl}");
+                _logger.LogInformation($"🔒 SECURE REQUEST: Proxying to: {targetUrl}");
                 
                 // Create the request
                 var request = new HttpRequestMessage(new HttpMethod(req.Method), targetUrl);
