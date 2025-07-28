@@ -78,28 +78,22 @@ class AuthService {
                     console.log('AUTH: Session restoration successful (localhost)');
                     return user;
                 } else {
-                    console.log('AUTH: Production environment, TEMPORARILY skipping token verification...');
-                    // TEMPORARY: Skip token verification in production until we fix the whoami endpoint
-                    this.currentUser = user;
-                    this.isAuthenticatedFlag = true;
-                    console.log('AUTH: Session restoration successful (production - no verification)');
-                    return user;
-                    
-                    /* DISABLED FOR NOW - whoami endpoint may not exist
-                    // Verify the user is still valid by checking with the backend
+                    console.log('AUTH: Production environment, validating token with backend...');
+                    // Validate the token with the backend
                     const isValid = await this.verifyUserToken(user.token);
                     
                     if (isValid) {
                         this.currentUser = user;
                         this.isAuthenticatedFlag = true;
-                        console.log('AUTH: Session restoration successful');
+                        console.log('AUTH: Session restoration successful (token validated)');
                         return user;
                     } else {
-                        console.log('AUTH: Token validation failed, clearing session');
+                        console.log('AUTH: Token validation failed, clearing session and redirecting to login');
                         this.logout();
+                        // Redirect to proper Microsoft login
+                        window.location.href = 'https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin';
                         return null;
                     }
-                    */
                 }
             } else {
                 console.log('AUTH: No valid session found');
@@ -166,7 +160,25 @@ class AuthService {
         sessionStorage.removeItem('pokemonGame_user');
         sessionStorage.removeItem('pokemonGame_authenticated');
         
+        // Clear local storage too (just in case)
+        localStorage.removeItem('pokemonGame_user');
+        localStorage.removeItem('pokemonGame_authenticated');
+        
+        // Clear any other Pokemon-related storage
+        Object.keys(sessionStorage).forEach(key => {
+            if (key.includes('pokemon') || key.includes('auth')) {
+                sessionStorage.removeItem(key);
+            }
+        });
+        
         console.log('AUTH: Logout complete');
+    }
+
+    // Force logout and redirect to proper login
+    static forceLogoutAndRedirect() {
+        console.log('AUTH: Force logout and redirect to Microsoft login...');
+        this.logout();
+        window.location.href = 'https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin';
     }
 
     // Get user's email (commonly needed for API calls)
