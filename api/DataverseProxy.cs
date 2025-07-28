@@ -223,7 +223,7 @@ namespace PokemonGame.API
                 bool isInternalOAuthCall = false;
                 
                 // Check if this is an internal call from MicrosoftAuth OAuth process
-                if (restOfPath.Contains("contacts") && req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
+                if (restOfPath.Contains("contacts") && (req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase) || req.Method.Equals("POST", StringComparison.OrdinalIgnoreCase)))
                 {
                     // Check if it's from the same Azure Functions domain (internal call)
                     var host = req.Headers.FirstOrDefault(h => h.Key.Equals("Host", StringComparison.OrdinalIgnoreCase));
