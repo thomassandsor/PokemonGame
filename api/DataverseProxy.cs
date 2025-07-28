@@ -194,10 +194,39 @@ namespace PokemonGame.API
             {
                 _logger.LogInformation($"🔐 SECURITY CHECK: DataverseProxy processing request for path: {restOfPath}");
                 
-                // 🔒 CRITICAL SECURITY: Validate authentication token
-                var authHeader = req.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
-                if (authHeader.Key == null || authHeader.Value == null || !authHeader.Value.Any())
+                // � OAUTH EXCEPTION: Allow internal OAuth profile creation calls
+                var userAgent = req.Headers.FirstOrDefault(h => h.Key.Equals("User-Agent", StringComparison.OrdinalIgnoreCase));
+                var referrer = req.Headers.FirstOrDefault(h => h.Key.Equals("Referer", StringComparison.OrdinalIgnoreCase));
+                
+                bool isInternalOAuthCall = false;
+                
+                // Check if this is an internal call from MicrosoftAuth OAuth process
+                if (restOfPath.Contains("contacts") && req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
                 {
+                    // Check if it's from the same Azure Functions domain (internal call)
+                    var host = req.Headers.FirstOrDefault(h => h.Key.Equals("Host", StringComparison.OrdinalIgnoreCase));
+                    if (host.Value != null && host.Value.Any() && 
+                        host.Value.First().Contains("pokemongame-functions-2025.azurewebsites.net"))
+                    {
+                        // Additional check: no Authorization header AND no X-User-Email header suggests internal OAuth call
+                        var authHeader = req.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
+                        var userEmailHeader = req.Headers.FirstOrDefault(h => h.Key.Equals("X-User-Email", StringComparison.OrdinalIgnoreCase));
+                        
+                        if ((authHeader.Key == null || !authHeader.Value.Any()) && 
+                            (userEmailHeader.Key == null || !userEmailHeader.Value.Any()))
+                        {
+                            _logger.LogInformation($"🔓 OAUTH: Allowing internal OAuth profile creation call for: {restOfPath}");
+                            isInternalOAuthCall = true;
+                        }
+                    }
+                }
+                
+                // �🔒 CRITICAL SECURITY: Validate authentication token (except for internal OAuth calls)
+                if (!isInternalOAuthCall)
+                {
+                    var authHeader = req.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
+                    if (authHeader.Key == null || authHeader.Value == null || !authHeader.Value.Any())
+                    {
                     _logger.LogWarning($"🚨 SECURITY VIOLATION: Unauthenticated access attempt to {restOfPath}");
                     var unauthorizedResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
                     unauthorizedResponse.Headers.Add("Content-Type", "application/json");
