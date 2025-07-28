@@ -1,6 +1,17 @@
 // Pokemon Service for loading REAL Pokemon data from Dataverse
 class PokemonService {
     
+    // Environment-aware base URL configuration
+    static get baseUrl() {
+        // Check if we're running in production (Azure Static Web Apps)
+        if (window.location.hostname.includes('azurestaticapps.net')) {
+            // Production: Use Azure Functions URL
+            return 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+        }
+        // Development: Use local Azure Functions
+        return 'http://localhost:7071/api/dataverse';
+    }
+    
     // Check if we're in development mode (localhost)
     static isDevelopmentMode() {
         return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -25,7 +36,7 @@ class PokemonService {
             console.log('POKEMON-SERVICE: Looking up user contact ID for email:', email);
             
             
-            const contactUrl = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
+            const contactUrl = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
             
             let userId;
             try {
@@ -60,7 +71,7 @@ class PokemonService {
             // Get Pokemon from pokedex table - this will work in Azure deployment
             console.log('POKEMON-SERVICE: Making authenticated request to Dataverse...');
             
-            const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'`;
+            const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'`;
             console.log('POKEMON-SERVICE: URL:', url);
             
             const response = await fetch(url, {
@@ -161,7 +172,7 @@ class PokemonService {
             // HYBRID APPROACH: Since $skip causes 400 errors, use a workaround
             if (offset === 0) {
                 // First page: Use only $top (which works)
-                const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=${limit}`;
+                const url = `${this.baseUrl}/pokemon_pokemons?%24top=${limit}`;
                 console.log('POKEMON-SERVICE: First page URL:', url);
                 
                 const response = await fetch(url, {
@@ -287,7 +298,7 @@ class PokemonService {
                 throw new Error('Authentication required to access Pokemon data');
             }
             
-            const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_pokemons?%24top=1000`;
+            const url = `${this.baseUrl}/pokemon_pokemons?%24top=1000`;
             
             const response = await fetch(url, {
                 method: 'GET',
