@@ -122,7 +122,7 @@ namespace PokemonGame.API
         }
 
         // 🔒 SECURITY: Enforce user data isolation for sensitive endpoints
-        private string EnforceDataIsolation(string restOfPath, string query, string userContactId)
+        private string EnforceDataIsolation(string restOfPath, string query, string userContactId, string userEmail)
         {
             try
             {
@@ -137,7 +137,29 @@ namespace PokemonGame.API
                 if (restOfPath.Contains("contacts"))
                 {
                     _logger.LogInformation($"🔒 SECURITY: Enforcing data isolation for contacts");
-                    return "$select=contactid,fullname"; // Remove email filter for security
+                    _logger.LogInformation($"🔍 DEBUG: Query string: {query}");
+                    _logger.LogInformation($"🔍 DEBUG: User email: {userEmail}");
+                    
+                    // Decode URL encoding and check for user's email
+                    var decodedQuery = System.Web.HttpUtility.UrlDecode(query ?? "");
+                    var userEmailEncoded = System.Web.HttpUtility.UrlEncode(userEmail);
+                    
+                    // Check if the query is looking up the authenticated user's email (multiple formats)
+                    if ((query?.Contains($"emailaddress1 eq '{userEmail}'") ?? false) || 
+                        (query?.Contains($"emailaddress1%20eq%20%27{userEmail}%27") ?? false) ||
+                        (query?.Contains($"emailaddress1%20eq%20%27{userEmailEncoded}%27") ?? false) ||
+                        decodedQuery.Contains($"emailaddress1 eq '{userEmail}'"))
+                    {
+                        _logger.LogInformation($"✅ SECURITY: Contact lookup for authenticated user {userEmail} - allowed");
+                        return query ?? ""; // Allow the original query
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"🚨 SECURITY: Contact lookup for different email attempted by {userEmail}");
+                        _logger.LogWarning($"🚨 SECURITY: Query was: {query}");
+                        _logger.LogWarning($"🚨 SECURITY: Decoded query was: {decodedQuery}");
+                        return "$filter=1 eq 2"; // Block unauthorized contact lookups
+                    }
                 }
                 
                 // For other endpoints, return original query but log access
@@ -264,9 +286,9 @@ namespace PokemonGame.API
                     return errorResponse;
                 }
 
-                // 🔒 CRITICAL SECURITY: Get user's contact ID for data isolation
+                // 🔒 CRITICAL SECURITY: Get user's contact ID for data isolation (except for contact lookups)
                 string? userContactId = null;
-                if (restOfPath.Contains("pokemon_pokedexes") || restOfPath.Contains("contacts"))
+                if (restOfPath.Contains("pokemon_pokedexes"))
                 {
                     userContactId = await GetUserContactIdAsync(userInfo.Email, accessToken, dataverseUrl);
                     if (string.IsNullOrEmpty(userContactId))
@@ -287,8 +309,7 @@ namespace PokemonGame.API
 
                 // 🔒 SECURITY: Enforce data isolation - modify query to restrict user access
                 var originalQuery = req.Url.Query;
-                var secureQuery = string.IsNullOrEmpty(userContactId) ? originalQuery : 
-                    "?" + EnforceDataIsolation(restOfPath, originalQuery?.TrimStart('?') ?? "", userContactId);
+                var secureQuery = "?" + EnforceDataIsolation(restOfPath, originalQuery?.TrimStart('?') ?? "", userContactId ?? "", userInfo.Email);
                 
                 // Build the target URL - remove /api/data/v9.2 from dataverseUrl if it exists and add it properly
                 var baseUrl = dataverseUrl.Replace("/api/data/v9.2", "");
