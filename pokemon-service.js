@@ -155,88 +155,36 @@ class PokemonService {
         }
     }
 
-    // Get all available Pokemon from the Pokemon master table
+    // Get all available Pokemon from JSON file only
     static async getAllPokemon(offset = 0, limit = 20) {
         try {
-            console.log('POKEMON-SERVICE: Loading Pokemon from Dataverse...');
-            console.log('POKEMON-SERVICE: Using confirmed table name: pokemon_pokemons');
+            console.log('POKEMON-SERVICE: Loading Pokemon from JSON cache...');
             console.log('POKEMON-SERVICE: Pagination - offset:', offset, 'limit:', limit);
             
-            // Get authentication token
-            const authUser = AuthService.getCurrentUser();
-            if (!authUser || !authUser.token) {
-                console.error('POKEMON-SERVICE: No authenticated user or token found');
-                throw new Error('Authentication required to access Pokemon data');
+            // Ensure cache is loaded
+            if (!PokemonService._allPokemonCache) {
+                console.log('POKEMON-SERVICE: Cache not ready, loading all Pokemon...');
+                await this.loadAndCacheAllPokemon();
             }
             
-            // HYBRID APPROACH: Since $skip causes 400 errors, use a workaround
-            if (offset === 0) {
-                // First page: Use only $top (which works)
-                const url = `${this.baseUrl}/pokemon_pokemons?%24top=${limit}`;
-                console.log('POKEMON-SERVICE: First page URL:', url);
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'cors',
-                    credentials: 'omit',
-                    headers: {
-                        'Authorization': `Bearer ${authUser.token}`,
-                        'Content-Type': 'application/json',
-                        'X-User-Email': authUser.email
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('POKEMON-SERVICE: Got first page from Dataverse:', data);
-                    
-                    const mappedPokemon = this.mapPokemonData(data.value || []);
-                    
-                    // For subsequent pages, we'll need to load all data and cache it
-                    // So let's also make a request for all Pokemon to cache
-                    this.loadAndCacheAllPokemon();
-                    
-                    const hasMore = data.value && data.value.length === limit;
-                    console.log('POKEMON-SERVICE: First page - has more?', hasMore);
-                    
-                    return {
-                        pokemon: mappedPokemon,
-                        hasMore: hasMore,
-                        tableName: 'pokemon_pokemons'
-                    };
-                } else {
-                    console.error('POKEMON-SERVICE: HTTP ERROR - Status:', response.status);
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-            } else {
-                // Subsequent pages: Use cached data (since $skip doesn't work)
-                console.log('POKEMON-SERVICE: Loading from cache for offset:', offset);
-                
-                if (!PokemonService._allPokemonCache) {
-                    console.log('POKEMON-SERVICE: Cache not ready, loading all Pokemon...');
-                    await this.loadAndCacheAllPokemon();
-                }
-                
-                const startIndex = offset;
-                const endIndex = offset + limit;
-                const pagePokemons = PokemonService._allPokemonCache.slice(startIndex, endIndex);
-                const hasMore = endIndex < PokemonService._allPokemonCache.length;
-                
-                console.log('POKEMON-SERVICE: Returning cached page:', pagePokemons.length, 'Pokemon');
-                console.log('POKEMON-SERVICE: Cache total:', PokemonService._allPokemonCache.length);
-                console.log('POKEMON-SERVICE: Has more?', hasMore);
-                
-                return {
-                    pokemon: pagePokemons,
-                    hasMore: hasMore,
-                    tableName: 'pokemon_pokemons'
-                };
-            }
+            // Return paginated results from cache
+            const startIndex = offset;
+            const endIndex = offset + limit;
+            const pagePokemons = PokemonService._allPokemonCache.slice(startIndex, endIndex);
+            const hasMore = endIndex < PokemonService._allPokemonCache.length;
+            
+            console.log('POKEMON-SERVICE: Returning cached page:', pagePokemons.length, 'Pokemon');
+            console.log('POKEMON-SERVICE: Cache total:', PokemonService._allPokemonCache.length);
+            console.log('POKEMON-SERVICE: Has more?', hasMore);
+            
+            return {
+                pokemon: pagePokemons,
+                hasMore: hasMore,
+                tableName: 'json_cache'
+            };
             
         } catch (error) {
-            console.error('POKEMON-SERVICE: DETAILED ERROR loading all Pokemon:', error);
-            console.error('POKEMON-SERVICE: Error type:', error.name);
-            console.error('POKEMON-SERVICE: Error message:', error.message);
+            console.error('POKEMON-SERVICE: ERROR loading Pokemon:', error);
             throw error;
         }
     }
@@ -251,103 +199,45 @@ class PokemonService {
             
             console.log('POKEMON-SERVICE: Loading ALL Pokemon for caching...');
             
-            // Always try enhanced JSON file first (both development and production)
-            console.log('POKEMON-SERVICE: Attempting to load from enhanced JSON file');
-            try {
-                const response = await fetch('/src/data/pokemon.json');
-                if (response.ok) {
-                    const pokemonData = await response.json();
-                    console.log('POKEMON-SERVICE: Successfully loaded from JSON file:', pokemonData.length, 'Pokemon');
-                    
-                    // Map JSON data to our expected format with enhanced data support
-                    PokemonService._allPokemonCache = pokemonData.map(p => ({
-                        id: p.id,
-                        name: p.name,
-                        type1: p.types[0] || 'normal',
-                        type2: p.types[1] || null,
-                        types: p.types || ['normal'], // Keep original types array
-                        baseHp: p.stats?.find(s => s.name === 'hp')?.base_stat || 50,
-                        baseAttack: p.stats?.find(s => s.name === 'attack')?.base_stat || 50,
-                        baseDefence: p.stats?.find(s => s.name === 'defense')?.base_stat || 50,
-                        baseSpeed: p.stats?.find(s => s.name === 'speed')?.base_stat || 50,
-                        // Use enhanced data if available, otherwise fallback
-                        description: p.description || `${p.types.join('/')} type Pokemon`,
-                        generation: p.generation || (p.id <= 151 ? 1 : p.id <= 251 ? 2 : p.id <= 386 ? 3 : p.id <= 493 ? 4 : 5),
-                        legendary: p.legendary !== undefined ? p.legendary : false,
-                        mythical: p.mythical !== undefined ? p.mythical : false,
-                        height: p.height,
-                        weight: p.weight,
-                        abilities: p.abilities || [],
-                        sprites: p.sprites
-                    }));
-                    
-                    console.log('POKEMON-SERVICE: Successfully cached', PokemonService._allPokemonCache.length, 'Pokemon from JSON');
-                    return;
-                }
-            } catch (jsonError) {
-                console.warn('POKEMON-SERVICE: Failed to load JSON file, falling back to Dataverse:', jsonError);
+            // Load from enhanced JSON file - NO FALLBACKS, fail fast if this doesn't work
+            console.log('POKEMON-SERVICE: Loading from enhanced JSON file');
+            const response = await fetch('/src/data/pokemon.json');
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load Pokemon JSON file: ${response.status} ${response.statusText}`);
             }
             
-            // Fallback to Dataverse if JSON fails (both development and production)
-            if (this.isDevelopmentMode()) {
-                console.log('POKEMON-SERVICE: Development mode JSON failed, skipping Dataverse fallback');
-                return;
-            }
+            const pokemonData = await response.json();
+            console.log('POKEMON-SERVICE: Successfully loaded from JSON file:', pokemonData.length, 'Pokemon');
             
-            // Production mode or JSON fallback: Load from Dataverse
-            console.log('POKEMON-SERVICE: Loading from Dataverse API');
+            // Map JSON data to our expected format with enhanced data support
+            PokemonService._allPokemonCache = pokemonData.map(p => ({
+                id: p.id,
+                name: p.name,
+                type1: p.types[0] || 'normal',
+                type2: p.types[1] || null,
+                types: p.types || ['normal'], // Keep original types array
+                baseHp: p.stats?.find(s => s.name === 'hp')?.base_stat || 50,
+                baseAttack: p.stats?.find(s => s.name === 'attack')?.base_stat || 50,
+                baseDefence: p.stats?.find(s => s.name === 'defense')?.base_stat || 50,
+                baseSpeed: p.stats?.find(s => s.name === 'speed')?.base_stat || 50,
+                // Use enhanced data if available, otherwise fallback
+                description: p.description || `${p.types.join('/')} type Pokemon`,
+                generation: p.generation || (p.id <= 151 ? 1 : p.id <= 251 ? 2 : p.id <= 386 ? 3 : p.id <= 493 ? 4 : 5),
+                legendary: p.legendary !== undefined ? p.legendary : false,
+                mythical: p.mythical !== undefined ? p.mythical : false,
+                height: p.height,
+                weight: p.weight,
+                abilities: p.abilities || [],
+                sprites: p.sprites
+            }));
             
-            // Get authentication token
-            const authUser = AuthService.getCurrentUser();
-            if (!authUser || !authUser.token) {
-                console.error('POKEMON-SERVICE: No authenticated user or token found');
-                throw new Error('Authentication required to access Pokemon data');
-            }
-            
-            const url = `${this.baseUrl}/pokemon_pokemons?%24top=1000`;
-            
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'cors',
-                credentials: 'omit',
-                headers: {
-                    'Authorization': `Bearer ${authUser.token}`,
-                    'Content-Type': 'application/json',
-                    'X-User-Email': authUser.email
-                }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('POKEMON-SERVICE: Loaded all Pokemon for cache:', data.value?.length || 0);
-                
-                PokemonService._allPokemonCache = this.mapPokemonData(data.value || []);
-                console.log('POKEMON-SERVICE: Cached', PokemonService._allPokemonCache.length, 'Pokemon');
-            } else {
-                console.error('POKEMON-SERVICE: Failed to load all Pokemon for cache');
-            }
+            console.log('POKEMON-SERVICE: Successfully cached', PokemonService._allPokemonCache.length, 'Pokemon from JSON');
+            console.log('POKEMON-SERVICE: Sample Pokemon data:', PokemonService._allPokemonCache[0]);
         } catch (error) {
             console.error('POKEMON-SERVICE: Error caching Pokemon:', error);
+            throw error; // Re-throw so calling code knows it failed
         }
-    }
-
-    // Helper method to map Pokemon data consistently
-    static mapPokemonData(rawPokemon) {
-        return rawPokemon.map(p => {
-            return {
-                id: p.pokemon_id || p.pokemonid || p.id || 1,
-                name: p.pokemon_name || p.pokemonname || p.name || 'Unknown',
-                type1: p.pokemon_type1 || p.type1 || p.pokemontype1 || 'normal',
-                type2: p.pokemon_type2 || p.type2 || p.pokemontype2 || null,
-                baseHp: p.pokemon_basehp || p.basehp || p.pokemonbasehp || 50,
-                baseAttack: p.pokemon_baseattack || p.baseattack || p.pokemonbaseattack || 50,
-                baseDefence: p.pokemon_basedefence || p.basedefence || p.pokemonbasedefence || 50,
-                baseSpeed: p.pokemon_basespeed || p.basespeed || p.pokemonbasespeed || 50,
-                description: p.pokemon_description || p.description || p.pokemondescription || '',
-                generation: p.pokemon_generation || p.generation || p.pokemongeneration || 1,
-                legendary: p.pokemon_legendary || p.legendary || p.pokemonlegendary || false
-            };
-        });
     }
 }
 

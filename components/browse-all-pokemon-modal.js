@@ -89,13 +89,6 @@ class BrowseAllPokemonModal {
      * Populate data for uncaught Pokemon (from JSON)
      */
     populateUncaughtPokemon(cardContainer, pokemonData) {
-        // Debug logging to understand data structure
-        console.log('BROWSE-MODAL: Populating uncaught Pokemon with data:', pokemonData);
-        console.log('BROWSE-MODAL: baseAttack:', pokemonData.baseAttack);
-        console.log('BROWSE-MODAL: baseDefence:', pokemonData.baseDefence);
-        console.log('BROWSE-MODAL: baseHp:', pokemonData.baseHp);
-        console.log('BROWSE-MODAL: description:', pokemonData.description);
-        
         // Stats - Show base stats from JSON + Description in same style
         const stats = [
             { name: 'Attack', value: pokemonData.baseAttack || 50 },
@@ -112,7 +105,6 @@ class BrowseAllPokemonModal {
             });
         }
 
-        console.log('BROWSE-MODAL: Final stats array:', stats);
         PokemonCardTemplates.populateStats(cardContainer, stats);
 
         // No additional sections for uncaught Pokemon - keep it clean
@@ -122,60 +114,43 @@ class BrowseAllPokemonModal {
      * Populate data for caught Pokemon (from Dataverse)
      */
     populateCaughtPokemon(cardContainer, pokemonData, caughtData) {
-        // Stats - Show actual caught Pokemon stats from Dataverse
+        // HP visual indicators (matching cards-testing.html format)
+        const getHPVisualIndicator = (hpPercentage) => {
+            if (hpPercentage <= 30) return '🔴'; // Critical
+            else if (hpPercentage <= 70) return '🟡'; // Damaged  
+            else return '🟢'; // Healthy
+        };
+
+        const getHPStatusText = (hpPercentage) => {
+            if (hpPercentage <= 30) return 'CRITICAL';
+            else if (hpPercentage <= 70) return 'DAMAGED';
+            else return 'HEALTHY';
+        };
+
+        // Calculate HP values
         const currentHP = caughtData.currentHP || caughtData.hp;
         const maxHP = caughtData.hp;
         const hpPercentage = (currentHP / maxHP) * 100;
         
+        // Get visual indicators
+        const statusEmoji = getHPVisualIndicator(hpPercentage);
+        const statusText = getHPStatusText(hpPercentage);
+
+        // Stats only - HP with visual format, Attack/Defense from Dataverse, Level added
         const stats = [
-            { name: 'Attack', value: caughtData.attack || pokemonData.baseAttack || 50 },
-            { name: 'Defense', value: caughtData.defense || pokemonData.baseDefence || 50 },
+            { name: 'Attack', value: caughtData.attack || 50 },
+            { name: 'Defense', value: caughtData.defense || 50 },
             { 
-                name: 'HP', 
-                value: `${currentHP}/${maxHP} (${Math.round(hpPercentage)}%)`,
+                name: `HP ${statusEmoji}`, 
+                value: `${currentHP}/${maxHP} ${statusText}`,
                 isSpecial: hpPercentage < 75
-            }
+            },
+            { name: 'Level', value: caughtData.level || 1 }
         ];
+        
         PokemonCardTemplates.populateStats(cardContainer, stats);
 
-        // Personal info from Dataverse
-        const personalInfoItems = [
-            { label: 'Level', value: caughtData.level || 1 },
-            { label: 'Experience', value: caughtData.experience || 0 }
-        ];
-        
-        if (caughtData.nickname && caughtData.nickname !== pokemonData.name) {
-            personalInfoItems.push({ label: 'Nickname', value: caughtData.nickname, special: true });
-        }
-        
-        if (caughtData.isShiny) {
-            personalInfoItems.push({ label: 'Special', value: 'Shiny ✨', special: true });
-        }
-
-        const personalInfoHtml = PokemonCardTemplates.getInfoBoxTemplate('Your Pokemon', personalInfoItems);
-        PokemonCardTemplates.addContentSection(cardContainer, personalInfoHtml);
-
-        // Catch details from Dataverse
-        const catchInfoItems = [];
-        if (caughtData.dateCaught) {
-            catchInfoItems.push({ label: 'Caught', value: new Date(caughtData.dateCaught).toLocaleDateString() });
-        }
-        if (caughtData.location) {
-            catchInfoItems.push({ label: 'Location', value: caughtData.location });
-        }
-
-        if (catchInfoItems.length > 0) {
-            const catchInfoHtml = PokemonCardTemplates.getInfoBoxTemplate('Catch Details', catchInfoItems);
-            PokemonCardTemplates.addContentSection(cardContainer, catchInfoHtml);
-        }
-
-        // Still show basic Pokemon info from JSON
-        const basicInfoHtml = PokemonCardTemplates.getInfoBoxTemplate('Species Info', [
-            { label: 'Height', value: PokemonCardTemplates.formatHeight(pokemonData.height) },
-            { label: 'Weight', value: PokemonCardTemplates.formatWeight(pokemonData.weight) },
-            { label: 'Generation', value: pokemonData.generation || 'Unknown' }
-        ]);
-        PokemonCardTemplates.addContentSection(cardContainer, basicInfoHtml);
+        // No additional sections - just the clean stats
     }
 
     /**
