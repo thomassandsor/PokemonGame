@@ -132,20 +132,26 @@ class BrowseAllPokemonModal {
             else return 'HEALTHY';
         };
 
-        // Calculate HP values
-        const currentHP = caughtData.currentHP || caughtData.hp;
-        const maxHP = caughtData.hp;
+        // Calculate HP values from Dataverse
+        const currentHP = caughtData.currentHP || caughtData.hp || 50;
+        const maxHP = caughtData.maxHP || caughtData.hp || 50;
         const hpPercentage = (currentHP / maxHP) * 100;
         
         // Get visual indicators
         const statusEmoji = getHPVisualIndicator(hpPercentage);
         const statusText = getHPStatusText(hpPercentage);
 
+        // Debug logging for Dataverse data
+        console.log('CAUGHT-MODAL: Dataverse data:', caughtData);
+        console.log('CAUGHT-MODAL: HP data - current:', currentHP, 'max:', maxHP);
+        console.log('CAUGHT-MODAL: Defense data:', caughtData.defense, caughtData.defence);
+        console.log('CAUGHT-MODAL: Attack data:', caughtData.attack);
+
         // Stats reordered - Level first, then Attack/Defense, then HP
         const stats = [
             { name: 'Level', value: caughtData.level || 1 },
             { name: 'Attack', value: caughtData.attack || 50 },
-            { name: 'Defense', value: caughtData.defense || 50 },
+            { name: 'Defense', value: caughtData.defense || caughtData.defence || 50 },
             { 
                 name: `HP ${statusEmoji}`, 
                 value: `${currentHP}/${maxHP} ${statusText}`,
@@ -162,30 +168,38 @@ class BrowseAllPokemonModal {
      * Add green checkmark indicator for caught Pokemon
      */
     addCaughtIndicator(cardContainer) {
-        // Add caught indicator in upper right corner
+        // Find the Pokemon image container
+        const imageContainer = cardContainer.querySelector('.pokemon-trading-card-image-container');
+        if (!imageContainer) {
+            console.warn('Could not find image container for caught indicator');
+            return;
+        }
+
+        // Add caught indicator in upper right corner of the image
         const caughtIndicator = document.createElement('div');
         caughtIndicator.style.cssText = `
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            right: 5px;
             background: #10b981;
             color: white;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 2px solid white;
         `;
         caughtIndicator.innerHTML = '✓';
         
-        // Add to the card container
-        cardContainer.style.position = 'relative';
-        cardContainer.appendChild(caughtIndicator);
+        // Make image container relative and add indicator
+        imageContainer.style.position = 'relative';
+        imageContainer.appendChild(caughtIndicator);
     }
 
     /**

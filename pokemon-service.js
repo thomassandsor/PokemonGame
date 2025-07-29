@@ -88,21 +88,36 @@ class PokemonService {
             if (response.ok) {
                 const data = await response.json();
                 console.log('POKEMON-SERVICE: Got real Pokemon data from Dataverse:', data);
+                console.log('POKEMON-SERVICE: Sample Pokemon fields:', data.value?.[0]);
                 
                 // Map Dataverse field names to expected format
-                const mappedPokemon = (data.value || []).map(p => ({
-                    name: p.pokemon_name,
-                    level: p.pokemon_level,
-                    hp: p.pokemon_hp,
-                    hpmax: p.pokemon_hpmax,
-                    attack: p.pokemon_attack,
-                    defence: p.pokemon_defence,
-                    height: p.pokemon_height,
-                    weight: p.pokemon_weight,
-                    pokedexid: p.pokemon_pokedexid,
-                    dateCaught: p.createdon,
-                    userId: p._pokemon_user_value
-                }));
+                const mappedPokemon = (data.value || []).map(p => {
+                    console.log('POKEMON-SERVICE: Mapping Pokemon:', p.pokemon_name, {
+                        hp: p.pokemon_hp,
+                        currentHP: p.pokemon_currenthp,
+                        maxHP: p.pokemon_maxhp,
+                        attack: p.pokemon_attack,
+                        defense: p.pokemon_defense,
+                        defence: p.pokemon_defence,
+                        level: p.pokemon_level
+                    });
+                    
+                    return {
+                        name: p.pokemon_name,
+                        level: p.pokemon_level,
+                        hp: p.pokemon_hp,
+                        currentHP: p.pokemon_currenthp || p.pokemon_hp, // Try both field names
+                        maxHP: p.pokemon_maxhp || p.pokemon_hp, // Try both field names
+                        attack: p.pokemon_attack,
+                        defense: p.pokemon_defense || p.pokemon_defence, // Try both spellings
+                        defence: p.pokemon_defence || p.pokemon_defense, // Keep both for compatibility
+                        height: p.pokemon_height,
+                        weight: p.pokemon_weight,
+                        pokedexid: p.pokemon_pokedexid,
+                        dateCaught: p.createdon,
+                        userId: p._pokemon_user_value
+                    };
+                });
                 
                 console.log('POKEMON-SERVICE: Mapped Pokemon data:', mappedPokemon);
                 return mappedPokemon;
