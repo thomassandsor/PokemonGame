@@ -251,43 +251,47 @@ class PokemonService {
             
             console.log('POKEMON-SERVICE: Loading ALL Pokemon for caching...');
             
-            // Use enhanced JSON file that includes descriptions, generation, legendary data
-            if (this.isDevelopmentMode()) {
-                console.log('POKEMON-SERVICE: Development mode - loading from enhanced JSON file');
-                try {
-                    const response = await fetch('/src/data/pokemon.json');
-                    if (response.ok) {
-                        const pokemonData = await response.json();
-                        console.log('POKEMON-SERVICE: Loaded from JSON file:', pokemonData.length, 'Pokemon');
-                        
-                        // Map JSON data to our expected format with enhanced data support
-                        PokemonService._allPokemonCache = pokemonData.map(p => ({
-                            id: p.id,
-                            name: p.name,
-                            type1: p.types[0] || 'normal',
-                            type2: p.types[1] || null,
-                            types: p.types || ['normal'], // Keep original types array
-                            baseHp: p.stats?.find(s => s.name === 'hp')?.base_stat || 50,
-                            baseAttack: p.stats?.find(s => s.name === 'attack')?.base_stat || 50,
-                            baseDefence: p.stats?.find(s => s.name === 'defense')?.base_stat || 50,
-                            baseSpeed: p.stats?.find(s => s.name === 'speed')?.base_stat || 50,
-                            // Use enhanced data if available, otherwise fallback
-                            description: p.description || `${p.types.join('/')} type Pokemon`,
-                            generation: p.generation || (p.id <= 151 ? 1 : p.id <= 251 ? 2 : p.id <= 386 ? 3 : p.id <= 493 ? 4 : 5),
-                            legendary: p.legendary !== undefined ? p.legendary : false,
-                            mythical: p.mythical !== undefined ? p.mythical : false,
-                            height: p.height,
-                            weight: p.weight,
-                            abilities: p.abilities || [],
-                            sprites: p.sprites
-                        }));
-                        
-                        console.log('POKEMON-SERVICE: Cached', PokemonService._allPokemonCache.length, 'Pokemon from JSON');
-                        return;
-                    }
-                } catch (jsonError) {
-                    console.warn('POKEMON-SERVICE: Failed to load JSON file, falling back to Dataverse:', jsonError);
+            // Always try enhanced JSON file first (both development and production)
+            console.log('POKEMON-SERVICE: Attempting to load from enhanced JSON file');
+            try {
+                const response = await fetch('/src/data/pokemon.json');
+                if (response.ok) {
+                    const pokemonData = await response.json();
+                    console.log('POKEMON-SERVICE: Successfully loaded from JSON file:', pokemonData.length, 'Pokemon');
+                    
+                    // Map JSON data to our expected format with enhanced data support
+                    PokemonService._allPokemonCache = pokemonData.map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        type1: p.types[0] || 'normal',
+                        type2: p.types[1] || null,
+                        types: p.types || ['normal'], // Keep original types array
+                        baseHp: p.stats?.find(s => s.name === 'hp')?.base_stat || 50,
+                        baseAttack: p.stats?.find(s => s.name === 'attack')?.base_stat || 50,
+                        baseDefence: p.stats?.find(s => s.name === 'defense')?.base_stat || 50,
+                        baseSpeed: p.stats?.find(s => s.name === 'speed')?.base_stat || 50,
+                        // Use enhanced data if available, otherwise fallback
+                        description: p.description || `${p.types.join('/')} type Pokemon`,
+                        generation: p.generation || (p.id <= 151 ? 1 : p.id <= 251 ? 2 : p.id <= 386 ? 3 : p.id <= 493 ? 4 : 5),
+                        legendary: p.legendary !== undefined ? p.legendary : false,
+                        mythical: p.mythical !== undefined ? p.mythical : false,
+                        height: p.height,
+                        weight: p.weight,
+                        abilities: p.abilities || [],
+                        sprites: p.sprites
+                    }));
+                    
+                    console.log('POKEMON-SERVICE: Successfully cached', PokemonService._allPokemonCache.length, 'Pokemon from JSON');
+                    return;
                 }
+            } catch (jsonError) {
+                console.warn('POKEMON-SERVICE: Failed to load JSON file, falling back to Dataverse:', jsonError);
+            }
+            
+            // Fallback to Dataverse if JSON fails (both development and production)
+            if (this.isDevelopmentMode()) {
+                console.log('POKEMON-SERVICE: Development mode JSON failed, skipping Dataverse fallback');
+                return;
             }
             
             // Production mode or JSON fallback: Load from Dataverse
