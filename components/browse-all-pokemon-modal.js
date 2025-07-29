@@ -69,6 +69,11 @@ class BrowseAllPokemonModal {
         // Populate basic info using template helpers
         PokemonCardTemplates.populateBasicInfo(cardContainer, pokemonData);
 
+        // Add caught indicator for caught Pokemon
+        if (options.isCaught) {
+            this.addCaughtIndicator(cardContainer);
+        }
+
         if (options.isCaught && options.caughtData) {
             // CAUGHT POKEMON - Show Dataverse data
             this.populateCaughtPokemon(cardContainer, pokemonData, options.caughtData);
@@ -136,16 +141,16 @@ class BrowseAllPokemonModal {
         const statusEmoji = getHPVisualIndicator(hpPercentage);
         const statusText = getHPStatusText(hpPercentage);
 
-        // Stats only - HP with visual format, Attack/Defense from Dataverse, Level added
+        // Stats reordered - Level first, then Attack/Defense, then HP
         const stats = [
+            { name: 'Level', value: caughtData.level || 1 },
             { name: 'Attack', value: caughtData.attack || 50 },
             { name: 'Defense', value: caughtData.defense || 50 },
             { 
                 name: `HP ${statusEmoji}`, 
                 value: `${currentHP}/${maxHP} ${statusText}`,
                 isSpecial: hpPercentage < 75
-            },
-            { name: 'Level', value: caughtData.level || 1 }
+            }
         ];
         
         PokemonCardTemplates.populateStats(cardContainer, stats);
@@ -154,39 +159,41 @@ class BrowseAllPokemonModal {
     }
 
     /**
+     * Add green checkmark indicator for caught Pokemon
+     */
+    addCaughtIndicator(cardContainer) {
+        // Add caught indicator in upper right corner
+        const caughtIndicator = document.createElement('div');
+        caughtIndicator.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        `;
+        caughtIndicator.innerHTML = '✓';
+        
+        // Add to the card container
+        cardContainer.style.position = 'relative';
+        cardContainer.appendChild(caughtIndicator);
+    }
+
+    /**
      * Add action buttons based on caught status
      */
     addActionButtons(cardContainer, options) {
-        // For uncaught Pokemon, don't add any buttons - keep it clean
-        if (!options.isCaught) {
-            return;
-        }
-
-        // CAUGHT POKEMON ACTIONS ONLY
-        if (options.onRename) {
-            const renameButton = PokemonCardTemplates.getActionButtonTemplate('Rename', 'primary', () => {
-                options.onRename(options.caughtData);
-            });
-            PokemonCardTemplates.addActionButton(cardContainer, renameButton);
-        }
-
-        if (options.onRelease) {
-            const releaseButton = PokemonCardTemplates.getActionButtonTemplate('Release', 'danger', () => {
-                options.onRelease(options.caughtData);
-            });
-            PokemonCardTemplates.addActionButton(cardContainer, releaseButton);
-        }
-
-        if (options.onViewDetails) {
-            const detailsButton = PokemonCardTemplates.getActionButtonTemplate('Full Details', 'primary', () => {
-                options.onViewDetails(options.caughtData);
-            });
-            PokemonCardTemplates.addActionButton(cardContainer, detailsButton);
-        }
-
-        // Always add close button for caught Pokemon
-        const closeButton = PokemonCardTemplates.getActionButtonTemplate('Close', 'secondary', () => this.close());
-        PokemonCardTemplates.addActionButton(cardContainer, closeButton);
+        // No buttons for any Pokemon - keep all modals clean
+        return;
     }
 
     /**
