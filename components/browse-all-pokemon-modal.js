@@ -89,6 +89,13 @@ class BrowseAllPokemonModal {
      * Populate data for uncaught Pokemon (from JSON)
      */
     populateUncaughtPokemon(cardContainer, pokemonData) {
+        // Debug logging to understand data structure
+        console.log('BROWSE-MODAL: Populating uncaught Pokemon with data:', pokemonData);
+        console.log('BROWSE-MODAL: baseAttack:', pokemonData.baseAttack);
+        console.log('BROWSE-MODAL: baseDefence:', pokemonData.baseDefence);
+        console.log('BROWSE-MODAL: baseHp:', pokemonData.baseHp);
+        console.log('BROWSE-MODAL: description:', pokemonData.description);
+        
         // Stats - Show base stats from JSON + Description in same style
         const stats = [
             { name: 'Attack', value: pokemonData.baseAttack || 50 },
@@ -105,6 +112,7 @@ class BrowseAllPokemonModal {
             });
         }
 
+        console.log('BROWSE-MODAL: Final stats array:', stats);
         PokemonCardTemplates.populateStats(cardContainer, stats);
 
         // No additional sections for uncaught Pokemon - keep it clean
