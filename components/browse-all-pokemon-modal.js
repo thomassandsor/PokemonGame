@@ -69,9 +69,9 @@ class BrowseAllPokemonModal {
         // Populate basic info using template helpers
         PokemonCardTemplates.populateBasicInfo(cardContainer, pokemonData);
 
-        // Add caught indicator for caught Pokemon
+        // Add pokeball indicator for caught Pokemon
         if (options.isCaught) {
-            this.addCaughtIndicator(cardContainer);
+            this.addPokeballIndicator(cardContainer);
         }
 
         if (options.isCaught && options.caughtData) {
@@ -143,7 +143,7 @@ class BrowseAllPokemonModal {
 
         // Debug logging for Dataverse data
         console.log('CAUGHT-MODAL: Dataverse data:', caughtData);
-        console.log('CAUGHT-MODAL: HP data - current:', currentHP, 'max:', maxHP);
+        console.log('CAUGHT-MODAL: HP data - current:', currentHP, 'max:', maxHP, 'percentage:', hpPercentage);
         console.log('CAUGHT-MODAL: Defense data:', caughtData.defense, caughtData.defence);
         console.log('CAUGHT-MODAL: Attack data:', caughtData.attack);
 
@@ -165,41 +165,43 @@ class BrowseAllPokemonModal {
     }
 
     /**
-     * Add green checkmark indicator for caught Pokemon
+     * Add pokeball SVG indicator for caught Pokemon
      */
-    addCaughtIndicator(cardContainer) {
-        // Find the Pokemon image container
-        const imageContainer = cardContainer.querySelector('.pokemon-trading-card-image-container');
-        if (!imageContainer) {
-            console.warn('Could not find image container for caught indicator');
+    addPokeballIndicator(cardContainer) {
+        // Find the Pokemon name element in the title area
+        const nameElement = cardContainer.querySelector('.pokemon-trading-card-name');
+        if (!nameElement) {
+            console.warn('Could not find name element for pokeball indicator');
             return;
         }
 
-        // Add caught indicator in upper right corner of the image
-        const caughtIndicator = document.createElement('div');
-        caughtIndicator.style.cssText = `
+        // Create pokeball SVG indicator
+        const pokeballIndicator = document.createElement('div');
+        pokeballIndicator.style.cssText = `
             position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #10b981;
-            color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
             z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            border: 2px solid white;
         `;
-        caughtIndicator.innerHTML = '✓';
         
-        // Make image container relative and add indicator
-        imageContainer.style.position = 'relative';
-        imageContainer.appendChild(caughtIndicator);
+        // Use the pokeball SVG from assets
+        pokeballIndicator.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="11" fill="#ffffff" stroke="#333" stroke-width="2"/>
+                <path d="M2 12h20" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="8" fill="none" stroke="#333" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="#333"/>
+                <circle cx="12" cy="8" r="1" fill="#ff0000"/>
+                <path d="M1 12a11 11 0 0 0 22 0" fill="#ff0000"/>
+            </svg>
+        `;
+        
+        // Make name element relative and add indicator
+        nameElement.style.position = 'relative';
+        nameElement.appendChild(pokeballIndicator);
     }
 
     /**

@@ -94,8 +94,7 @@ class PokemonService {
                 const mappedPokemon = (data.value || []).map(p => {
                     console.log('POKEMON-SERVICE: Mapping Pokemon:', p.pokemon_name, {
                         hp: p.pokemon_hp,
-                        currentHP: p.pokemon_currenthp,
-                        maxHP: p.pokemon_maxhp,
+                        hpmax: p.pokemon_hpmax,
                         attack: p.pokemon_attack,
                         defense: p.pokemon_defense,
                         defence: p.pokemon_defence,
@@ -106,8 +105,8 @@ class PokemonService {
                         name: p.pokemon_name,
                         level: p.pokemon_level,
                         hp: p.pokemon_hp,
-                        currentHP: p.pokemon_currenthp || p.pokemon_hp, // Try both field names
-                        maxHP: p.pokemon_maxhp || p.pokemon_hp, // Try both field names
+                        currentHP: p.pokemon_hp, // Current HP
+                        maxHP: p.pokemon_hpmax, // Max HP from separate field
                         attack: p.pokemon_attack,
                         defense: p.pokemon_defense || p.pokemon_defence, // Try both spellings
                         defence: p.pokemon_defence || p.pokemon_defense, // Keep both for compatibility
