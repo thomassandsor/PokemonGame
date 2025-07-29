@@ -437,179 +437,110 @@ async function loadMorePokemon() {
     return;
 }
 
-function showPokemonDetails(pokemon) {
-    const modal = document.getElementById('pokemonModal');
-    
-    // Set Pokemon name and image
-    document.getElementById('modalPokemonName').textContent = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
-    document.getElementById('modalImage').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
-    document.getElementById('modalImage').alt = pokemon.name;
+async function showPokemonDetails(pokemon) {
+    console.log('POKEMON-UNIFIED: Opening Pokemon card for browsing:', pokemon.name);
     
     // Check if this Pokemon is caught
     const caughtPokemon = myPokemon.find(myP => 
         myP.name && myP.name.toLowerCase() === pokemon.name.toLowerCase()
     );
     
-    // Calculate and display HP (use actual stats if available)
-    let hpValue = pokemon.baseHp || pokemon.hp || Math.floor(Math.random() * 50) + 30;
-    if (caughtPokemon && caughtPokemon.hp) {
-        hpValue = caughtPokemon.hp;
-    }
-    document.getElementById('pokemonHP').textContent = `HP ${hpValue}`;
+    // Use the enhanced local data
+    const completeData = pokemon;
     
-    // Get types - handle both the new types array and legacy type1/type2 properties
-    let types = pokemon.types || [];
-    if (types.length === 0 && pokemon.type1) {
-        types = [pokemon.type1, pokemon.type2].filter(type => type && type !== 'null' && type.trim() !== '');
-    }
-    if (types.length === 0) {
-        types = ['normal']; // fallback
-    }
+    console.log('POKEMON-UNIFIED: Using local Pokemon data:', completeData);
     
-    // Set type-based header color and display type badges
-    const typesContainer = document.getElementById('pokemonTypes');
-    const cardHeader = document.getElementById('pokemonCardHeader');
-    typesContainer.innerHTML = '';
-    
-    if (types.length > 0) {
-        // Set header to primary type
-        const primaryType = types[0].toLowerCase();
-        cardHeader.className = `pokemon-trading-card-header ${primaryType}`;
-        
-        // Add type badges
-        types.forEach(typeName => {
-            const typeBadge = document.createElement('span');
-            typeBadge.className = `pokemon-trading-card-type-badge ${typeName.toLowerCase()}`;
-            typeBadge.textContent = typeName.toUpperCase();
-            typesContainer.appendChild(typeBadge);
-        });
-    } else {
-        cardHeader.className = 'pokemon-trading-card-header normal';
-    }
-    
-    // Populate Pokemon stats
-    const statsContainer = document.getElementById('pokemonStatsContainer');
-    statsContainer.innerHTML = '';
-    
-    // Main stats to display - use caught Pokemon stats if available
-    let statsToShow = [
-        { name: 'Attack', value: pokemon.baseAttack || pokemon.attack, key: 'attack' },
-        { name: 'Defense', value: pokemon.baseDefence || pokemon.defense, key: 'defense' },
-        { name: 'Speed', value: pokemon.baseSpeed || pokemon.speed, key: 'speed' }
-    ];
-    
-    // If Pokemon is caught, use caught Pokemon stats
-    if (caughtPokemon) {
-        statsToShow = [
-            { name: 'Attack', value: caughtPokemon.attack || pokemon.baseAttack || pokemon.attack },
-            { name: 'Defense', value: caughtPokemon.defense || pokemon.baseDefence || pokemon.defense },
-            { name: 'Speed', value: caughtPokemon.speed || pokemon.baseSpeed || pokemon.speed }
-        ];
-    }
-    
-    statsToShow.forEach(stat => {
-        if (stat.value !== undefined && stat.value !== null) {
-            const statRow = document.createElement('div');
-            statRow.className = 'pokemon-trading-card-stats-row';
-            statRow.innerHTML = `
-                <span class="pokemon-trading-card-stat-name">${stat.name}</span>
-                <span class="pokemon-trading-card-stat-value">${stat.value}</span>
-            `;
-            statsContainer.appendChild(statRow);
-        }
-    });
-    
-    // If no stats available, show placeholders
-    if (statsContainer.children.length === 0) {
-        const placeholderStats = [
-            { name: 'Attack', value: Math.floor(Math.random() * 40) + 40 },
-            { name: 'Defense', value: Math.floor(Math.random() * 40) + 35 },
-            { name: 'Speed', value: Math.floor(Math.random() * 40) + 45 }
-        ];
-        
-        placeholderStats.forEach(stat => {
-            const statRow = document.createElement('div');
-            statRow.className = 'pokemon-trading-card-stats-row';
-            statRow.innerHTML = `
-                <span class="pokemon-trading-card-stat-name">${stat.name}</span>
-                <span class="pokemon-trading-card-stat-value">${stat.value}</span>
-            `;
-            statsContainer.appendChild(statRow);
-        });
-    }
-    
-    // Caught status container
-    const caughtStatusContainer = document.getElementById('caughtStatusContainer');
-    const formattedNumber = `#${pokemon.id.toString().padStart(3, '0')}`;
+    // Create and show the browse all modal using template system
+    const browseModal = new BrowseAllPokemonModal();
     
     if (caughtPokemon) {
-        caughtStatusContainer.innerHTML = `
-            <div style="text-align: center; color: #27ae60; font-weight: bold; font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">
-                ✅ CAUGHT!
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
-                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Level:</span>
-                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.level || 1}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
-                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Date Caught:</span>
-                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.dateCaught || 'Unknown'}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Shiny:</span>
-                <span style="font-size: var(--font-size-sm); color: #2d3436;">${caughtPokemon.isShiny ? '✨ Yes' : 'No'}</span>
-            </div>
-        `;
-        caughtStatusContainer.style.display = 'block';
+        // CAUGHT POKEMON - Show Dataverse data with personal info
+        const options = {
+            isCaught: true,
+            caughtData: caughtPokemon,
+            onRename: (pokemonData) => renamePokemon(pokemonData),
+            onRelease: (pokemonData) => releasePokemon(pokemonData),
+            onViewDetails: (pokemonData) => {
+                console.log('View full details for:', pokemonData.name);
+                // TODO: Open detailed Pokemon management page
+                alert(`View details for ${pokemonData.name}! (Feature coming soon)`);
+            }
+        };
+        browseModal.show(completeData, options);
     } else {
-        caughtStatusContainer.innerHTML = `
-            <div style="text-align: center; color: #e74c3c; font-weight: bold; font-size: var(--font-size-lg);">
-                ❌ NOT CAUGHT
-            </div>
-        `;
-        caughtStatusContainer.style.display = 'block';
+        // UNCAUGHT POKEMON - Show generic data with catch option
+        const options = {
+            isCaught: false,
+            onCatch: (pokemonData) => {
+                console.log('Would catch Pokemon:', pokemonData.name);
+                // TODO: Implement catch functionality
+                alert(`Catching ${pokemonData.name}! (Feature coming soon)`);
+            },
+            onAddToWishlist: (pokemonData) => {
+                console.log('Add to wishlist:', pokemonData.name);
+                // TODO: Implement wishlist functionality
+                alert(`Added ${pokemonData.name} to wishlist! (Feature coming soon)`);
+            }
+        };
+        browseModal.show(completeData, options);
     }
-    
-    // Populate additional info
-    const infoContainer = document.getElementById('pokemonInfoContainer');
-    infoContainer.innerHTML = `
-        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
-            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">ID:</span>
-            <span style="font-size: var(--font-size-sm); color: #2d3436;">${formattedNumber}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-xs); padding: 4px 0; border-bottom: 1px solid rgba(45, 52, 54, 0.2);">
-            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Generation:</span>
-            <span style="font-size: var(--font-size-sm); color: #2d3436;">${pokemon.generation || 'Unknown'}</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-            <span style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436;">Legendary:</span>
-            <span style="font-size: var(--font-size-sm); color: #2d3436;">${pokemon.legendary ? 'Yes' : 'No'}</span>
-        </div>
-        ${pokemon.description ? `
-        <div style="margin-top: var(--space-md); padding-top: var(--space-md); border-top: 2px solid #2d3436;">
-            <div style="font-size: var(--font-size-sm); font-weight: bold; color: #2d3436; margin-bottom: var(--space-xs);">Description:</div>
-            <div style="font-size: var(--font-size-sm); color: #2d3436; line-height: 1.4;">${pokemon.description}</div>
-        </div>
-        ` : ''}
-    `;
-    
-    modal.style.display = 'block';
 }
 
-function viewMyPokemonDetails(pokemonName) {
+async function viewMyPokemonDetails(pokemonName) {
+    console.log('POKEMON-UNIFIED: Opening Pokemon card for my collection:', pokemonName);
+    
     const pokemon = myPokemon.find(p => p.name === pokemonName);
-    if (pokemon) {
-        // Find the corresponding Pokemon from allPokemon for additional details
-        const basePokemon = allPokemon.find(p => 
-            p.name.toLowerCase() === pokemonName.toLowerCase()
-        );
-        
-        if (basePokemon) {
-            showPokemonDetails(basePokemon);
-        } else {
-            alert(`🔍 Pokemon Details\n\nName: ${pokemonName}\nLevel: ${pokemon.level || 1}\n\nDetailed view available when browsing all Pokemon!`);
-        }
+    if (!pokemon) {
+        console.error('Pokemon not found in my collection:', pokemonName);
+        return;
     }
+    
+    // Find the corresponding base Pokemon data from allPokemon for additional details
+    const basePokemon = allPokemon.find(p => 
+        p.name.toLowerCase() === pokemonName.toLowerCase()
+    );
+    
+    // Use the enhanced local data instead of API calls
+    const completeData = basePokemon || pokemon;
+    
+    console.log('POKEMON-UNIFIED: Using local Pokemon data for my collection:', completeData);
+    
+    // Format Pokemon data to match the expected structure
+    const formattedPokemon = {
+        id: completeData.id || pokemon.id,
+        name: completeData.name || pokemon.name,
+        types: completeData.types ? completeData.types.map(type => ({ type: { name: type } })) : [],
+        sprites: {
+            official_artwork: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${completeData.id || pokemon.id}.png`,
+            front_default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${completeData.id || pokemon.id}.png`
+        },
+        baseHp: completeData.baseHp || 50,
+        baseAttack: completeData.baseAttack || 50,
+        baseDefence: completeData.baseDefence || 50,
+        baseSpeed: completeData.baseSpeed || 50,
+        generation: completeData.generation || 1,
+        legendary: completeData.legendary || false,
+        mythical: completeData.mythical || false,
+        description: completeData.description || `${completeData.name.charAt(0).toUpperCase() + completeData.name.slice(1)} is a Pokemon.`,
+        height: completeData.height,
+        weight: completeData.weight,
+        abilities: completeData.abilities || []
+    };
+    
+    // Use the shared card system
+    const pokemonCards = new PokemonCardSystem();
+    
+    const options = {
+        caughtPokemon: pokemon,
+        callbacks: {
+            close: () => console.log('My Pokemon card closed'),
+            rename: (pokemonData) => renamePokemon(pokemonData),
+            release: (pokemonData) => releasePokemon(pokemonData)
+        }
+    };
+    
+    // Show card with MY_COLLECTION context
+    pokemonCards.showCard(formattedPokemon, 'MY_COLLECTION', options);
 }
 
 function closeModal() {
@@ -654,6 +585,24 @@ function logout() {
     console.log('POKEMON-UNIFIED: Logging out...');
     AuthService.logout();
     window.location.href = 'index.html';
+}
+
+// Pokemon action callback functions for the card system
+function renamePokemon(pokemonData) {
+    const newName = prompt('Enter new nickname:', pokemonData.nickname || pokemonData.name);
+    if (newName && newName.trim()) {
+        console.log('Renaming Pokemon to:', newName.trim());
+        // TODO: Implement Pokemon nickname update in database
+        alert(`Pokemon renamed to "${newName.trim()}"! (Feature coming soon)`);
+    }
+}
+
+function releasePokemon(pokemonData) {
+    if (confirm(`Are you sure you want to release ${pokemonData.nickname || pokemonData.name}?`)) {
+        console.log('Releasing Pokemon:', pokemonData.name);
+        // TODO: Implement Pokemon release from collection
+        alert(`${pokemonData.name} released! (Feature coming soon)`);
+    }
 }
 
 // Modal click outside to close

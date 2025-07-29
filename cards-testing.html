@@ -258,6 +258,7 @@
     </div>
 
     <!-- Include the card system -->
+    <script src="components/pokemon-trading-card-renderer.js"></script>
     <script src="components/pokemon-card-system.js"></script>
     
     <script>
@@ -428,10 +429,31 @@
             filteredStats.forEach(stat => {
                 const statRow = document.createElement('div');
                 statRow.className = 'pokemon-trading-card-stats-row';
-                statRow.innerHTML = `
-                    <span class="pokemon-trading-card-stat-name">${stat.name}</span>
-                    <span class="pokemon-trading-card-stat-value">${stat.value}</span>
-                `;
+                
+                // Special handling for HP in "My Pokemon" context
+                let statValue = stat.value;
+                if (stat.name === 'HP' && containerId === 'myPokemonCardContainer' && options.caughtPokemon) {
+                    const currentHP = options.caughtPokemon.currentHP || options.caughtPokemon.hp;
+                    const maxHP = options.caughtPokemon.hp;
+                    const hpPercentage = (currentHP / maxHP) * 100;
+                    
+                    // Get visual indicators
+                    const statusEmoji = getHPVisualIndicator(hpPercentage);
+                    const statusText = getHPStatusText(hpPercentage);
+                    
+                    statRow.innerHTML = `
+                        <span class="pokemon-trading-card-stat-name">HP ${statusEmoji}</span>
+                        <span class="pokemon-trading-card-stat-value" style="color: white; font-weight: bold;">
+                            ${currentHP}/${maxHP} ${statusText}
+                        </span>
+                    `;
+                } else {
+                    statRow.innerHTML = `
+                        <span class="pokemon-trading-card-stat-name">${stat.name}</span>
+                        <span class="pokemon-trading-card-stat-value">${statValue}</span>
+                    `;
+                }
+                
                 statsContainer.appendChild(statRow);
             });
 
@@ -688,6 +710,24 @@
 
         function goHome() {
             window.location.href = 'index.html';
+        }
+
+        function getHPVisualIndicator(hpPercentage) {
+            // Creative visual indicators instead of just text color
+            if (hpPercentage <= 30) {
+                return '🔴'; // Red circle emoji for critical
+            } else if (hpPercentage <= 70) {
+                return '🟡'; // Yellow circle emoji for moderate
+            } else {
+                return '🟢'; // Green circle emoji for healthy
+            }
+        }
+
+        function getHPStatusText(hpPercentage) {
+            // Optional status text
+            if (hpPercentage <= 30) return 'CRITICAL';
+            else if (hpPercentage <= 70) return 'DAMAGED';
+            else return 'HEALTHY';
         }
     </script>
 </body>

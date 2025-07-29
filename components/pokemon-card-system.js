@@ -32,7 +32,7 @@ class PokemonCardSystem {
         BROWSE_ALL: {
             id: 'browse_all',
             title: 'Pokemon Details',
-            sections: ['basic', 'types', 'stats', 'info', 'caught_status'],
+            sections: ['basic', 'types', 'stats', 'info'],
             actions: ['close'],
             showCaughtIndicator: true,
             headerStyle: 'type_based'
@@ -162,6 +162,48 @@ class PokemonCardSystem {
      * Build the card content based on context and Pokemon data
      */
     buildCard(pokemonData, context, options) {
+        // Use the existing modal structure but populate it with consistent data formatting
+        this.populateExistingModal(pokemonData, context, options);
+    }
+
+    /**
+     * Populate the existing modal structure with Pokemon data
+     */
+    populateExistingModal(pokemonData, context, options) {
+        // Set basic Pokemon info using existing modal structure
+        this.setBasicInfo(pokemonData);
+        
+        // Set type-based styling
+        this.setTypeBasedStyling(pokemonData);
+        
+        // Build sections based on context - use new approach for consistency
+        this.buildSectionsNew(pokemonData, context, options);
+        
+        // Build action buttons
+        this.buildActionsNew(context, options);
+        
+        // Apply context-specific styling
+        this.applyContextStyling(context);
+    }
+
+    /**
+     * Map internal context to context ID for renderer
+     */
+    getContextIdFromContext(context) {
+        switch(context.id) {
+            case 'browse_all': return 'BROWSE_ALL';
+            case 'my_collection': return 'MY_COLLECTION';
+            case 'encounter': return 'ENCOUNTER';
+            case 'battle': return 'BATTLE';
+            case 'comparison': return 'COMPARISON';
+            default: return 'BROWSE_ALL';
+        }
+    }
+
+    /**
+     * Original build card method as fallback
+     */
+    buildCardOriginal(pokemonData, context, options) {
         // Set basic Pokemon info
         this.setBasicInfo(pokemonData);
         
@@ -658,6 +700,225 @@ class PokemonCardSystem {
         if (callback && typeof callback === 'function') {
             callback(this.currentPokemon, move);
         }
+    }
+
+    /**
+     * New methods to build sections with improved consistency
+     */
+    buildSectionsNew(pokemonData, context, options) {
+        const dynamicContent = document.getElementById('pokemonDynamicContent');
+        dynamicContent.innerHTML = '';
+
+        // Always add basic info (height/weight) first
+        const basicSection = this.createBasicInfoSectionNew(pokemonData);
+        if (basicSection) {
+            dynamicContent.appendChild(basicSection);
+        }
+
+        // Update stats using the existing stats container with improved formatting
+        this.updateStatsContainerNew(pokemonData, options);
+
+        // Add context-specific sections
+        context.sections.forEach(sectionType => {
+            if (sectionType === 'types' || sectionType === 'stats' || sectionType === 'basic') {
+                return; // Skip - types/stats already handled above, basic already added
+            }
+            
+            const section = this.createSectionNew(sectionType, pokemonData, options);
+            if (section) {
+                dynamicContent.appendChild(section);
+            }
+        });
+    }
+
+    /**
+     * Create basic info section with height and weight
+     */
+    createBasicInfoSectionNew(pokemonData) {
+        const section = document.createElement('div');
+        section.className = 'pokemon-trading-card-section';
+        
+        const height = pokemonData.height ? `${(pokemonData.height / 10).toFixed(1)}m` : 'Unknown';
+        const weight = pokemonData.weight ? `${(pokemonData.weight / 10).toFixed(1)}kg` : 'Unknown';
+        
+        section.innerHTML = `
+            <div class="pokemon-trading-card-info-row">
+                <span class="pokemon-trading-card-info-label">Height:</span>
+                <span class="pokemon-trading-card-info-value">${height}</span>
+            </div>
+            <div class="pokemon-trading-card-info-row">
+                <span class="pokemon-trading-card-info-label">Weight:</span>
+                <span class="pokemon-trading-card-info-value">${weight}</span>
+            </div>
+        `;
+        
+        return section;
+    }
+
+    /**
+     * Update stats container with improved formatting
+     */
+    updateStatsContainerNew(pokemonData, options) {
+        const statsContainer = document.getElementById('pokemonStatsContainer');
+        statsContainer.innerHTML = '';
+        
+        // Get base stats
+        const attack = pokemonData.baseAttack || 50;
+        const defense = pokemonData.baseDefence || pokemonData.baseDefense || 50;
+        const hp = options.caughtPokemon?.hp || pokemonData.baseHp || 50;
+        
+        const stats = [
+            { name: 'Attack', value: attack },
+            { name: 'Defense', value: defense },
+            { name: 'HP', value: hp }
+        ];
+        
+        stats.forEach(stat => {
+            const statRow = document.createElement('div');
+            statRow.className = 'pokemon-trading-card-stats-row';
+            
+            // Special handling for HP in "My Pokemon" context
+            if (stat.name === 'HP' && options.caughtPokemon) {
+                const currentHP = options.caughtPokemon.currentHP || options.caughtPokemon.hp;
+                const maxHP = options.caughtPokemon.hp;
+                const hpPercentage = (currentHP / maxHP) * 100;
+                
+                const statusEmoji = this.getHPVisualIndicator(hpPercentage);
+                const statusText = this.getHPStatusText(hpPercentage);
+                
+                statRow.innerHTML = `
+                    <span class="pokemon-trading-card-stat-name">HP ${statusEmoji}</span>
+                    <span class="pokemon-trading-card-stat-value" style="color: white; font-weight: bold;">
+                        ${currentHP}/${maxHP} ${statusText}
+                    </span>
+                `;
+            } else {
+                statRow.innerHTML = `
+                    <span class="pokemon-trading-card-stat-name">${stat.name}</span>
+                    <span class="pokemon-trading-card-stat-value">${stat.value}</span>
+                `;
+            }
+            
+            statsContainer.appendChild(statRow);
+        });
+    }
+
+    /**
+     * Create sections with new approach
+     */
+    createSectionNew(sectionType, pokemonData, options) {
+        switch(sectionType) {
+            case 'info':
+                return this.createPokemonInfoSectionNew(pokemonData);
+            case 'personal_info':
+                return this.createPersonalInfoSectionNew(pokemonData, options);
+            case 'catch_details':
+                return this.createCatchDetailsSectionNew(pokemonData, options);
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Create Pokemon info section (description, generation, etc.)
+     */
+    createPokemonInfoSectionNew(pokemonData) {
+        const section = document.createElement('div');
+        section.className = 'pokemon-trading-card-section';
+        
+        let content = '';
+        
+        if (pokemonData.description) {
+            content += `
+                <div class="pokemon-trading-card-description">
+                    <strong>Description:</strong><br>
+                    <em>${pokemonData.description}</em>
+                </div>
+            `;
+        }
+        
+        if (pokemonData.generation) {
+            content += `
+                <div class="pokemon-trading-card-info-row">
+                    <span class="pokemon-trading-card-info-label">Generation:</span>
+                    <span class="pokemon-trading-card-info-value">${pokemonData.generation}</span>
+                </div>
+            `;
+        }
+        
+        if (pokemonData.legendary || pokemonData.mythical) {
+            const status = pokemonData.mythical ? 'Mythical' : 'Legendary';
+            content += `
+                <div class="pokemon-trading-card-info-row">
+                    <span class="pokemon-trading-card-info-label">Status:</span>
+                    <span class="pokemon-trading-card-info-value special">${status} ✨</span>
+                </div>
+            `;
+        }
+        
+        section.innerHTML = content;
+        return content ? section : null;
+    }
+
+    /**
+     * Build action buttons with new approach
+     */
+    buildActionsNew(context, options) {
+        const actionsContainer = document.getElementById('pokemonActionsContainer');
+        actionsContainer.innerHTML = '';
+
+        context.actions.forEach(actionType => {
+            const button = this.createActionButtonNew(actionType, options);
+            if (button) {
+                actionsContainer.appendChild(button);
+            }
+        });
+    }
+
+    /**
+     * Create action buttons with improved styling
+     */
+    createActionButtonNew(actionType, options) {
+        const button = document.createElement('button');
+        button.className = 'pokemon-btn pokemon-btn-primary pokemon-trading-card-action-btn';
+        
+        switch(actionType) {
+            case 'close':
+                button.textContent = 'Close';
+                button.onclick = () => this.closeCard();
+                break;
+                
+            case 'rename':
+                button.textContent = 'Rename';
+                button.onclick = () => this.executeCallback('rename', options);
+                break;
+                
+            case 'release':
+                button.textContent = 'Release';
+                button.className = 'pokemon-btn pokemon-btn-danger pokemon-trading-card-action-btn';
+                button.onclick = () => this.executeCallback('release', options);
+                break;
+                
+            default:
+                return null;
+        }
+        
+        return button;
+    }
+
+    // Helper methods for HP status
+    getHPVisualIndicator(percentage) {
+        if (percentage > 75) return '💚';
+        if (percentage > 50) return '💛';
+        if (percentage > 25) return '🧡';
+        return '❤️';
+    }
+
+    getHPStatusText(percentage) {
+        if (percentage > 75) return 'Healthy';
+        if (percentage > 50) return 'Good';
+        if (percentage > 25) return 'Injured';
+        return 'Critical';
     }
 
     showModal() {

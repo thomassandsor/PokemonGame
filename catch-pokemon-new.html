@@ -490,8 +490,8 @@
             try {
                 document.getElementById('videoDebugInfo').textContent = 'Loading Pokemon data...';
                 
-                // Try to load from local JSON file first
-                const response = await fetch('/legacy-react/src/data/pokemon.json');
+                // Try to load from enhanced JSON file first
+                const response = await fetch('/src/data/pokemon.json');
                 
                 if (response.ok) {
                     const pokemonData = await response.json();

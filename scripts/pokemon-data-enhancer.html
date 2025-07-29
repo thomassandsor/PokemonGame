@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Data Enhancer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .progress {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background-color: #4CAF50;
+            height: 20px;
+            transition: width 0.3s ease;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .download-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pokemon Data Enhancer</h1>
+        <p>This tool will enhance your existing Pokemon JSON file with missing data from PokeAPI:</p>
+        <ul>
+            <li>Descriptions (flavor text)</li>
+            <li>Generation information</li>
+            <li>Legendary/Mythical status</li>
+            <li>Missing Pokemon (if any)</li>
+        </ul>
+
+        <div>
+            <label for="fileInput">Select your pokemon.json file:</label><br>
+            <input type="file" id="fileInput" accept=".json" style="margin: 10px 0;">
+        </div>
+
+        <button id="enhanceBtn" onclick="startEnhancement()" disabled>Enhance Pokemon Data</button>
+
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+        </div>
+        <div id="progressText"></div>
+
+        <div class="log" id="logOutput"></div>
+
+        <div class="download-section" id="downloadSection">
+            <h3>Enhancement Complete!</h3>
+            <p>Your enhanced Pokemon data is ready for download.</p>
+            <button id="downloadBtn" onclick="downloadEnhancedData()">Download Enhanced Pokemon.json</button>
+        </div>
+    </div>
+
+    <script>
+        let existingData = [];
+        let enhancedData = [];
+        let logElement;
+
+        function log(message) {
+            if (!logElement) {
+                logElement = document.getElementById('logOutput');
+            }
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateProgress(current, total) {
+            const percentage = (current / total) * 100;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `Progress: ${current}/${total} Pokemon processed`;
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        existingData = JSON.parse(e.target.result);
+                        log(`Loaded ${existingData.length} Pokemon from file`);
+                        document.getElementById('enhanceBtn').disabled = false;
+                    } catch (error) {
+                        log(`Error parsing JSON file: ${error.message}`);
+                        alert('Error parsing JSON file. Please make sure it\'s a valid JSON file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function fetchPokemonSpecies(id) {
+            try {
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                log(`Warning: Failed to fetch species data for Pokemon ${id}: ${error.message}`);
+                return null;
+            }
+        }
+
+        function getEnglishFlavorText(speciesData) {
+            if (!speciesData || !speciesData.flavor_text_entries) {
+                return null;
+            }
+
+            const englishEntry = speciesData.flavor_text_entries.find(entry => 
+                entry.language.name === 'en'
+            );
+
+            if (englishEntry) {
+                return englishEntry.flavor_text
+                    .replace(/\f/g, ' ')
+                    .replace(/\n/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            return null;
+        }
+
+        function getGeneration(speciesData) {
+            if (!speciesData || !speciesData.generation) {
+                return 1;
+            }
+
+            const genName = speciesData.generation.name;
+            const genNumber = genName.replace('generation-', '');
+            
+            const romanToNumber = {
+                'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5, 'vi': 6, 'vii': 7, 'viii': 8
+            };
+
+            return romanToNumber[genNumber] || parseInt(genNumber) || 1;
+        }
+
+        async function enhancePokemon(pokemon) {
+            log(`Enhancing ${pokemon.name} (${pokemon.id})...`);
+
+            // If this Pokemon already has complete data, skip API calls
+            if (pokemon.description && pokemon.generation && pokemon.hasOwnProperty('legendary')) {
+                log(`${pokemon.name} already has complete data, skipping API call`);
+                return pokemon;
+            }
+
+            // Fetch species data
+            const speciesData = await fetchPokemonSpecies(pokemon.id);
+            await sleep(200); // Be respectful to the API
+
+            const enhanced = { ...pokemon };
+
+            if (speciesData) {
+                // Add description if missing
+                if (!enhanced.description) {
+                    enhanced.description = getEnglishFlavorText(speciesData) || 
+                        `${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)} is a Pokemon.`;
+                }
+
+                // Add generation if missing
+                if (!enhanced.generation) {
+                    enhanced.generation = getGeneration(speciesData);
+                }
+
+                // Add legendary status if missing
+                if (!enhanced.hasOwnProperty('legendary')) {
+                    enhanced.legendary = speciesData.is_legendary || false;
+                }
+
+                // Add mythical status if missing
+                if (!enhanced.hasOwnProperty('mythical')) {
+                    enhanced.mythical = speciesData.is_mythical || false;
+                }
+
+                log(`Enhanced ${pokemon.name}: Gen ${enhanced.generation}, Legendary: ${enhanced.legendary}`);
+            } else {
+                // Fallback values
+                if (!enhanced.description) {
+                    enhanced.description = `${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)} is a Pokemon.`;
+                }
+                if (!enhanced.generation) {
+                    enhanced.generation = pokemon.id <= 151 ? 1 : 
+                                          pokemon.id <= 251 ? 2 : 
+                                          pokemon.id <= 386 ? 3 : 
+                                          pokemon.id <= 493 ? 4 : 
+                                          pokemon.id <= 649 ? 5 : 6;
+                }
+                if (!enhanced.hasOwnProperty('legendary')) {
+                    enhanced.legendary = false;
+                }
+                if (!enhanced.hasOwnProperty('mythical')) {
+                    enhanced.mythical = false;
+                }
+
+                log(`Used fallback data for ${pokemon.name}`);
+            }
+
+            return enhanced;
+        }
+
+        async function startEnhancement() {
+            if (existingData.length === 0) {
+                alert('Please select a Pokemon JSON file first');
+                return;
+            }
+
+            // Disable the button and show progress
+            document.getElementById('enhanceBtn').disabled = true;
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('downloadSection').style.display = 'none';
+
+            log('Starting Pokemon data enhancement...');
+            enhancedData = [];
+
+            try {
+                for (let i = 0; i < existingData.length; i++) {
+                    const pokemon = existingData[i];
+                    const enhanced = await enhancePokemon(pokemon);
+                    enhancedData.push(enhanced);
+                    
+                    updateProgress(i + 1, existingData.length);
+                    
+                    // Update UI every 10 Pokemon
+                    if ((i + 1) % 10 === 0 || i === existingData.length - 1) {
+                        // Allow UI to update
+                        await sleep(10);
+                    }
+                }
+
+                log('Enhancement complete!');
+                log(`Total Pokemon enhanced: ${enhancedData.length}`);
+                
+                // Show download section
+                document.getElementById('downloadSection').style.display = 'block';
+                
+            } catch (error) {
+                log(`Error during enhancement: ${error.message}`);
+                alert('Enhancement failed. Check the log for details.');
+            } finally {
+                document.getElementById('enhanceBtn').disabled = false;
+            }
+        }
+
+        function downloadEnhancedData() {
+            if (enhancedData.length === 0) {
+                alert('No enhanced data to download');
+                return;
+            }
+
+            const jsonString = JSON.stringify(enhancedData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pokemon-enhanced.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            log('Enhanced Pokemon data downloaded!');
+        }
+    </script>
+</body>
+</html>
