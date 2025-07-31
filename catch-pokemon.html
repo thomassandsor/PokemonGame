@@ -585,6 +585,12 @@
     <!-- Include Auth Service -->
     <script src="auth.js"></script>
     
+    <!-- Include Pokemon Card Template System -->
+    <script src="components/pokemon-card-templates.js"></script>
+    
+    <!-- Include Pokemon Encounter Modal -->
+    <script src="components/pokemon-encounter-modal.js"></script>
+    
     <!-- Include Catch Pokemon Service -->
     <script src="catch-pokemon-service.js"></script>
     
@@ -846,116 +852,53 @@
             }
         }
 
-        // Show Pokemon encounter screen
+        // Show Pokemon encounter screen using new PokemonEncounterModal
         async function showPokemonEncounter(pokemonData, userData = null) {
-            // Set Pokemon image and name
-            document.getElementById('encounterPokemonImage').src = 
-                pokemonData.sprites?.official_artwork || pokemonData.sprites?.front_default || '';
-            document.getElementById('encounterPokemonName').textContent = pokemonData.name;
+            console.log('🎯 ENCOUNTER: Showing Pokemon encounter with new modal system');
+            console.log('🎯 ENCOUNTER: Pokemon data:', pokemonData);
+            console.log('🎯 ENCOUNTER: User data:', userData);
             
-            // Calculate and display HP (base HP stat or estimate)
-            const hpStat = pokemonData.stats?.find(stat => stat.stat?.name === 'hp' || stat.name === 'hp');
-            const hpValue = hpStat ? hpStat.base_stat || hpStat.value : Math.floor(Math.random() * 50) + 30;
-            document.getElementById('pokemonHP').textContent = `HP ${hpValue}`;
+            // Debug: Check if classes are available
+            console.log('🎯 ENCOUNTER: PokemonCardTemplates available?', typeof window.PokemonCardTemplates);
+            console.log('🎯 ENCOUNTER: PokemonEncounterModal available?', typeof window.PokemonEncounterModal);
             
-            // Set type-based header color and display type badges
-            const typesContainer = document.getElementById('pokemonTypes');
-            const cardHeader = document.getElementById('pokemonCardHeader');
-            typesContainer.innerHTML = '';
-            
-            if (pokemonData.types && pokemonData.types.length > 0) {
-                // Set header to primary type
-                const primaryType = pokemonData.types[0].type?.name || pokemonData.types[0];
-                cardHeader.className = `pokemon-trading-card-header ${primaryType}`;
-                
-                // Add type badges
-                pokemonData.types.forEach(typeInfo => {
-                    const typeName = typeInfo.type?.name || typeInfo;
-                    const typeBadge = document.createElement('span');
-                    typeBadge.className = `pokemon-trading-card-type-badge ${typeName}`;
-                    typeBadge.textContent = typeName.toUpperCase();
-                    typesContainer.appendChild(typeBadge);
-                });
-            } else {
-                cardHeader.className = 'pokemon-trading-card-header normal';
-            }
-            
-            // Populate Pokemon stats
-            const statsContainer = document.getElementById('pokemonStatsContainer');
-            statsContainer.innerHTML = '';
-            
-            if (pokemonData.stats && pokemonData.stats.length > 0) {
-                // Show main stats: Attack, Defense, Speed
-                const mainStats = ['attack', 'defense', 'speed'];
-                mainStats.forEach(statName => {
-                    const statData = pokemonData.stats.find(stat => 
-                        (stat.stat?.name || stat.name) === statName
-                    );
-                    
-                    if (statData) {
-                        const statValue = statData.base_stat || statData.value || 0;
-                        const statRow = document.createElement('div');
-                        statRow.className = 'pokemon-trading-card-stats-row';
-                        statRow.innerHTML = `
-                            <span class="pokemon-trading-card-stat-name">${statName.charAt(0).toUpperCase() + statName.slice(1)}</span>
-                            <span class="pokemon-trading-card-stat-value">${statValue}</span>
-                        `;
-                        statsContainer.appendChild(statRow);
-                    }
-                });
-            } else {
-                // Fallback: show placeholder stats
-                const placeholderStats = [
-                    { name: 'Attack', value: Math.floor(Math.random() * 40) + 40 },
-                    { name: 'Defense', value: Math.floor(Math.random() * 40) + 35 },
-                    { name: 'Speed', value: Math.floor(Math.random() * 40) + 45 }
-                ];
-                
-                placeholderStats.forEach(stat => {
-                    const statRow = document.createElement('div');
-                    statRow.className = 'pokemon-trading-card-stats-row';
-                    statRow.innerHTML = `
-                        <span class="pokemon-trading-card-stat-name">${stat.name}</span>
-                        <span class="pokemon-trading-card-stat-value">${stat.value}</span>
-                    `;
-                    statsContainer.appendChild(statRow);
-                });
-            }
-            
-            // Use pre-fetched user data if available, otherwise fetch it
-            let userInfo = userData;
-            if (!userInfo) {
-                try {
-                    const currentUser = AuthService.getCurrentUser();
-                    if (currentUser && currentUser.email) {
-                        userInfo = await CatchPokemonService.getUserData(currentUser.email);
-                        window.currentUserData = userInfo;
-                    }
-                } catch (error) {
-                    console.error('Error getting user data in encounter:', error);
+            // Create or get the encounter modal instance
+            if (!window.pokemonEncounterModalInstance) {
+                if (typeof window.PokemonEncounterModal === 'undefined') {
+                    console.error('🎯 ENCOUNTER: PokemonEncounterModal class is not available!');
+                    alert('Error: Pokemon encounter system not loaded. Please refresh the page.');
+                    return;
                 }
+                console.log('🎯 ENCOUNTER: Creating new instance...');
+                window.pokemonEncounterModalInstance = new PokemonEncounterModal();
+                console.log('🎯 ENCOUNTER: Created new encounter modal instance:', window.pokemonEncounterModalInstance);
+                console.log('🎯 ENCOUNTER: Instance methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.pokemonEncounterModalInstance)));
             }
             
-            // Display pokeball count and update UI
-            if (userInfo) {
-                document.getElementById('pokeballCount').textContent = userInfo.pokeballCount;
-                
-                // Check if user can catch with pokeball
-                const catchCheck = CatchPokemonService.canCatchWithPokeball(window.currentPokemonNumber, userInfo);
-                
-                if (catchCheck.canCatch) {
-                    // User has pokeballs - show normal catch option
-                    const pokeballDisplay = document.getElementById('pokeballCountDisplay');
-                    pokeballDisplay.className = 'pokemon-stats-retro';
-                    
-                    document.getElementById('defaultActions').classList.remove('hidden');
-                    document.getElementById('noPokeballs').classList.add('hidden');
-                } else {
-                    showNoPokeballs();
+            // Debug the instance
+            console.log('🎯 ENCOUNTER: Current encounterModal:', window.pokemonEncounterModalInstance);
+            console.log('🎯 ENCOUNTER: show method type:', typeof window.pokemonEncounterModalInstance.show);
+            
+            // Get pokeball count from user data
+            const pokeballCount = userData ? userData.pokeballCount : 0;
+            console.log('🎯 ENCOUNTER: Pokeball count:', pokeballCount);
+            
+            // Show the encounter modal with Pokemon data and callbacks
+            window.pokemonEncounterModalInstance.show(pokemonData, {
+                pokeballCount: pokeballCount,
+                onCatch: () => {
+                    console.log('🎯 ENCOUNTER: Catch button clicked');
+                    startThrowAnimation();
+                },
+                onRunAway: () => {
+                    console.log('🎯 ENCOUNTER: Run away button clicked');
+                    runAway();
+                },
+                onMinigame: () => {
+                    console.log('🎯 ENCOUNTER: Minigame button clicked');
+                    MinigameLibrary.showMinigameSelection();
                 }
-            }
-            
-            showUIState(UI_STATES.ENCOUNTER);
+            });
         }
 
         // Check pokeball count and display appropriate UI

@@ -33,6 +33,8 @@ class CatchPokemonService {
             const secureOptions = {
                 ...options,
                 signal: controller.signal,
+                mode: 'cors',
+                credentials: 'omit',
                 headers: {
                     'Authorization': `Bearer ${authUser.token}`,
                     'Content-Type': 'application/json',

@@ -168,40 +168,45 @@ class BrowseAllPokemonModal {
      * Add pokeball SVG indicator for caught Pokemon
      */
     addPokeballIndicator(cardContainer) {
-        // Find the Pokemon name element in the title area
-        const nameElement = cardContainer.querySelector('.pokemon-trading-card-name');
-        if (!nameElement) {
-            console.warn('Could not find name element for pokeball indicator');
+        // Find the image container to position relative to image like type badges
+        const imageContainer = cardContainer.querySelector('.pokemon-trading-card-image-container');
+        if (!imageContainer) {
+            console.warn('Could not find image container for pokeball indicator');
             return;
         }
 
-        // Create pokeball SVG indicator
+        // Create pokeball SVG indicator positioned like type badges but in upper left
         const pokeballIndicator = document.createElement('div');
+        pokeballIndicator.className = 'pokeball-indicator-overlay';
         pokeballIndicator.style.cssText = `
             position: absolute;
-            left: -35px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
+            top: 8px;
+            left: 8px;
+            width: 40px;
+            height: 40px;
             z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         `;
         
-        // Use the pokeball SVG from assets
+        // Use a properly oriented pokeball SVG (red on top)
         pokeballIndicator.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="11" fill="#ffffff" stroke="#333" stroke-width="2"/>
+                <path d="M1 12a11 11 0 0 1 22 0" fill="#ff0000"/>
                 <path d="M2 12h20" stroke="#333" stroke-width="2"/>
                 <circle cx="12" cy="12" r="8" fill="none" stroke="#333" stroke-width="2"/>
                 <circle cx="12" cy="12" r="3" fill="#333"/>
-                <circle cx="12" cy="8" r="1" fill="#ff0000"/>
-                <path d="M1 12a11 11 0 0 0 22 0" fill="#ff0000"/>
+                <circle cx="12" cy="12" r="1" fill="#ffffff"/>
             </svg>
         `;
         
-        // Make name element relative and add indicator
-        nameElement.style.position = 'relative';
-        nameElement.appendChild(pokeballIndicator);
+        // Add indicator to image container (like type badges)
+        imageContainer.appendChild(pokeballIndicator);
     }
 
     /**
