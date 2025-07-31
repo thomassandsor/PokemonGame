@@ -14,18 +14,18 @@
     
     .pokemon-scanner-inner {
         background: #000;
-        border-radius: 20px;
-        padding: 15px;
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow-md);
     }
 
     #qrVideo {
         width: 100%;
-        height: 60vh;
-        max-height: 400px;
+        height: 300px;
         object-fit: cover;
-        border-radius: 15px;
+        border-radius: var(--radius-md);
         display: block;
     }
 
@@ -37,7 +37,7 @@
         width: 200px;
         height: 200px;
         border: 3px solid var(--pokemon-yellow);
-        border-radius: 15px;
+        border-radius: var(--radius-md);
         box-shadow: 0 0 0 4px rgba(255, 222, 0, 0.3);
         pointer-events: none;
         z-index: 10;
@@ -328,6 +328,12 @@
         animation: scanPulse 2s infinite;
     }
 
+    /* Fun pokeball spinning animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     /* Hidden by default */
     .hidden {
         display: none !important;
@@ -389,6 +395,28 @@
         .pokemon-name-retro {
             font-size: 1.4rem;
         }
+        
+        /* Mobile QR scanner */
+        #qrVideo {
+            height: 250px;
+        }
+        
+        .pokemon-scanner-overlay,
+        .pokemon-scanner-corners {
+            width: 150px;
+            height: 150px;
+        }
+        
+        /* Smaller pokeballs on mobile */
+        .pokemon-header img {
+            width: 24px !important;
+            height: 24px !important;
+        }
+        
+        /* Smaller title gap on mobile */
+        .pokemon-header div {
+            gap: var(--space-md) !important;
+        }
     }
 
     @media (max-height: 700px) {
@@ -442,16 +470,25 @@
 </head>
 <body class="pokemon-game-body">
     <div class="pokemon-container">
-        <!-- Clean Header -->
-        <header class="pokemon-header">
-            <div class="pokemon-header-content">
-                <h1 class="pokemon-title">Catch Pokemon</h1>
+        <!-- Title Section - Completely Separate -->
+        <div style="text-align: center; margin-bottom: var(--space-xl);">
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-lg);">
+                <img src="assets/pokeball.svg" alt="Pokeball" style="width: 32px; height: 32px; animation: spin 3s linear infinite;">
+                <h1 class="pokemon-title" style="margin: 0;">Catch Pokemon</h1>
+                <img src="assets/pokeball.svg" alt="Pokeball" style="width: 32px; height: 32px; animation: spin 3s linear infinite reverse;">
             </div>
-        </header>
+        </div>
 
-        <!-- Pokemon QR Scanner -->
+        <!-- Home Button Section - Completely Separate -->
+        <div style="text-align: center; margin-bottom: var(--space-lg);">
+            <button class="pokemon-btn pokemon-btn-sm" onclick="navigateHome()">
+                🏠 Home
+            </button>
+        </div>
+
+        <!-- QR Scanner Section -->
         <div id="scannerContainer" class="pokemon-section">
-            <div class="pokemon-card">
+            <div class="pokemon-card" style="max-width: 400px; margin: 0 auto;">
                 <div class="pokemon-scanner-frame">
                     <div class="pokemon-scanner-inner">
                         <video id="qrVideo" playsinline autoplay></video>
@@ -465,11 +502,14 @@
                     </div>
                 </div>
                 
-                <div class="pokemon-text text-center" style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(0, 0, 0, 0.6); border-radius: var(--radius-md); color: white;">
-                    📱 Point your camera at a Pokémon QR code
+                <!-- Scanner Controls -->
+                <div class="pokemon-flex-center mt-lg">
+                    <button id="refreshScannerBtn" class="pokemon-btn pokemon-btn-primary" onclick="refreshQRScanner()">
+                        🔄 Refresh Scanner
+                    </button>
                 </div>
-            
-                <div id="videoDebugInfo" class="pokemon-text-small text-center" style="color: var(--pokemon-blue); margin-top: var(--space-md);"></div>
+                
+                <div id="videoDebugInfo" class="text-center mt-md pokemon-text-small"></div>
             </div>
         </div> <!-- End pokemon-section -->
     </div> <!-- End pokemon-container -->
@@ -1096,6 +1136,75 @@
             window.location.href = '/index.html';
         }
 
+        // Navigate to home page
+        function navigateHome() {
+            // Stop any active scanning
+            if (window.qrScanner) {
+                qrScanner.stopScanning();
+            }
+            
+            // Redirect to main menu
+            window.location.href = '/index.html';
+        }
+
+        // Refresh QR Scanner
+        function refreshQRScanner() {
+            console.log('🔄 Refreshing QR Scanner...');
+            
+            // Update button text and styling to show it's working
+            const refreshBtn = document.getElementById('refreshScannerBtn');
+            const originalText = refreshBtn.textContent;
+            refreshBtn.textContent = '⏳ Refreshing...';
+            refreshBtn.disabled = true;
+            refreshBtn.className = 'pokemon-btn pokemon-btn-secondary'; // Change to secondary while loading
+            
+            // Stop current scanning
+            if (window.qrScanner) {
+                qrScanner.stopScanning();
+            }
+            
+            // Clear any existing video streams
+            const video = document.getElementById('qrVideo');
+            if (video && video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            // Reset debug info
+            document.getElementById('videoDebugInfo').innerHTML = '';
+            
+            // Wait a moment then restart everything
+            setTimeout(() => {
+                // Reset button
+                refreshBtn.textContent = originalText;
+                refreshBtn.disabled = false;
+                refreshBtn.className = 'pokemon-btn pokemon-btn-primary'; // Back to primary styling
+                
+                // Restart the camera and scanner
+                if (window.qrScanner) {
+                    // Reinitialize the camera
+                    qrScanner.initCamera().then(() => {
+                        console.log('✅ QR Scanner refreshed successfully');
+                        document.getElementById('videoDebugInfo').innerHTML = 
+                            '<span style="color: var(--pokemon-green);">✅ Scanner ready!</span>';
+                        
+                        // Clear the success message after 2 seconds
+                        setTimeout(() => {
+                            if (currentState === UI_STATES.SCANNER) {
+                                document.getElementById('videoDebugInfo').innerHTML = '';
+                            }
+                        }, 2000);
+                    }).catch(error => {
+                        console.error('❌ Failed to refresh scanner:', error);
+                        document.getElementById('videoDebugInfo').innerHTML = 
+                            '<span style="color: var(--pokemon-red);">❌ Refresh failed</span>';
+                        refreshBtn.className = 'pokemon-btn pokemon-btn-danger'; // Show error state
+                    });
+                }
+            }, 500);
+        }
+
         // Show duplicate Pokemon modal with nice UI
         function showDuplicatePokemonModal(pokemonNumber, message) {
             // Create a nice error overlay
@@ -1514,8 +1623,7 @@
                 this.scanning = true;
                 this.scannerId = Date.now(); // Create unique session ID
                 console.log('🎯 Starting QR scan loop... Session ID:', this.scannerId);
-                document.getElementById('videoDebugInfo').innerHTML = 
-                    '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
+                // Remove automatic "Scanning for QR codes..." text - user now has refresh button
                     
                 this.scanLoop();
             }
@@ -1640,8 +1748,8 @@
                     // Resume scanning after 2 seconds for invalid codes
                     setTimeout(() => {
                         if (currentState === UI_STATES.SCANNER && !this.scanning) {
-                            document.getElementById('videoDebugInfo').innerHTML = 
-                                '<span style="color: #4ecdc4;">🔍 Scanning for QR codes...</span>';
+                            // Clear the error message, but don't show "scanning" text - user has refresh button
+                            document.getElementById('videoDebugInfo').innerHTML = '';
                             this.startScanning(); // Use startScanning to create new session
                         }
                     }, 2000);
