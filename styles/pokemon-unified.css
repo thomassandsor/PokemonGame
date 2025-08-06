@@ -1,15 +1,76 @@
 /* Pokemon Unified Page Styles */
 
+/* Compact section spacing */
+.pokemon-section {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+}
+
+/* Home Button Styles - Inline with header */
+.pokemon-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-right: 15px;
+}
+
+.pokemon-home-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pokeball-icon {
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+}
+
+.pokemon-home-btn:hover .pokeball-icon {
+    transform: rotate(15deg);
+}
+
+/* Header Content Layout - Same as index.html but with home button */
+.pokemon-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+}
+
+.pokemon-title {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    text-transform: none;
+}
+
 /* View Toggle */
 .view-toggle {
     display: flex;
     gap: 10px;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .toggle-btn {
-    padding: 12px 24px;
+    padding: 10px 20px;
     border: 2px solid #3b82f6;
     background: white;
     color: #3b82f6;
@@ -32,14 +93,6 @@
 }
 
 /* Trainer Info in Header */
-.pokemon-header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
 .trainer-info {
     text-align: right;
     color: white;
@@ -268,6 +321,54 @@
 .nav-button.logout {
     border-color: #dc2626;
     color: #dc2626;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .pokemon-home-btn {
+        width: 36px;
+        height: 36px;
+        padding: 6px;
+        margin-right: 12px;
+    }
+    
+    .pokeball-icon {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .pokemon-section {
+        padding: 12px 15px;
+        margin-bottom: 12px;
+    }
+    
+    .view-toggle {
+        margin-bottom: 12px;
+    }
+    
+    .toggle-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pokemon-home-btn {
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+        margin-right: 10px;
+    }
+    
+    .pokeball-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .pokemon-section {
+        padding: 10px 12px;
+        margin-bottom: 10px;
+    }
 }
 
 .nav-button.logout:hover {

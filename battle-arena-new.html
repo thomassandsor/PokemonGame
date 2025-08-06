@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Arena - Pokemon Game</title>
+    <link rel="stylesheet" href="styles/pokemon-design-system.css">
+    <style>
+        /* Battle Arena Specific Styles */
+        .battle-arena-container {
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+            padding: 20px 0 48px 0;
+            font-family: var(--font-pokemon);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+            background-attachment: fixed;
+        }
+        
+        .battle-arena-container::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><pattern id="trainer" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M30,30 Q50,10 70,30 Q50,50 30,30" fill="none" stroke="rgba(255,193,7,0.03)" stroke-width="2"/><circle cx="50" cy="70" r="15" fill="rgba(59,130,246,0.02)"/><path d="M35,70 L65,70 M50,55 L50,85" stroke="rgba(239,68,68,0.03)" stroke-width="1"/></pattern></defs><rect width="200" height="200" fill="url(%23trainer)"/></svg>'),
+                radial-gradient(circle at 10% 10%, rgba(255, 193, 7, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            background-size: 300px 300px, 100%, 100%, 100%;
+            pointer-events: none;
+            z-index: -1;
+            animation: trainerWorldFloat 30s ease-in-out infinite;
+        }
+        
+        @keyframes trainerWorldFloat {
+            0%, 100% { transform: translateX(0px) translateY(0px); }
+            25% { transform: translateX(-10px) translateY(-5px); }
+            50% { transform: translateX(10px) translateY(5px); }
+            75% { transform: translateX(-5px) translateY(10px); }
+        }
+
+        .arena-logo {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .arena-nav {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin: 0 auto 28px auto;
+            width: 100%;
+            max-width: 600px;
+            z-index: 1;
+            padding: 0 20px;
+        }
+        
+        .arena-nav-btn {
+            flex: 1 1 0;
+            min-width: 120px;
+            max-width: 340px;
+            margin: 0;
+            padding: 14px 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            border: 3px solid #1976d2;
+            background: #fff;
+            color: #1976d2;
+            box-shadow: none;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.18s cubic-bezier(.4,2,.6,1);
+            text-shadow: none;
+            position: relative;
+            opacity: 0.7;
+        }
+        
+        .arena-nav-btn.active, .arena-nav-btn:focus {
+            background: #1976d2;
+            color: #fff;
+            border-color: #1976d2;
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        .arena-nav-btn:hover:not(.active) {
+            filter: brightness(1.08);
+            opacity: 0.85;
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .arena-table-section {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            background: #fff;
+            border: 4px solid #1976d2;
+            border-radius: 24px;
+            box-shadow: none;
+            margin: 0 20px 32px 20px;
+            max-width: calc(100% - 40px);
+        }
+
+        .arena-battles-table {
+            min-width: 600px;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: none;
+            overflow: hidden;
+            margin: 0 auto 0 auto;
+            font-size: 1rem;
+        }
+
+        .arena-battles-table thead {
+            background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+        }
+
+        .arena-battles-table th {
+            color: #fff;
+            font-weight: 700;
+            padding: 14px 10px;
+            border: none;
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .arena-battles-table td {
+            background: #f7fbff;
+            color: #222;
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #e3f2fd;
+            font-size: 1rem;
+        }
+
+        .arena-battles-table tbody tr:nth-child(even) td {
+            background: #e3f2fd;
+        }
+
+        .arena-battles-table tbody tr:hover td {
+            background: #bbdefb;
+        }
+
+        .arena-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+        
+        .arena-type-badge.training {
+            background: linear-gradient(90deg, #43a047 60%, #a5d6a7 100%);
+            color: #fff;
+            border: 1px solid #388e3c;
+        }
+        
+        .arena-type-badge.pvp {
+            background: linear-gradient(90deg, #f44336 60%, #ffbdbd 100%);
+            color: #fff;
+            border: 1px solid #d32f2f;
+        }
+
+        .arena-empty {
+            color: #1976d2;
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .arena-open-btn {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+            color: white;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .arena-open-btn:hover {
+            background: linear-gradient(135deg, #66bb6a, #9ccc65);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .pokeball-spinner {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at center, #ffffff 0%, #ff0000 45%, #000000 50%, #ffffff 55%, #ffffff 100%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message-banner {
+            background: linear-gradient(135deg, #2196f3, #21cbf3);
+            color: white;
+            padding: 16px 20px;
+            margin: 0 20px 20px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        /* Pokemon Selection Styles */
+        .pokemon-select-view {
+            margin: 0 20px 20px 20px;
+        }
+        
+        .pokemon-select-modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .pokemon-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .pokemon-card {
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .pokemon-card:hover {
+            border-color: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokemon-card.selected {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .pokemon-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .pokemon-card h4 {
+            margin: 8px 0 4px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .pokemon-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .challenge-types {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .challenge-btn {
+            flex: 1;
+            max-width: 250px;
+            min-width: 200px;
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .challenge-btn:hover {
+            border-color: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .challenge-btn.selected {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .btn-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+        
+        .btn-content h4 {
+            margin: 0 0 8px 0;
+            color: #1976d2;
+            font-weight: 700;
+        }
+        
+        .btn-content p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+        
+        .section-header h2 {
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status.won {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.lost {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .arena-view {
+            display: none;
+        }
+
+        .arena-view.active {
+            display: block;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .arena-nav {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .arena-nav-btn {
+                max-width: none;
+                width: 100%;
+            }
+            
+            .challenge-types {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pokemon-grid {
+                justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="pokemon-game-body">
+    <div class="battle-arena-container">
+        <!-- Clean Header -->
+        <header class="pokemon-header">
+            <div class="pokemon-header-content">
+                <div class="arena-logo">⚔️</div>
+                <h1 class="pokemon-title">Battle Arena</h1>
+                <div class="trainer-info">
+                    <div class="trainer-name" id="trainerName">Welcome, Trainer!</div>
+                    <div class="pokemon-stats">
+                        <span>Ready to Battle!</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- View Toggle Navigation -->
+        <div class="pokemon-section">
+            <div class="view-toggle arena-nav">
+                <button id="challengesBtn" class="toggle-btn arena-nav-btn active" onclick="switchView('challenges')">
+                    🏟️ Open Challenges
+                </button>
+                <button id="createBtn" class="toggle-btn arena-nav-btn" onclick="switchView('create')">
+                    ⚡ Create Challenge
+                </button>
+                <button id="historyBtn" class="toggle-btn arena-nav-btn" onclick="switchView('history')">
+                    📜 My Battles
+                </button>
+            </div>
+        </div>
+
+        <!-- Message Banner -->
+        <div id="messageBanner" class="message-banner" style="display: none;">
+            <span id="messageText"></span>
+            <button id="closeMessage" class="close-btn">×</button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="pokemon-content">
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="pokemon-loading" style="display: none;">
+                <div class="pokeball-spinner"></div>
+                <p class="pokemon-text-center">Loading battles...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="pokemon-error" style="display: none;">
+                <div class="pokemon-error-icon">⚠️</div>
+                <p id="errorText" class="pokemon-text-center"></p>
+            </div>
+
+            <!-- Open Challenges View -->
+            <div id="challengesView" class="arena-view active">
+                <div class="arena-table-section">
+                    <table class="arena-battles-table">
+                        <thead>
+                            <tr>
+                                <th>Trainer</th>
+                                <th>Pokemon</th>
+                                <th>Type</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="challengesTableBody">
+                            <tr>
+                                <td colspan="5" class="arena-empty">Loading challenges...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Create Challenge View -->
+            <div id="createView" class="arena-view">
+                <div class="pokemon-select-view">
+                    <div class="pokemon-select-modal">
+                        <h2 class="pokemon-title">Create a Battle Challenge</h2>
+                        <p class="pokemon-text-center">Choose your Pokemon and challenge type</p>
+                        
+                        <!-- Pokemon Selection -->
+                        <div class="pokemon-section">
+                            <h3>Select Your Pokemon:</h3>
+                            <div id="pokemonSelector" class="pokemon-grid">
+                                <div class="pokemon-loading">
+                                    <div class="pokeball-spinner"></div>
+                                    <p>Loading your Pokemon...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Challenge Type Selection -->
+                        <div class="pokemon-section">
+                            <h3>Challenge Type:</h3>
+                            <div class="challenge-types">
+                                <button id="trainingBtn" class="challenge-btn" onclick="selectChallengeType('training')">
+                                    <div class="btn-icon">🎯</div>
+                                    <div class="btn-content">
+                                        <h4>Training Battle</h4>
+                                        <p>Fight against AI for practice</p>
+                                    </div>
+                                </button>
+                                <button id="pvpBtn" class="challenge-btn" onclick="selectChallengeType('open')">
+                                    <div class="btn-icon">⚔️</div>
+                                    <div class="btn-content">
+                                        <h4>PvP Challenge</h4>
+                                        <p>Challenge other trainers</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Create Button -->
+                        <div class="pokemon-section">
+                            <button id="createChallengeBtn" class="pokemon-btn" onclick="createChallenge()" disabled>
+                                Create Challenge
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battle History View -->
+            <div id="historyView" class="arena-view">
+                <div class="arena-table-section">
+                    <div class="section-header">
+                        <h2>Your Battle History</h2>
+                        <button class="refresh-btn" onclick="loadUserBattles()">🔄 Refresh</button>
+                    </div>
+                    <table class="arena-battles-table">
+                        <thead>
+                            <tr>
+                                <th>Opponent</th>
+                                <th>Your Pokemon</th>
+                                <th>Result</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="6" class="arena-empty">Loading battle history...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty State for No Battles -->
+            <div id="emptyState" class="pokemon-empty-state" style="display: none;">
+                <div class="empty-icon">⚔️</div>
+                <h3>No Battles Found</h3>
+                <p>No battles available at the moment. Create a challenge to get started!</p>
+                <button onclick="switchView('create')" class="pokemon-btn">
+                    Create Challenge
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="battle-challenge-service.js"></script>
+    <script src="pokemon-service.js"></script>
+    <script>
+        // Battle Arena JavaScript Implementation
+        class BattleArena {
+            constructor() {
+                this.currentView = 'challenges';
+                this.selectedPokemon = null;
+                this.selectedChallengeType = null;
+                this.userPokemon = [];
+                this.userId = null;
+                this.battles = [];
+                this.userBattles = [];
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    // Initialize auth and get user data
+                    await this.initializeAuth();
+                    
+                    // Load initial data
+                    await this.loadUserData();
+                    await this.loadOpenChallenges();
+                    
+                    // Set up event listeners
+                    this.setupEventListeners();
+                    
+                    // Update trainer name
+                    this.updateTrainerName();
+                } catch (error) {
+                    console.error('Failed to initialize Battle Arena:', error);
+                    this.showError('Failed to initialize battle arena. Please refresh the page.');
+                }
+            }
+
+            async initializeAuth() {
+                if (typeof initializeAuth === 'function') {
+                    await initializeAuth();
+                }
+            }
+
+            async loadUserData() {
+                try {
+                    if (!window.currentUser?.email) {
+                        throw new Error('User not authenticated');
+                    }
+
+                    // Get user contact info
+                    const contact = await getContactByEmail(window.currentUser.email);
+                    if (!contact?.contactid) {
+                        throw new Error('User profile not found');
+                    }
+                    
+                    this.userId = contact.contactid;
+                    
+                    // Load user's Pokemon
+                    const pokemon = await getCaughtPokemonByTrainer(this.userId);
+                    this.userPokemon = pokemon.filter(p => !p.hp || p.hp > 0); // Only healthy Pokemon
+                    
+                    this.renderPokemonSelector();
+                } catch (error) {
+                    console.error('Failed to load user data:', error);
+                    this.showError('Failed to load your Pokemon. Please check your connection.');
+                }
+            }
+
+            updateTrainerName() {
+                const trainerNameEl = document.getElementById('trainerName');
+                if (window.currentUser?.name) {
+                    trainerNameEl.textContent = `Welcome, ${window.currentUser.name}!`;
+                }
+            }
+
+            setupEventListeners() {
+                // Close message banner
+                document.getElementById('closeMessage').addEventListener('click', () => {
+                    this.hideMessage();
+                });
+            }
+
+            // View Management
+            switchView(view) {
+                // Update navigation buttons
+                document.querySelectorAll('.arena-nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(`${view}Btn`).classList.add('active');
+                
+                // Update views
+                document.querySelectorAll('.arena-view').forEach(v => {
+                    v.classList.remove('active');
+                });
+                document.getElementById(`${view}View`).classList.add('active');
+                
+                this.currentView = view;
+                this.hideMessage();
+                this.hideError();
+                
+                // Load appropriate data
+                if (view === 'challenges') {
+                    this.loadOpenChallenges();
+                } else if (view === 'history') {
+                    this.loadUserBattles();
+                } else if (view === 'create') {
+                    this.renderPokemonSelector();
+                }
+            }
+
+            // Challenge Management
+            async loadOpenChallenges() {
+                this.showLoading(true);
+                try {
+                    const challenges = await BattleChallengeService.getOpenChallenges();
+                    this.battles = challenges;
+                    this.renderChallenges();
+                } catch (error) {
+                    console.error('Failed to load challenges:', error);
+                    this.showError('Failed to load challenges. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async loadUserBattles() {
+                if (!this.userId) return;
+                
+                this.showLoading(true);
+                try {
+                    const battles = await BattleChallengeService.getUserChallenges(this.userId);
+                    this.userBattles = battles;
+                    this.renderBattleHistory();
+                } catch (error) {
+                    console.error('Failed to load battle history:', error);
+                    this.showError('Failed to load battle history. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            renderChallenges() {
+                const tbody = document.getElementById('challengesTableBody');
+                tbody.innerHTML = '';
+
+                if (this.battles.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="arena-empty">No open challenges found.</td></tr>';
+                    return;
+                }
+
+                this.battles.forEach(battle => {
+                    const row = document.createElement('tr');
+                    const trainerName = battle.pokemon_Player1?.firstname || 'Unknown';
+                    const pokemonName = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown';
+                    const challengeType = battle.pokemon_challengetype === 2 ? 'training' : 'pvp';
+                    const challengeTypeText = battle.pokemon_challengetype === 2 ? 'Training' : 'PvP';
+                    const createdDate = battle.createdon ? new Date(battle.createdon).toLocaleDateString() : 'Unknown';
+
+                    row.innerHTML = `
+                        <td>${trainerName}</td>
+                        <td>${pokemonName}</td>
+                        <td><span class="arena-type-badge ${challengeType}">${challengeTypeText}</span></td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="arena-open-btn" onclick="battleArena.joinBattle('${battle.pokemon_battleid}')">
+                                Join Battle
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            renderBattleHistory() {
+                const tbody = document.getElementById('historyTableBody');
+                tbody.innerHTML = '';
+
+                if (this.userBattles.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="arena-empty">No battle history found.</td></tr>';
+                    return;
+                }
+
+                this.userBattles.forEach(battle => {
+                    const row = document.createElement('tr');
+                    const opponent = battle.pokemon_Player2?.firstname || 'AI';
+                    const myPokemon = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown';
+                    const result = this.getBattleResult(battle);
+                    const challengeType = battle.pokemon_challengetype === 2 ? 'training' : 'pvp';
+                    const challengeTypeText = battle.pokemon_challengetype === 2 ? 'Training' : 'PvP';
+                    const battleDate = battle.createdon ? new Date(battle.createdon).toLocaleDateString() : 'Unknown';
+
+                    row.innerHTML = `
+                        <td>${opponent}</td>
+                        <td>${myPokemon}</td>
+                        <td><span class="status ${result.toLowerCase()}">${result}</span></td>
+                        <td><span class="arena-type-badge ${challengeType}">${challengeTypeText}</span></td>
+                        <td>${battleDate}</td>
+                        <td>
+                            ${battle.pokemon_battleresult ? 
+                                `<button class="arena-open-btn" onclick="battleArena.viewBattleResult('${battle.pokemon_battleid}')">View Result</button>` : 
+                                'Pending'
+                            }
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            getBattleResult(battle) {
+                if (!battle.pokemon_battleresult) return 'Pending';
+                
+                try {
+                    const result = JSON.parse(battle.pokemon_battleresult);
+                    if (result.winner === this.userId) return 'Won';
+                    if (result.winner) return 'Lost';
+                    return 'Draw';
+                } catch {
+                    return 'Unknown';
+                }
+            }
+
+            renderPokemonSelector() {
+                const selector = document.getElementById('pokemonSelector');
+                
+                if (this.userPokemon.length === 0) {
+                    selector.innerHTML = `
+                        <div class="pokemon-empty-state">
+                            <div class="empty-icon">🎯</div>
+                            <h3>No Pokemon Available</h3>
+                            <p>You need healthy Pokemon to create battles. Catch some Pokemon first!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                selector.innerHTML = '';
+                this.userPokemon.forEach(pokemon => {
+                    const card = document.createElement('div');
+                    card.className = 'pokemon-card';
+                    card.onclick = () => this.selectPokemon(pokemon);
+                    
+                    const imageUrl = pokemon.pokemon_Pokemon?.pokemon_imageurl || 
+                                  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.pokedexId}.png`;
+                    
+                    card.innerHTML = `
+                        <img src="${imageUrl}" alt="${pokemon.pokemon_Pokemon?.pokemon_name || 'Pokemon'}" 
+                             onerror="this.src='https://via.placeholder.com/60x60?text=?'">
+                        <h4>${pokemon.pokemon_Pokemon?.pokemon_name || 'Unknown'}</h4>
+                        <p>HP: ${pokemon.hp || pokemon.pokemon_Pokemon?.pokemon_hp || '???'}</p>
+                    `;
+                    
+                    selector.appendChild(card);
+                });
+            }
+
+            selectPokemon(pokemon) {
+                // Remove previous selection
+                document.querySelectorAll('.pokemon-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Add selection to clicked card
+                event.target.closest('.pokemon-card').classList.add('selected');
+                
+                this.selectedPokemon = pokemon;
+                this.updateCreateButton();
+            }
+
+            selectChallengeType(type) {
+                // Remove previous selection
+                document.querySelectorAll('.challenge-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                // Add selection to clicked button
+                document.getElementById(`${type === 'training' ? 'training' : 'pvp'}Btn`).classList.add('selected');
+                
+                this.selectedChallengeType = type;
+                this.updateCreateButton();
+            }
+
+            updateCreateButton() {
+                const btn = document.getElementById('createChallengeBtn');
+                btn.disabled = !this.selectedPokemon || !this.selectedChallengeType;
+            }
+
+            async createChallenge() {
+                if (!this.selectedPokemon || !this.selectedChallengeType || !this.userId) {
+                    this.showError('Please select a Pokemon and challenge type.');
+                    return;
+                }
+
+                this.showLoading(true);
+                try {
+                    const result = await BattleChallengeService.createChallenge(
+                        this.userId,
+                        this.selectedPokemon.pokedexId,
+                        this.selectedChallengeType
+                    );
+
+                    if (result.success) {
+                        this.showMessage(
+                            this.selectedChallengeType === 'training' 
+                                ? 'Training battle started! Check your history for results.' 
+                                : 'Challenge created! Other players can now join.'
+                        );
+                        this.switchView('history');
+                    } else {
+                        this.showError(result.error || 'Failed to create challenge');
+                    }
+                } catch (error) {
+                    console.error('Failed to create challenge:', error);
+                    this.showError('Error creating challenge. Please try again.');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async joinBattle(battleId) {
+                if (!this.userId) {
+                    this.showError('Please login to join battles.');
+                    return;
+                }
+
+                // Navigate to battle join page
+                window.location.href = `battle-join.html?id=${battleId}`;
+            }
+
+            viewBattleResult(battleId) {
+                // Navigate to battle result page
+                window.location.href = `battle-result.html?id=${battleId}`;
+            }
+
+            // UI Helper Methods
+            showLoading(show) {
+                const spinner = document.getElementById('loadingSpinner');
+                spinner.style.display = show ? 'flex' : 'none';
+            }
+
+            showMessage(message) {
+                const banner = document.getElementById('messageBanner');
+                const text = document.getElementById('messageText');
+                text.textContent = message;
+                banner.style.display = 'flex';
+            }
+
+            hideMessage() {
+                document.getElementById('messageBanner').style.display = 'none';
+            }
+
+            showError(message) {
+                const errorEl = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = message;
+                errorEl.style.display = 'flex';
+            }
+
+            hideError() {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+        }
+
+        // Global functions for onclick handlers
+        function switchView(view) {
+            window.battleArena.switchView(view);
+        }
+
+        function selectChallengeType(type) {
+            window.battleArena.selectChallengeType(type);
+        }
+
+        function createChallenge() {
+            window.battleArena.createChallenge();
+        }
+
+        function loadUserBattles() {
+            window.battleArena.loadUserBattles();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.battleArena = new BattleArena();
+        });
+    </script>
+</body>
+</html>

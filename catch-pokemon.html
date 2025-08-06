@@ -776,6 +776,8 @@
             
             // Store Pokemon number globally for use after minigame
             window.currentPokemonNumber = pokemonNumber;
+            // Initialize global Pokemon data variable
+            window.currentPokemonData = null;
             
             // Stop scanning
             if (qrScanner) {
@@ -820,6 +822,8 @@
                     
                     if (pokemonData) {
                         currentPokemonData = pokemonData;
+                        // Store Pokemon data globally for use after minigame
+                        window.currentPokemonData = pokemonData;
                         showPokemonEncounter(pokemonData, result.userData);
                     } else {
                         alert('Failed to load Pokemon data. Please try again.');
@@ -1031,6 +1035,7 @@
         function runAway() {
             console.log('🏃 Player chose to run away');
             currentPokemonData = null;
+            window.currentPokemonData = null;
             showUIState(UI_STATES.SCANNER);
         }
 
@@ -1050,7 +1055,9 @@
                 // Use the catch service - either works or fails
                 const result = await CatchPokemonService.catchPokemonOptimized(
                     currentPokemonData.id, 
-                    window.currentUserData
+                    window.currentUserData,
+                    {}, // options
+                    currentPokemonData // Pokemon JSON data with stats
                 );
                 
                 hideLoadingSpinner();
@@ -1271,6 +1278,7 @@
             
             // Reset and go back to scanner
             currentPokemonData = null;
+            window.currentPokemonData = null;
             showUIState(UI_STATES.SCANNER);
         }
 
@@ -1348,7 +1356,8 @@
                 // Actually catch the Pokemon using the special minigame catch method
                 const result = await CatchPokemonService.catchPokemonViaMinigame(
                     window.currentPokemonNumber, 
-                    window.currentUserData
+                    window.currentUserData,
+                    window.currentPokemonData // Pokemon JSON data with stats
                 );
                 
                 // Remove loading overlay
@@ -1370,8 +1379,9 @@
                     alert(`Failed to catch Pokemon: ${result.error}`);
                     // Return to scanner on failure
                     window.currentPokemonNumber = null;
+                    window.currentPokemonData = null;
                     currentPokemonData = null;
-                    setUIState(UI_STATES.SCANNER);
+                    showUIState(UI_STATES.SCANNER);
                     // Reset guard flag on failure
                     isMinigameCatchInProgress = false;
                 }
@@ -1386,6 +1396,7 @@
                 }
                 // Return to scanner on error
                 window.currentPokemonNumber = null;
+                window.currentPokemonData = null;
                 currentPokemonData = null;
                 setUIState(UI_STATES.SCANNER);
             } finally {
@@ -1450,6 +1461,7 @@
             
             // Clear stored Pokemon data and go back to main menu
             window.currentPokemonNumber = null;
+            window.currentPokemonData = null;
             currentPokemonData = null;
             
             // Navigate to main menu

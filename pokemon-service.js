@@ -102,6 +102,8 @@ class PokemonService {
                     });
                     
                     return {
+                        id: p.pokemon_pokedexid, // Dataverse record ID for the pokemon_pokedex entry
+                        pokemon_pokemonid: p.pokemon_pokedexid, // Same ID for backward compatibility
                         name: p.pokemon_name,
                         level: p.pokemon_level,
                         hp: p.pokemon_hp,

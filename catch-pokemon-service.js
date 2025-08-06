@@ -95,9 +95,10 @@ class CatchPokemonService {
      * Catch a Pokemon via minigame completion (no pokeball consumption)
      * @param {number} pokemonNumber - Pokemon ID from QR code
      * @param {Object} userData - Optional pre-fetched user data from getUserData()
+     * @param {Object} pokemonJsonData - Full Pokemon JSON data with stats (optional)
      * @returns {Promise<Object>} Result of catch operation
      */
-    static async catchPokemonViaMinigame(pokemonNumber, userData = null) {
+    static async catchPokemonViaMinigame(pokemonNumber, userData = null, pokemonJsonData = null) {
         let currentStep = 'initialization';
         console.time('🎮 MINIGAME-CATCH: Total catch time');
         try {
@@ -130,7 +131,7 @@ class CatchPokemonService {
             currentStep = 'entry_creation';
             // Create Pokedex entry with lookup relationships
             console.log('🎮 MINIGAME-CATCH: Creating entry with userId:', userInfo.userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
-            const pokedexEntry = this.createPokedexEntry(userInfo.userId, masterPokemon, { minigame: true });
+            const pokedexEntry = this.createPokedexEntry(userInfo.userId, masterPokemon, { minigame: true }, pokemonJsonData);
             console.log('🎮 MINIGAME-CATCH: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
             
             currentStep = 'database_insert';
@@ -178,9 +179,10 @@ class CatchPokemonService {
      * @param {number} pokemonNumber - Pokemon ID from QR code
      * @param {Object} userData - Pre-fetched user data from getUserData()
      * @param {Object} options - Optional catch parameters
+     * @param {Object} pokemonJsonData - Full Pokemon JSON data with stats (optional)
      * @returns {Promise<Object>} Result of catch operation
      */
-    static async catchPokemonOptimized(pokemonNumber, userData, options = {}) {
+    static async catchPokemonOptimized(pokemonNumber, userData, options = {}, pokemonJsonData = null) {
         let currentStep = 'initialization';
         try {
             console.log('🎯 CATCH-SERVICE: Starting optimized catch process for Pokemon #' + pokemonNumber);
@@ -205,7 +207,7 @@ class CatchPokemonService {
             currentStep = 'entry_creation';
             // Create Pokedex entry with lookup relationships
             console.log('🎯 CATCH-SERVICE: Creating entry with userId:', userData.userId, 'pokemonId:', masterPokemon.pokemon_pokemonid);
-            const pokedexEntry = this.createPokedexEntry(userData.userId, masterPokemon, options);
+            const pokedexEntry = this.createPokedexEntry(userData.userId, masterPokemon, options, pokemonJsonData);
             console.log('🎯 CATCH-SERVICE: Pokedex entry:', JSON.stringify(pokedexEntry, null, 2));
             
             currentStep = 'database_insert';
@@ -760,19 +762,53 @@ class CatchPokemonService {
     /**
      * Create Pokedex entry with lookup relationships using @odata.bind
      */
-    static createPokedexEntry(userId, masterPokemon, options = {}) {
+    static createPokedexEntry(userId, masterPokemon, options = {}, pokemonJsonData = null) {
         // Clean GUIDs (remove braces if present)
         const cleanUserId = userId.replace(/[{}]/g, '');
         const cleanPokemonId = masterPokemon.pokemon_pokemonid.replace(/[{}]/g, '');
         
-        return {
+        const entry = {
             // Associate with existing contact and pokemon using @odata.bind (trying Pascal case)
             "pokemon_User@odata.bind": `/contacts(${cleanUserId})`,
             "pokemon_Pokemon@odata.bind": `/pokemon_pokemons(${cleanPokemonId})`,
             
             // Pokemon name
-            pokemon_name: masterPokemon.pokemon_name
+            pokemon_name: masterPokemon.pokemon_name,
+            
+            // Set level to 1 as requested
+            pokemon_level: 1
         };
+
+        // Extract and add stats from Pokemon JSON data if available
+        if (pokemonJsonData && pokemonJsonData.stats) {
+            // Add stats back now that basic entry works
+            console.log('🎯 CATCH-SERVICE: Pokemon JSON data available, adding all stats');
+            
+            // Find HP stat
+            const hpStat = pokemonJsonData.stats.find(s => s.name === 'hp');
+            if (hpStat) {
+                entry.pokemon_hp = hpStat.base_stat; // Current HP
+                entry.pokemon_hpmax = hpStat.base_stat; // Max HP
+            }
+
+            // Find attack stat
+            const attackStat = pokemonJsonData.stats.find(s => s.name === 'attack');
+            if (attackStat) {
+                entry.pokemon_attack = attackStat.base_stat;
+            }
+
+            // Find defense stat
+            const defenseStat = pokemonJsonData.stats.find(s => s.name === 'defense');
+            if (defenseStat) {
+                entry.pokemon_defence = defenseStat.base_stat; // British spelling used in Dataverse
+            }
+
+            console.log('🎯 CATCH-SERVICE: Added Pokemon stats - HP:', entry.pokemon_hp, 'Max HP:', entry.pokemon_hpmax, 'Attack:', entry.pokemon_attack, 'Defence:', entry.pokemon_defence);
+        } else {
+            console.log('🎯 CATCH-SERVICE: No Pokemon JSON data provided, skipping stats');
+        }
+
+        return entry;
     }
     
     /**

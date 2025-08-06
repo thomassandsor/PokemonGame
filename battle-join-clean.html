@@ -22,6 +22,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             margin-bottom: 24px;
             padding: 24px;
+            border-left: 4px solid #3b82f6;
         }
 
         .battle-info-card h3 {
@@ -70,57 +71,107 @@
             font-weight: 600;
         }
 
-        /* Pokemon grid - use design system styles for cards */
+        /* Pokemon grid */
         .pokemon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 16px;
+            justify-content: center;
             margin-bottom: 24px;
         }
 
-        /* Battle-specific Pokemon card selection styles */
+        .pokemon-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .pokemon-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         .pokemon-card.selected {
-            border-color: #10b981 !important;
-            background: #f0fdf4 !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
+            border-color: #10b981;
+            background: #f0fdf4;
         }
 
-        /* Battle action button override */
-        .pokemon-card .pokemon-actions .action-btn {
-            background: #10b981;
-            color: white;
+        .pokemon-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
         }
 
-        .pokemon-card .pokemon-actions .action-btn:hover {
-            background: #059669;
+        .pokemon-placeholder {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto;
         }
 
-        /* HP Bar for battle cards */
-        .pokemon-hp-bar {
-            background: #e9ecef;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
+        .pokemon-card h4 {
             margin: 8px 0 4px 0;
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
         }
 
-        .pokemon-hp-fill {
+        .pokemon-card h5 {
+            margin: 8px 0 4px 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .pokemon-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .pokemon-card .level {
+            margin: 4px 0;
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .pokemon-card small {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* HP Bar */
+        .hp-bar {
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .hp-fill {
             height: 100%;
             transition: width 0.5s ease;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         .hp-high { background: #28a745; }
         .hp-medium { background: #ffc107; }
         .hp-low { background: #dc3545; }
-
-        .pokemon-hp-text {
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            margin: 4px 0;
-        }
 
         /* Action buttons */
         .action-buttons {
@@ -206,7 +257,9 @@
         <main class="pokemon-main">
             <!-- Loading State -->
             <div id="loadingState" class="loading-state">
-                <img src="assets/pokeball.svg" alt="Loading..." class="pokemon-spinner" style="width: 48px; height: 48px;">
+                <div class="pokemon-spinner"></div>
+                <h3>Loading Battle...</h3>
+                <p>Please wait while we load the battle information.</p>
             </div>
 
             <!-- Error State -->
@@ -238,7 +291,7 @@
                                 <span class="detail-value" id="pokemonLevel">Loading...</span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">HP:</span>
+                                <span class="detail-label">Created:</span>
                                 <span class="detail-value" id="battleCreated">Loading...</span>
                             </div>
                         </div>
@@ -269,9 +322,7 @@
     <!-- Scripts -->
     <script src="auth.js"></script>
     <script src="pokemon-service.js"></script>
-    <script src="portal-settings-service.js"></script>
     <script src="battle-challenge-service.js"></script>
-    <script src="battle-simulation-service.js"></script>
     <script>
         class BattleJoin {
             constructor() {
@@ -280,42 +331,8 @@
                 this.battleData = null;
                 this.userPokemon = [];
                 this.selectedPokemon = null;
-                this.pokemonData = null; // Cache for Pokemon.json data
                 
                 this.init();
-            }
-            
-            // Load Pokemon data from JSON file
-            async loadPokemonData() {
-                if (this.pokemonData) {
-                    return this.pokemonData; // Return cached data
-                }
-                
-                try {
-                    console.log('📦 Loading Pokemon.json data...');
-                    const response = await fetch('src/data/pokemon.json');
-                    if (!response.ok) {
-                        throw new Error(`Failed to load Pokemon data: ${response.statusText}`);
-                    }
-                    this.pokemonData = await response.json();
-                    console.log('✅ Loaded Pokemon.json data:', this.pokemonData.length, 'Pokemon');
-                    return this.pokemonData;
-                } catch (error) {
-                    console.error('❌ Error loading Pokemon.json:', error);
-                    return [];
-                }
-            }
-            
-            // Get Pokemon details by name from JSON data
-            getPokemonByName(pokemonName) {
-                if (!this.pokemonData) {
-                    console.warn('Pokemon data not loaded yet');
-                    return null;
-                }
-                
-                return this.pokemonData.find(p => 
-                    p.name.toLowerCase() === pokemonName.toLowerCase()
-                );
             }
             
             getBattleIdFromUrl() {
@@ -330,9 +347,6 @@
                     this.showError('No battle ID provided');
                     return;
                 }
-                
-                // Load Pokemon data first
-                await this.loadPokemonData();
                 
                 // Get current user
                 this.currentUser = await this.getCurrentUser();
@@ -428,17 +442,13 @@
                     // Use the battle challenge service to get caught Pokemon
                     const pokemon = await BattleChallengeService.getCaughtPokemon(this.currentUser.id);
                     
-                    console.log('🔍 DEBUG: Raw Pokemon data from Dataverse:', pokemon);
-                    console.log('🔍 DEBUG: Sample Pokemon structure:', pokemon[0]);
-                    
                     // Filter out fainted Pokemon (HP <= 0)
                     this.userPokemon = pokemon.filter(p => {
-                        const hp = p.pokemon_hp;
+                        const hp = p.pokemon_current_hp || p.pokemon_max_hp || 100;
                         return hp > 0;
                     });
                     
                     console.log('✅ Loaded user Pokemon:', this.userPokemon.length);
-                    console.log('🔍 DEBUG: Filtered Pokemon data:', this.userPokemon);
                     
                     if (this.userPokemon.length === 0) {
                         throw new Error('You have no Pokemon available for battle. Catch some Pokemon first or heal your current team!');
@@ -454,18 +464,18 @@
                 try {
                     console.log('🎨 renderBattleInfo: Starting with data:', this.battleData);
                     const player1Name = this.battleData.pokemon_Player1?.firstname || 'Unknown Trainer';
-                    const pokemonName = this.battleData.pokemon_Player1Pokemon?.pokemon_name || 'Unknown Pokemon';
+                    const pokemonData = this.battleData.pokemon_Player1Pokemon?.pokemon_Pokemon;
+                    const pokemonName = pokemonData?.pokemon_name || 'Unknown Pokemon';
                     const pokemonLevel = this.battleData.pokemon_Player1Pokemon?.pokemon_level || 5;
-                    const pokemonHP = this.battleData.pokemon_Player1Pokemon?.pokemon_hp || '?';
-                    const pokemonMaxHP = this.battleData.pokemon_Player1Pokemon?.pokemon_hpmax || '?';
+                    const createdDate = this.battleData.createdon ? 
+                        new Date(this.battleData.createdon).toLocaleDateString() : 'Unknown';
                     
-                    console.log('🎨 renderBattleInfo: Player 1 Pokemon data:', this.battleData.pokemon_Player1Pokemon);
                     console.log('🎨 renderBattleInfo: Setting challenger name to:', player1Name);
                     document.getElementById('challengerName').textContent = player1Name;
                     console.log('🎨 renderBattleInfo: Setting challenger Pokemon to:', pokemonName);
                     document.getElementById('challengerPokemon').textContent = pokemonName;
                     document.getElementById('pokemonLevel').textContent = `Lv. ${pokemonLevel}`;
-                    document.getElementById('battleCreated').textContent = `${pokemonHP}/${pokemonMaxHP}`;
+                    document.getElementById('battleCreated').textContent = createdDate;
                     
                     console.log('✅ renderBattleInfo: Completed successfully');
                 } catch (error) {
@@ -491,94 +501,24 @@
                     
                     console.log('🎨 renderUserPokemon: Generating HTML for Pokemon...');
                     container.innerHTML = this.userPokemon.map(pokemon => {
-                        console.log('🔍 DEBUG: Rendering Pokemon:', pokemon);
-                        
-                        // Get Pokemon name - check multiple possible fields
-                        const pokemonName = pokemon.pokemon_nickname || 
-                                          pokemon.pokemon_name || 
-                                          pokemon.pokemon_Pokemon?.pokemon_name || 
-                                          'Unknown Pokemon';
-                        
-                        // Get Pokemon level
-                        const pokemonLevel = pokemon.pokemon_level || 5;
-                        
-                        // Get Pokemon details from JSON data
-                        const pokemonJsonData = this.getPokemonByName(pokemonName);
-                        console.log('🔍 DEBUG: Pokemon JSON data for', pokemonName, ':', pokemonJsonData);
-                        
-                        // Get Pokemon ID and sprite from JSON data or fallback
-                        let pokemonId = 1; // Default fallback
-                        let pokemonSprite = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png';
-                        let types = ['normal'];
-                        
-                        if (pokemonJsonData) {
-                            pokemonId = pokemonJsonData.id;
-                            pokemonSprite = pokemonJsonData.sprites?.front_default || 
-                                          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonJsonData.id}.png`;
-                            types = pokemonJsonData.types || ['normal'];
-                        } else {
-                            // Fallback: try to get from expanded Pokemon data or Dataverse fields
-                            pokemonId = pokemon.pokemon_Pokemon?.pokemon_id || 
-                                      pokemon.pokemon_id || 
-                                      1;
-                            pokemonSprite = pokemon.pokemon_Pokemon?.pokemon_sprite_url || 
-                                          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-                            
-                            // Try to get types from expanded Pokemon data
-                            if (pokemon.pokemon_Pokemon) {
-                                const type1 = pokemon.pokemon_Pokemon.pokemon_type1;
-                                const type2 = pokemon.pokemon_Pokemon.pokemon_type2;
-                                types = [];
-                                if (type1) types.push(type1.toLowerCase());
-                                if (type2 && type2 !== type1) types.push(type2.toLowerCase());
-                                if (types.length === 0) types = ['normal'];
-                            }
-                        }
-                        
-                        // Get HP values from Dataverse fields
-                        const currentHp = pokemon.pokemon_hp || 0;
-                        const maxHp = pokemon.pokemon_hpmax || 100;
-                        
-                        const hpPercentage = (currentHp / maxHp) * 100;
+                        const pokemonData = pokemon.pokemon_Pokemon;
+                        const hp = pokemon.pokemon_current_hp || pokemon.pokemon_max_hp || 100;
+                        const maxHp = pokemon.pokemon_max_hp || 100;
+                        const hpPercentage = (hp / maxHp) * 100;
                         const hpClass = hpPercentage > 60 ? 'hp-high' : hpPercentage > 30 ? 'hp-medium' : 'hp-low';
                         
-                        console.log('🔍 DEBUG: Final mapped Pokemon data:', {
-                            name: pokemonName,
-                            level: pokemonLevel,
-                            id: pokemonId,
-                            sprite: pokemonSprite,
-                            hp: currentHp,
-                            maxHp: maxHp,
-                            types: types,
-                            jsonDataFound: !!pokemonJsonData
-                        });
-                        
-                        // Use unified card structure
                         return `
-                            <div class="pokemon-card my-pokemon-card" 
+                            <div class="pokemon-card" 
                                  data-pokemon-id="${pokemon.pokemon_pokedexid}"
                                  onclick="battleJoin.selectPokemon('${pokemon.pokemon_pokedexid}')">
-                                <div class="pokemon-card-image">
-                                    <img src="${pokemonSprite}" 
-                                         alt="${pokemonName}" 
-                                         onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'">
+                                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonData?.pokemon_id || 1}.png" 
+                                     alt="${pokemonData?.pokemon_name || 'Unknown'}">
+                                <h5>${pokemon.pokemon_nickname || pokemonData?.pokemon_name || 'Unknown Pokemon'}</h5>
+                                <p class="level">Level ${pokemon.pokemon_level || 5}</p>
+                                <div class="hp-bar">
+                                    <div class="hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
                                 </div>
-                                <div class="pokemon-card-info">
-                                    <div class="pokemon-card-name">${pokemonName}</div>
-                                    <div class="pokemon-level">Level ${pokemonLevel}</div>
-                                    <div class="pokemon-card-types">
-                                        ${types.map(type => `<span class="pokemon-type-badge pokemon-type-${type}">${type}</span>`).join('')}
-                                    </div>
-                                    <div class="pokemon-hp-bar">
-                                        <div class="pokemon-hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
-                                    </div>
-                                    <div class="pokemon-hp-text">HP: ${currentHp}/${maxHp}</div>
-                                </div>
-                                <div class="pokemon-actions">
-                                    <button class="action-btn" onclick="event.stopPropagation(); battleJoin.selectPokemon('${pokemon.pokemon_pokedexid}')">
-                                        Select for Battle
-                                    </button>
-                                </div>
+                                <small>HP: ${hp}/${maxHp}</small>
                             </div>
                         `;
                     }).join('');
@@ -591,22 +531,14 @@
             selectPokemon(pokemonId) {
                 this.selectedPokemon = this.userPokemon.find(p => p.pokemon_pokedexid === pokemonId);
                 
-                // Update UI - remove selected from all cards
+                // Update UI
                 document.querySelectorAll('.pokemon-card').forEach(card => {
                     card.classList.remove('selected');
                 });
-                
-                // Add selected to clicked card
-                const selectedCard = document.querySelector(`[data-pokemon-id="${pokemonId}"]`);
-                if (selectedCard) {
-                    selectedCard.classList.add('selected');
-                }
+                document.querySelector(`[data-pokemon-id="${pokemonId}"]`).classList.add('selected');
                 
                 // Enable join button
-                const joinButton = document.getElementById('joinButton');
-                if (joinButton) {
-                    joinButton.disabled = false;
-                }
+                document.getElementById('joinButton').disabled = false;
                 
                 console.log('✅ Selected Pokemon:', pokemonId);
             }
@@ -645,28 +577,11 @@
                     // Start battle simulation
                     await this.simulateBattle();
                     
-                    // Add alert with HP information before redirect to allow console inspection
-                    const battleData = await BattleChallengeService.getBattleById(this.battleId);
-                    const p1Name = battleData.pokemon_Player1?.firstname || 'Player 1';
-                    const p1Pokemon = battleData.pokemon_Player1Pokemon?.pokemon_name || 'Unknown';
-                    const p1HP = battleData.pokemon_Player1Pokemon?.pokemon_hp || '?';
-                    const p1MaxHP = battleData.pokemon_Player1Pokemon?.pokemon_hpmax || '?';
-                    
-                    const p2Name = battleData.pokemon_Player2?.firstname || 'Player 2';
-                    const p2Pokemon = battleData.pokemon_Player2Pokemon?.pokemon_name || 'Unknown';
-                    const p2HP = battleData.pokemon_Player2Pokemon?.pokemon_hp || '?';
-                    const p2MaxHP = battleData.pokemon_Player2Pokemon?.pokemon_hpmax || '?';
-                    
-                    alert(`✅ Battle simulation complete!\n\nBattle Participants:\n${p1Name}'s ${p1Pokemon}: ${p1HP}/${p1MaxHP} HP\n${p2Name}'s ${p2Pokemon}: ${p2HP}/${p2MaxHP} HP\n\nCheck console for full details, then click OK to view results.`);
-                    
                     // Redirect to battle result
                     window.location.href = `battle-result.html?battleId=${this.battleId}`;
                     
                 } catch (error) {
                     console.error('❌ Error joining battle:', error);
-                    
-                    // Show detailed error in alert
-                    alert(`❌ Battle Error: ${error.message}\n\nCheck console for full details.`);
                     
                     // Restore button
                     joinBtn.textContent = originalText;
@@ -678,117 +593,33 @@
             
             async simulateBattle() {
                 try {
-                    console.log('🎲 Simulating complex PvP battle...');
+                    console.log('🎲 Simulating PvP battle...');
                     
-                    // Get battle details with Pokemon information
-                    const battleData = await BattleChallengeService.getBattleById(this.battleId);
-                    console.log('📊 Battle data for simulation:', battleData);
-                    console.log('🔍 Battle data keys:', Object.keys(battleData));
-                    console.log('🔍 Player1Pokemon structure:', battleData.pokemon_Player1Pokemon);
-                    console.log('🔍 Player2Pokemon structure:', battleData.pokemon_Player2Pokemon);
+                    // For now, just log that simulation would happen
+                    // In a full implementation, this would simulate the battle between the two players' Pokemon
+                    console.log('⚠️ PvP battle simulation not yet implemented - battle will be marked as completed');
                     
-                    // Extract player and Pokemon data
-                    const player1 = {
-                        id: battleData._pokemon_player1_value || 'player1',
-                        name: battleData.pokemon_Player1?.firstname || 'Player 1'
-                    };
-                    
-                    const player2 = {
-                        id: battleData._pokemon_player2_value || 'player2',
-                        name: battleData.pokemon_Player2?.firstname || 'Player 2'
-                    };
-                    
-                    const pokemon1 = {
-                        pokemon_id: battleData.pokemon_Player1Pokemon?.pokemon_pokedexid || '25',
-                        pokemon_name: battleData.pokemon_Player1Pokemon?.pokemon_name || 'Pikachu',
-                        pokemon_level: battleData.pokemon_Player1Pokemon?.pokemon_level || 5,
-                        pokemon_hp: battleData.pokemon_Player1Pokemon?.pokemon_hp || 100,
-                        pokemon_hpmax: battleData.pokemon_Player1Pokemon?.pokemon_hpmax || 100
-                    };
-                    
-                    const pokemon2 = {
-                        pokemon_id: battleData.pokemon_Player2Pokemon?.pokemon_pokedexid || '4',
-                        pokemon_name: battleData.pokemon_Player2Pokemon?.pokemon_name || 'Charmander',
-                        pokemon_level: battleData.pokemon_Player2Pokemon?.pokemon_level || 5,
-                        pokemon_hp: battleData.pokemon_Player2Pokemon?.pokemon_hp || 100,
-                        pokemon_hpmax: battleData.pokemon_Player2Pokemon?.pokemon_hpmax || 100
-                    };
-                    
-                    // Add pokemon_pokedexid from the pokedex entries
-                    pokemon1.pokemon_pokedexid = battleData.pokemon_Player1Pokemon?.pokemon_pokedexid || battleData._pokemon_player1pokemon_value;
-                    pokemon2.pokemon_pokedexid = battleData.pokemon_Player2Pokemon?.pokemon_pokedexid || battleData._pokemon_player2pokemon_value;
-                    
-                    console.log('🔍 Player data:', { player1, player2 });
-                    console.log('🔍 Pokemon data (with pokedex IDs):', { pokemon1, pokemon2 });
-                    console.log(`⚔️ Battle: ${player1.name}'s ${pokemon1.pokemon_name} vs ${player2.name}'s ${pokemon2.pokemon_name}`);
-                    
-                    // Check if we have valid data
-                    if (!player1.id || !player2.id) {
-                        throw new Error('Missing player data - only one player found in battle');
-                    }
-                    
-                    // Get max turns configuration
-                    const maxTurns = await BattleSimulationService.getMaxTurns();
-                    
-                    // Run the complex battle simulation
-                    const completeBattleData = await BattleSimulationService.simulateComplexBattle(
-                        player1,
-                        player2,
-                        pokemon1,
-                        pokemon2,
-                        maxTurns
-                    );
-                    
-                    console.log('🏆 Complex battle simulation complete:', completeBattleData);
-                    
-                    // Complete the battle with the full turn-by-turn data
-                    console.log('🔄 Calling completeBattle with battleId:', this.battleId);
-                    try {
-                        const completionResult = await BattleChallengeService.completeBattle(this.battleId, completeBattleData);
-                        console.log('✅ Battle completion result:', completionResult);
-                    } catch (completionError) {
-                        console.warn('⚠️ Battle completion failed, but continuing:', completionError.message);
-                    }
-                    
-                    // Update Pokemon HP after battle (non-blocking)
-                    console.log('🏥 Updating Pokemon HP after battle...');
-                    try {
-                        const hpUpdateResult = await BattleChallengeService.updateBattlePokemonHP(completeBattleData.final_result);
-                        
-                        if (hpUpdateResult.success) {
-                            console.log(`✅ Updated HP for ${hpUpdateResult.updated_count} Pokemon`);
-                        } else {
-                            console.warn('⚠️ Some Pokemon HP updates failed:', hpUpdateResult.error);
-                        }
-                    } catch (hpError) {
-                        console.warn('⚠️ HP update failed, but continuing:', hpError.message);
-                    }
-                    
-                } catch (error) {
-                    console.error('❌ Error simulating complex battle:', error);
-                    console.error('❌ Error stack:', error.stack);
-                    
-                    // Show detailed error in alert for debugging
-                    alert(`❌ Battle Simulation Error: ${error.message}\n\nFull error logged to console. Using fallback battle result.`);
-                    
-                    // Fallback to simple battle result
-                    const simpleBattleResult = {
+                    // Create a simple battle result for now
+                    const battleResult = {
                         battleId: this.battleId,
                         winner: Math.random() > 0.5 ? 'player1' : 'player2',
                         battleLog: [
-                            'Battle simulation encountered an error.',
-                            'Fallback result generated.',
-                            `Error: ${error.message}`
+                            'Battle simulation is not yet fully implemented.',
+                            'This is a placeholder result.',
+                            'In the future, this will be a full turn-by-turn battle.'
                         ],
                         metadata: {
                             battleType: 'pvp',
-                            completedAt: new Date().toISOString(),
-                            error: error.message
+                            completedAt: new Date().toISOString()
                         }
                     };
                     
-                    console.log('🔄 Using fallback battle result:', simpleBattleResult);
-                    await BattleChallengeService.completeBattle(this.battleId, simpleBattleResult);
+                    // Complete the battle
+                    await BattleChallengeService.completeBattle(this.battleId, battleResult);
+                    
+                } catch (error) {
+                    console.error('❌ Error simulating battle:', error);
+                    // Don't throw - battle can still be resolved manually
                 }
             }
             
