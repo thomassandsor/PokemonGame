@@ -9,12 +9,14 @@
 </head>
 <body class="pokemon-game-body">
     <div class="pokemon-container">
+        <!-- Home Button (absolutely positioned to left side) -->
+        <a href="index.html" class="pokemon-home-btn" title="Home">
+            <img src="assets/pokeball.svg" alt="Home" class="pokeball-icon">
+        </a>
+
         <!-- Clean Header -->
         <header class="pokemon-header">
             <div class="pokemon-header-content">
-                <a href="index.html" class="pokemon-home-btn" title="Home">
-                    <img src="assets/pokeball.svg" alt="Home" class="pokeball-icon">
-                </a>
                 <h1 class="pokemon-title">Pokedex</h1>
             </div>
         </header>
@@ -23,10 +25,10 @@
         <div class="pokemon-section">
             <div class="view-toggle">
                 <button id="allPokemonBtn" class="toggle-btn active" onclick="switchView('all')">
-                    📖 All Pokemon
+                    📖 All
                 </button>
                 <button id="myPokemonBtn" class="toggle-btn" onclick="switchView('my')">
-                    🎯 My Pokemon
+                    🎯 Caught
                 </button>
             </div>
         </div>

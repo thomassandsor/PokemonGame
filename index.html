@@ -40,16 +40,6 @@
                 <div class="nav-label">Battle Arena</div>
                 <div class="nav-description">Challenge trainers</div>
             </a>
-            <a href="cards-testing.html" class="pokemon-main-nav-item" style="border: 2px dashed var(--pokemon-yellow); background: rgba(255, 193, 7, 0.1);">
-                <div class="nav-icon">🃏</div>
-                <div class="nav-label">Cards Testing</div>
-                <div class="nav-description">Test Pokemon card system</div>
-            </a>
-            <a href="pokemon-json-generator.html" class="pokemon-main-nav-item" style="border: 2px dashed var(--pokemon-green); background: rgba(40, 167, 69, 0.1);">
-                <div class="nav-icon">⚙️</div>
-                <div class="nav-label">Pokemon Data Generator</div>
-                <div class="nav-description">Generate enhanced Pokemon JSON</div>
-            </a>
             <a href="admin.html" class="pokemon-main-nav-item" style="border: 2px solid var(--pokemon-red); background: rgba(220, 53, 69, 0.1);">
                 <div class="nav-icon">🔧</div>
                 <div class="nav-label">Admin Panel</div>
@@ -157,9 +147,54 @@
                 document.getElementById('userName').textContent = user.name;
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('userInfo').classList.remove('hidden');
-                document.getElementById('navButtons').classList.remove('hidden');
                 document.getElementById('loginPrompt').classList.add('hidden');
+                
+                // Load user profile to check admin role
+                loadUserProfileAndShowNavigation(user.email);
             }
+        }
+
+        async function loadUserProfileAndShowNavigation(email) {
+            try {
+                console.log('INDEX: Loading user profile to check admin privileges...');
+                
+                // Fetch user profile from Dataverse
+                const profile = await AuthService.getUserProfileFromDataverse(email);
+                
+                if (profile) {
+                    console.log('INDEX: User profile loaded, isAdmin:', profile.isAdmin);
+                    
+                    // Show navigation with conditional admin panel
+                    showNavigation(profile.isAdmin);
+                } else {
+                    console.log('INDEX: Could not load user profile, showing navigation without admin panel');
+                    // Show navigation without admin panel if profile fetch fails
+                    showNavigation(false);
+                }
+                
+            } catch (error) {
+                console.error('INDEX: Error loading user profile:', error);
+                // Show navigation without admin panel on error
+                showNavigation(false);
+            }
+        }
+
+        function showNavigation(isAdmin) {
+            const navContainer = document.getElementById('navButtons');
+            
+            // Show/hide admin panel based on user role
+            const adminPanel = navContainer.querySelector('a[href="admin.html"]');
+            if (adminPanel) {
+                if (isAdmin) {
+                    console.log('INDEX: User is admin, showing Admin Panel');
+                    adminPanel.style.display = '';
+                } else {
+                    console.log('INDEX: User is not admin, hiding Admin Panel');
+                    adminPanel.style.display = 'none';
+                }
+            }
+            
+            navContainer.classList.remove('hidden');
         }
 
         function showLoginPrompt() {

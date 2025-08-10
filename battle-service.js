@@ -348,7 +348,7 @@ class BattleService {
         pokemon.hp = pokemon.pokemon_current_hp || pokemon.pokemon_max_hp || pokemon.hp || (30 + pokemon.level * 2);
         pokemon.max_hp = pokemon.pokemon_max_hp || pokemon.max_hp || pokemon.hp;
         pokemon.attack = pokemon.pokemon_attack || pokemon.attack || (20 + pokemon.level * 1.5);
-        pokemon.defense = pokemon.pokemon_defense || pokemon.defense || (20 + pokemon.level * 1.2);
+        pokemon.defense = pokemon.pokemon_defence || pokemon.defense || (20 + pokemon.level * 1.2);
         pokemon.speed = pokemon.pokemon_speed || pokemon.speed || (25 + pokemon.level * 1.3);
         
         // Ensure name and types

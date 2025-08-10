@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Winner Lookup Test</title>
+</head>
+<body>
+    <h1>Simple Winner Lookup Field Test</h1>
+    <p>Testing direct update of winner pokemon lookup field</p>
+    
+    <div>
+        <label>Auth Token:</label><br>
+        <input type="text" id="authToken" placeholder="Paste auth token here" style="width: 500px;">
+        <p><small>Get token from browser console: <code>AuthService.getCurrentUser().token</code></small></p>
+    </div>
+    
+    <button onclick="testWinnerUpdate()">Test Winner Pokemon Update</button>
+    <div id="results"></div>
+
+    <script>
+        async function testWinnerUpdate() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing Winner Pokemon Lookup Update...</h2>';
+            
+            try {
+                // Get token from input
+                const token = document.getElementById('authToken').value.trim();
+                
+                if (!token) {
+                    results.innerHTML += '<p>❌ Please enter auth token</p>';
+                    return;
+                }
+                
+                results.innerHTML += '<p>✅ Using provided token (length: ' + token.length + ')</p>';
+                
+                // Use the known battle ID
+                const battleId = '34db8361-4a72-f011-b4cb-7c1e5250e283';
+                
+                // Use Player 1's Pokemon ID as the winner (hardcoded from the battle data we saw)
+                const winnerPokemonId = 'f5ef02ae-9568-f011-bec1-7c1e5250e283';
+                
+                results.innerHTML += `<p>🎯 Battle ID: ${battleId}</p>`;
+                results.innerHTML += `<p>🏆 Setting winner to Pokemon ID: ${winnerPokemonId}</p>`;
+                
+                const baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+                const url = `${baseUrl}/pokemon_battles(${battleId})`;
+                
+                results.innerHTML += '<p>🌐 URL: ' + url + '</p>';
+                
+                // Simple direct update - try different field name patterns
+                const approaches = [
+                    {
+                        name: 'Standard lowercase',
+                        data: { 'pokemon_winnerpokemon@odata.bind': `/pokemon_pokedexes(${winnerPokemonId})` }
+                    },
+                    {
+                        name: 'Pascal case like Player fields',
+                        data: { 'pokemon_WinnerPokemon@odata.bind': `/pokemon_pokedexes(${winnerPokemonId})` }
+                    },
+                    {
+                        name: 'Match Player1Pokemon pattern',
+                        data: { 'pokemon_WinnerPokemon@odata.bind': `/pokemon_pokedexes(${winnerPokemonId})` }
+                    },
+                    {
+                        name: 'Try Winner only',
+                        data: { 'pokemon_Winner@odata.bind': `/pokemon_pokedexes(${winnerPokemonId})` }
+                    }
+                ];
+                
+                for (const approach of approaches) {
+                    results.innerHTML += `<p>🔄 Trying: ${approach.name}</p>`;
+                    results.innerHTML += '<p>� Update data: ' + JSON.stringify(approach.data) + '</p>';
+                    
+                    const response = await fetch(url, {
+                        method: 'PATCH',
+                        mode: 'cors',
+                        credentials: 'omit',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                            'X-User-Email': 'sandsor@outlook.com'
+                        },
+                        body: JSON.stringify(approach.data)
+                    });
+                    
+                    results.innerHTML += `<p>📡 Response status: ${response.status}</p>`;
+                    
+                    if (response.ok) {
+                        results.innerHTML += `<p>✅ SUCCESS with ${approach.name}!</p>`;
+                        break;
+                    } else {
+                        const errorText = await response.text();
+                        results.innerHTML += `<p>❌ FAILED with ${approach.name}: ${response.status}</p>`;
+                        if (approach.name === 'Try Winner only') {
+                            results.innerHTML += '<details><summary>Last error details</summary><pre>' + errorText + '</pre></details>';
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                results.innerHTML += '<p>❌ ERROR: ' + error.message + '</p>';
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

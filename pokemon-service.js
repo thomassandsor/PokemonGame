@@ -68,11 +68,13 @@ class PokemonService {
                 return [];
             }
 
-            // Get Pokemon from pokedex table - this will work in Azure deployment
+            // Get Pokemon from pokedex table - simplified query without expand since it's not working
             console.log('POKEMON-SERVICE: Making authenticated request to Dataverse...');
             
-            const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'`;
-            console.log('POKEMON-SERVICE: URL:', url);
+            const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${userId}'&$select=pokemon_pokedexid,pokemon_name,pokemon_level,pokemon_hp,pokemon_hpmax,pokemon_attack,pokemon_defence,pokemon_height,pokemon_weight,pokemon_trainingsessions,createdon,_pokemon_pokemon_value`;
+            console.log('POKEMON-SERVICE: Full URL being requested:', url);
+            console.log('POKEMON-SERVICE: Base URL:', this.baseUrl);
+            console.log('POKEMON-SERVICE: User ID:', userId);
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -80,25 +82,23 @@ class PokemonService {
                 credentials: 'omit',
                 headers: {
                     'Authorization': `Bearer ${authUser.token}`,
-                    'Content-Type': 'application/json',
-                    'X-User-Email': authUser.email  // Additional verification
+                    'X-User-Email': authUser.email
                 }
             });
 
             if (response.ok) {
                 const data = await response.json();
                 console.log('POKEMON-SERVICE: Got real Pokemon data from Dataverse:', data);
-                console.log('POKEMON-SERVICE: Sample Pokemon fields:', data.value?.[0]);
+                console.log('POKEMON-SERVICE: Loaded', data.value?.length, 'Pokemon records');
                 
                 // Map Dataverse field names to expected format
                 const mappedPokemon = (data.value || []).map(p => {
                     console.log('POKEMON-SERVICE: Mapping Pokemon:', p.pokemon_name, {
                         hp: p.pokemon_hp,
                         hpmax: p.pokemon_hpmax,
-                        attack: p.pokemon_attack,
-                        defense: p.pokemon_defense,
-                        defence: p.pokemon_defence,
-                        level: p.pokemon_level
+                        level: p.pokemon_level,
+                        trainingSessions: p.pokemon_trainingsessions,
+                        masterPokemonId: p._pokemon_pokemon_value
                     });
                     
                     return {
@@ -110,11 +110,14 @@ class PokemonService {
                         currentHP: p.pokemon_hp, // Current HP
                         maxHP: p.pokemon_hpmax, // Max HP from separate field
                         attack: p.pokemon_attack,
-                        defense: p.pokemon_defense || p.pokemon_defence, // Try both spellings
-                        defence: p.pokemon_defence || p.pokemon_defense, // Keep both for compatibility
+                        defense: p.pokemon_defence || 15, // Use pokemon_defence consistently
+                        defence: p.pokemon_defence || 15, // Use pokemon_defence consistently
                         height: p.pokemon_height,
                         weight: p.pokemon_weight,
-                        pokedexid: p.pokemon_pokedexid,
+                        pokemon_trainingsessions: p.pokemon_trainingsessions, // Training sessions field
+                        pokedexid: p.pokemon_pokedexid, // Keep for backward compatibility
+                        pokemonSpriteId: null, // Will be determined by name-based lookup in UI
+                        masterPokemonId: p._pokemon_pokemon_value, // Reference to master Pokemon record
                         dateCaught: p.createdon,
                         userId: p._pokemon_user_value
                     };

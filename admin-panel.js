@@ -13,19 +13,53 @@ let allSettings = [];
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin Panel: Initializing...');
     
-    // Check authentication
-    if (!AuthService.isAuthenticated()) {
-        console.warn('Admin Panel: User not authenticated, redirecting to login');
-        window.location.href = 'index.html';
+    // Wait a moment for AuthService to be ready, then check authentication
+    setTimeout(() => {
+        checkAuthentication();
+    }, 500);
+});
+
+function checkAuthentication() {
+    console.log('Admin Panel: Checking authentication...');
+    console.log('Admin Panel: AuthService available:', typeof AuthService !== 'undefined');
+    
+    if (typeof AuthService === 'undefined') {
+        console.warn('Admin Panel: AuthService not available, retrying...');
+        setTimeout(checkAuthentication, 1000);
         return;
     }
+    
+    // Try to restore authentication first
+    AuthService.restoreAuthFromSession()
+        .then(() => {
+            if (AuthService.isAuthenticated()) {
+                console.log('Admin Panel: User is authenticated, initializing components...');
+                initializeComponents();
+            } else {
+                console.warn('Admin Panel: User not authenticated, redirecting to login');
+                window.location.href = 'index.html';
+            }
+        })
+        .catch(error => {
+            console.error('Admin Panel: Error checking authentication:', error);
+            // Don't redirect immediately, give user a chance to see what's happening
+            setTimeout(() => {
+                if (!AuthService.isAuthenticated()) {
+                    window.location.href = 'index.html';
+                }
+            }, 2000);
+        });
+}
+
+function initializeComponents() {
+    console.log('Admin Panel: Initializing components...');
     
     // Initialize components
     initializePokemonCountSlider();
     loadDemoModeStatus();
     
     console.log('Admin Panel: Initialized successfully');
-});
+}
 
 // Tab Management
 function showTab(tabName) {
@@ -574,7 +608,7 @@ if (typeof PokemonService !== 'undefined' && !PokemonService.importPokemonFromAP
                 pokemon_type: pokemonData.types.map(t => t.type.name).join(', '),
                 pokemon_hp: pokemonData.stats.find(s => s.stat.name === 'hp')?.base_stat || 100,
                 pokemon_attack: pokemonData.stats.find(s => s.stat.name === 'attack')?.base_stat || 100,
-                pokemon_defense: pokemonData.stats.find(s => s.stat.name === 'defense')?.base_stat || 100,
+                pokemon_defence: pokemonData.stats.find(s => s.stat.name === 'defense')?.base_stat || 100,
                 pokemon_imageurl: pokemonData.sprites.front_default || '',
                 pokemon_description: `Imported from PokeAPI - ${pokemonData.name}`,
                 pokemon_rarity: this.calculateRarity(pokemonData.base_experience || 100)

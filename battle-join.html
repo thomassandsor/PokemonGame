@@ -20,8 +20,8 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            margin-bottom: 24px;
-            padding: 24px;
+            margin-bottom: 16px;
+            padding: 16px;
         }
 
         .battle-info-card h3 {
@@ -29,6 +29,96 @@
             color: #333;
             font-size: 18px;
             font-weight: 600;
+        }
+
+        .battle-overview {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .challenger-info h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .challenger-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .opponent-pokemon-showcase-centered {
+            display: flex;
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .opponent-pokemon-card-large {
+            background: white;
+            border: 3px solid #e74c3c;
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            min-width: 180px;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+            position: relative;
+            transform: scale(1.1);
+        }
+
+        .opponent-pokemon-card-large::before {
+            content: "OPPONENT";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .opponent-pokemon-card-large img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .opponent-pokemon-card-large .pokemon-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 30px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .opponent-pokemon-card-large h4 {
+            margin: 10px 0 4px 0;
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .opponent-pokemon-card-large p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .opponent-pokemon-showcase {
+            display: flex;
+            justify-content: center;
         }
 
         .battle-details {
@@ -60,11 +150,11 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 24px;
+            padding: 18px;
         }
 
         .pokemon-selection-card h3 {
-            margin: 0 0 20px 0;
+            margin: 0 0 16px 0;
             color: #333;
             font-size: 18px;
             font-weight: 600;
@@ -72,28 +162,154 @@
 
         /* Pokemon grid - use design system styles for cards */
         .pokemon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 12px 0;
         }
 
-        /* Battle-specific Pokemon card selection styles */
+        /* Standardized Pokemon card styles (matching battle-arena) */
+        .pokemon-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-width: 110px;
+        }
+
+        .pokemon-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         .pokemon-card.selected {
-            border-color: #10b981 !important;
-            background: #f0fdf4 !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
+            border-color: #10b981;
+            background: #f0fdf4;
         }
 
-        /* Battle action button override */
-        .pokemon-card .pokemon-actions .action-btn {
-            background: #10b981;
+        .pokemon-card.unavailable {
+            border-color: #e0e0e0;
+            background: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .pokemon-card.unavailable:hover {
+            border-color: #e0e0e0;
+            transform: none;
+            box-shadow: none;
+            background: #f8f9fa;
+        }
+
+        .pokemon-card img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+        }
+
+        .pokemon-card h4 {
+            margin: 6px 0 3px 0;
+            font-size: 13px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .pokemon-card p {
+            margin: 0;
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Standardized header styles (matching battle-arena) */
+        .home-nav-btn {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        .home-nav-btn:hover {
+            background: #f8f9fa;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .home-nav-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokeball-icon {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.2s;
+        }
+
+        .home-nav-btn:hover .pokeball-icon {
+            transform: rotate(10deg);
+        }
+
+        .pokemon-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-spacer {
+            width: 48px;
+        }
+
+        .pokemon-title {
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+
+        /* Standardized Pokemon button styles */
+        .pokemon-btn {
+            background: #3b82f6;
             color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .pokemon-card .pokemon-actions .action-btn:hover {
-            background: #059669;
+        .pokemon-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .pokemon-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         /* HP Bar for battle cards */
@@ -127,7 +343,7 @@
             display: flex;
             gap: 12px;
             justify-content: center;
-            margin-top: 24px;
+            margin-top: 16px;
         }
 
         .back-btn {
@@ -158,6 +374,44 @@
             color: #666;
         }
 
+        .battle-joining-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+        }
+
+        .battle-joining-spinner {
+            width: 64px;
+            height: 64px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .battle-joining-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .battle-joining-status {
+            font-size: 14px;
+            color: #ccc;
+        }
+
         .error-state {
             background: #ffebee;
             color: #c62828;
@@ -175,8 +429,22 @@
 
         /* Mobile responsive */
         @media (max-width: 768px) {
-            .battle-details {
+            .battle-overview {
                 grid-template-columns: 1fr;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .opponent-pokemon-card-large {
+                transform: scale(1.0);
+                min-width: 150px;
+                padding: 14px;
+            }
+            
+            .opponent-pokemon-card-large img,
+            .opponent-pokemon-card-large .pokemon-placeholder {
+                width: 70px;
+                height: 70px;
             }
             
             .pokemon-grid {
@@ -184,7 +452,13 @@
             }
             
             .pokemon-card {
-                min-width: 100px;
+                min-width: 95px;
+                padding: 10px;
+            }
+            
+            .pokemon-card img {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -194,11 +468,11 @@
         <!-- Clean Header -->
         <header class="pokemon-header">
             <div class="pokemon-header-content">
-                <div class="arena-logo">⚔️</div>
-                <h1 class="pokemon-title">Join Battle</h1>
-                <div class="trainer-info">
-                    <div class="trainer-name" id="trainerName">Ready to Battle!</div>
-                </div>
+                <button class="home-nav-btn" onclick="window.location.href='index.html'" title="Go Home">
+                    <img src="assets/pokeball.svg" alt="Home" class="pokeball-icon">
+                </button>
+                <h1 class="pokemon-title">⚔️ Join Battle</h1>
+                <div class="header-spacer"></div>
             </div>
         </header>
 
@@ -223,23 +497,13 @@
                 <div class="pokemon-container">
                     <!-- Battle Information Card -->
                     <div class="battle-info-card">
-                        <h3>⚔️ Battle Information</h3>
-                        <div class="battle-details">
-                            <div class="detail-item">
-                                <span class="detail-label">Challenger:</span>
-                                <span class="detail-value" id="challengerName">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Pokemon:</span>
-                                <span class="detail-value" id="challengerPokemon">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Level:</span>
-                                <span class="detail-value" id="pokemonLevel">Loading...</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">HP:</span>
-                                <span class="detail-value" id="battleCreated">Loading...</span>
+                        <div class="opponent-pokemon-showcase-centered">
+                            <div class="opponent-pokemon-card-large">
+                                <img id="opponentPokemonImage" src="" alt="Opponent Pokemon" style="display: none;">
+                                <div class="pokemon-placeholder" id="opponentPokemonPlaceholder">?</div>
+                                <h4 id="opponentPokemonName">Loading...</h4>
+                                <p>HP: <span id="opponentPokemonHP">Loading...</span></p>
+                                <p>Level: <span id="opponentPokemonLevel">Loading...</span></p>
                             </div>
                         </div>
                     </div>
@@ -253,7 +517,7 @@
 
                         <div class="action-buttons">
                             <a href="battle-arena.html" class="back-btn">← Go Back</a>
-                            <button class="pokemon-button pokemon-button-primary" 
+                            <button class="pokemon-btn" 
                                     id="joinButton" 
                                     onclick="joinBattle()" 
                                     disabled>
@@ -262,6 +526,13 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Battle Joining Overlay -->
+            <div id="battleJoiningOverlay" class="battle-joining-overlay" style="display: none;">
+                <img src="assets/pokeball.svg" alt="Loading..." class="battle-joining-spinner">
+                <div class="battle-joining-text">Joining Battle...</div>
+                <div class="battle-joining-status" id="battleJoiningStatus">Connecting to battle...</div>
             </div>
         </main>
     </div>
@@ -316,6 +587,61 @@
                 return this.pokemonData.find(p => 
                     p.name.toLowerCase() === pokemonName.toLowerCase()
                 );
+            }
+            
+            // Get Pokemon that are currently in active battles
+            async getActiveBattlePokemon() {
+                if (!this.currentUser?.id) return [];
+                
+                try {
+                    console.log('BATTLE-JOIN: Checking for Pokemon in active battles...');
+                    
+                    const authUser = await AuthService.checkAuth();
+                    if (!authUser || !authUser.token) {
+                        return [];
+                    }
+
+                    // Get active battles where user is player 1 or player 2
+                    // statuscode 1 = Open, 895550002 = In Progress (active battles)
+                    const url = `https://org2d10b8dd.api.crm3.dynamics.com/api/data/v9.2/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.currentUser.id}' or _pokemon_player2_value eq '${this.currentUser.id}') and (statuscode eq 1 or statuscode eq 895550002) and statecode eq 0&$select=_pokemon_player1pokemon_value,_pokemon_player2pokemon_value`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        credentials: 'omit',
+                        headers: {
+                            'Authorization': `Bearer ${authUser.token}`,
+                            'Content-Type': 'application/json',
+                            'X-User-Email': authUser.email
+                        }
+                    });
+
+                    if (!response.ok) {
+                        console.error('BATTLE-JOIN: Failed to get active battles:', response.status);
+                        return [];
+                    }
+
+                    const data = await response.json();
+                    const activeBattles = data.value || [];
+                    
+                    // Extract Pokemon IDs that are in active battles
+                    const activePokemonIds = new Set();
+                    activeBattles.forEach(battle => {
+                        if (battle._pokemon_player1pokemon_value) {
+                            activePokemonIds.add(battle._pokemon_player1pokemon_value);
+                        }
+                        if (battle._pokemon_player2pokemon_value) {
+                            activePokemonIds.add(battle._pokemon_player2pokemon_value);
+                        }
+                    });
+                    
+                    console.log('BATTLE-JOIN: Found', activePokemonIds.size, 'Pokemon in active battles:', Array.from(activePokemonIds));
+                    return Array.from(activePokemonIds);
+                    
+                } catch (error) {
+                    console.error('BATTLE-JOIN: Error checking active battles:', error);
+                    return [];
+                }
             }
             
             getBattleIdFromUrl() {
@@ -431,18 +757,11 @@
                     console.log('🔍 DEBUG: Raw Pokemon data from Dataverse:', pokemon);
                     console.log('🔍 DEBUG: Sample Pokemon structure:', pokemon[0]);
                     
-                    // Filter out fainted Pokemon (HP <= 0)
-                    this.userPokemon = pokemon.filter(p => {
-                        const hp = p.pokemon_hp;
-                        return hp > 0;
-                    });
+                    // Keep ALL Pokemon for display, but we'll mark unavailable ones in the UI
+                    this.userPokemon = pokemon;
                     
-                    console.log('✅ Loaded user Pokemon:', this.userPokemon.length);
-                    console.log('🔍 DEBUG: Filtered Pokemon data:', this.userPokemon);
-                    
-                    if (this.userPokemon.length === 0) {
-                        throw new Error('You have no Pokemon available for battle. Catch some Pokemon first or heal your current team!');
-                    }
+                    console.log('✅ Loaded all user Pokemon:', this.userPokemon.length);
+                    console.log('🔍 DEBUG: All Pokemon data:', this.userPokemon);
                     
                 } catch (error) {
                     console.error('❌ Error loading user Pokemon:', error);
@@ -460,12 +779,77 @@
                     const pokemonMaxHP = this.battleData.pokemon_Player1Pokemon?.pokemon_hpmax || '?';
                     
                     console.log('🎨 renderBattleInfo: Player 1 Pokemon data:', this.battleData.pokemon_Player1Pokemon);
-                    console.log('🎨 renderBattleInfo: Setting challenger name to:', player1Name);
-                    document.getElementById('challengerName').textContent = player1Name;
-                    console.log('🎨 renderBattleInfo: Setting challenger Pokemon to:', pokemonName);
-                    document.getElementById('challengerPokemon').textContent = pokemonName;
-                    document.getElementById('pokemonLevel').textContent = `Lv. ${pokemonLevel}`;
-                    document.getElementById('battleCreated').textContent = `${pokemonHP}/${pokemonMaxHP}`;
+                    console.log('🎨 renderBattleInfo: Opponent Pokemon:', pokemonName);
+                    
+                    // Update opponent Pokemon card
+                    document.getElementById('opponentPokemonName').textContent = pokemonName;
+                    document.getElementById('opponentPokemonHP').textContent = `${pokemonHP}/${pokemonMaxHP}`;
+                    document.getElementById('opponentPokemonLevel').textContent = `Lv. ${pokemonLevel}`;
+                    
+                    // Pokemon name to ID mapping for sprites (comprehensive list for Gen 1)
+                    const pokemonNameToId = {
+                        'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3,
+                        'charmander': 4, 'charmeleon': 5, 'charizard': 6,
+                        'squirtle': 7, 'wartortle': 8, 'blastoise': 9,
+                        'caterpie': 10, 'metapod': 11, 'butterfree': 12,
+                        'weedle': 13, 'kakuna': 14, 'beedrill': 15,
+                        'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
+                        'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
+                        'ekans': 23, 'arbok': 24, 'pikachu': 25, 'raichu': 26,
+                        'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
+                        'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34,
+                        'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
+                        'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
+                        'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
+                        'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
+                        'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
+                        'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
+                        'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
+                        'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
+                        'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
+                        'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
+                        'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
+                        'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
+                        'farfetchd': 83, 'doduo': 84, 'dodrio': 85, 'seel': 86,
+                        'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
+                        'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94,
+                        'onix': 95, 'drowzee': 96, 'hypno': 97, 'krabby': 98,
+                        'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
+                        'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106,
+                        'hitmonchan': 107, 'lickitung': 108, 'koffing': 109, 'weezing': 110,
+                        'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
+                        'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118,
+                        'seaking': 119, 'staryu': 120, 'starmie': 121, 'mr. mime': 122,
+                        'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
+                        'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130,
+                        'lapras': 131, 'ditto': 132, 'eevee': 133, 'vaporeon': 134,
+                        'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
+                        'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142,
+                        'snorlax': 143, 'articuno': 144, 'zapdos': 145, 'moltres': 146,
+                        'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
+                        'mew': 151
+                    };
+                    
+                    // Get Pokemon sprite ID
+                    let pokemonSpriteId = pokemonNameToId[pokemonName.toLowerCase()] || 1;
+                    
+                    // Generate image URL from Pokemon ID
+                    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonSpriteId}.png`;
+                    
+                    // Update Pokemon image
+                    const pokemonImage = document.getElementById('opponentPokemonImage');
+                    const pokemonPlaceholder = document.getElementById('opponentPokemonPlaceholder');
+                    
+                    pokemonImage.src = imageUrl;
+                    pokemonImage.style.display = 'block';
+                    pokemonPlaceholder.style.display = 'none';
+                    
+                    // Handle image load error
+                    pokemonImage.onerror = function() {
+                        console.error('Failed to load opponent Pokemon image:', imageUrl);
+                        pokemonImage.style.display = 'none';
+                        pokemonPlaceholder.style.display = 'flex';
+                    };
                     
                     console.log('✅ renderBattleInfo: Completed successfully');
                 } catch (error) {
@@ -484,121 +868,196 @@
                     }
                     
                     if (this.userPokemon.length === 0) {
-                        container.innerHTML = '<p class="empty-state">No Pokemon available for battle. All your Pokemon may be fainted or you need to catch some first!</p>';
+                        container.innerHTML = '<p class="empty-state">No Pokemon found. Catch some Pokemon first!</p>';
                         console.log('✅ renderUserPokemon: Showed no Pokemon message');
                         return;
                     }
                     
-                    console.log('🎨 renderUserPokemon: Generating HTML for Pokemon...');
-                    container.innerHTML = this.userPokemon.map(pokemon => {
-                        console.log('🔍 DEBUG: Rendering Pokemon:', pokemon);
+                    // Get Pokemon in active battles first
+                    this.getActiveBattlePokemon().then(activePokemonIds => {
+                        console.log('🎨 renderUserPokemon: Generating HTML for Pokemon with active battle check...');
                         
-                        // Get Pokemon name - check multiple possible fields
-                        const pokemonName = pokemon.pokemon_nickname || 
-                                          pokemon.pokemon_name || 
-                                          pokemon.pokemon_Pokemon?.pokemon_name || 
-                                          'Unknown Pokemon';
+                        // Add status summary
+                        const availableCount = this.userPokemon.filter(p => {
+                            const pokemonId = p.pokemon_pokedexid || p.id;
+                            const isInBattle = activePokemonIds.includes(pokemonId);
+                            const hp = p.pokemon_hp !== undefined ? p.pokemon_hp : 0;
+                            const isFainted = hp <= 0;
+                            return !isInBattle && !isFainted;
+                        }).length;
                         
-                        // Get Pokemon level
-                        const pokemonLevel = pokemon.pokemon_level || 5;
+                        const inBattleCount = this.userPokemon.filter(p => {
+                            const pokemonId = p.pokemon_pokedexid || p.id;
+                            return activePokemonIds.includes(pokemonId);
+                        }).length;
                         
-                        // Get Pokemon details from JSON data
-                        const pokemonJsonData = this.getPokemonByName(pokemonName);
-                        console.log('🔍 DEBUG: Pokemon JSON data for', pokemonName, ':', pokemonJsonData);
+                        const faintedCount = this.userPokemon.filter(p => {
+                            const hp = p.pokemon_hp !== undefined ? p.pokemon_hp : 0;
+                            return hp <= 0;
+                        }).length;
                         
-                        // Get Pokemon ID and sprite from JSON data or fallback
-                        let pokemonId = 1; // Default fallback
-                        let pokemonSprite = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png';
-                        let types = ['normal'];
+                        // Pokemon name to ID mapping for sprites (comprehensive list for Gen 1)
+                        const pokemonNameToId = {
+                            'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3,
+                            'charmander': 4, 'charmeleon': 5, 'charizard': 6,
+                            'squirtle': 7, 'wartortle': 8, 'blastoise': 9,
+                            'caterpie': 10, 'metapod': 11, 'butterfree': 12,
+                            'weedle': 13, 'kakuna': 14, 'beedrill': 15,
+                            'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
+                            'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
+                            'ekans': 23, 'arbok': 24, 'pikachu': 25, 'raichu': 26,
+                            'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
+                            'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34,
+                            'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
+                            'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
+                            'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
+                            'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
+                            'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
+                            'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
+                            'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
+                            'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
+                            'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
+                            'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
+                            'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
+                            'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
+                            'farfetchd': 83, 'doduo': 84, 'dodrio': 85, 'seel': 86,
+                            'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
+                            'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94,
+                            'onix': 95, 'drowzee': 96, 'hypno': 97, 'krabby': 98,
+                            'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
+                            'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106,
+                            'hitmonchan': 107, 'lickitung': 108, 'koffing': 109, 'weezing': 110,
+                            'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
+                            'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118,
+                            'seaking': 119, 'staryu': 120, 'starmie': 121, 'mr. mime': 122,
+                            'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
+                            'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130,
+                            'lapras': 131, 'ditto': 132, 'eevee': 133, 'vaporeon': 134,
+                            'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
+                            'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142,
+                            'snorlax': 143, 'articuno': 144, 'zapdos': 145, 'moltres': 146,
+                            'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
+                            'mew': 151
+                        };
                         
-                        if (pokemonJsonData) {
-                            pokemonId = pokemonJsonData.id;
-                            pokemonSprite = pokemonJsonData.sprites?.front_default || 
-                                          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonJsonData.id}.png`;
-                            types = pokemonJsonData.types || ['normal'];
-                        } else {
-                            // Fallback: try to get from expanded Pokemon data or Dataverse fields
-                            pokemonId = pokemon.pokemon_Pokemon?.pokemon_id || 
-                                      pokemon.pokemon_id || 
-                                      1;
-                            pokemonSprite = pokemon.pokemon_Pokemon?.pokemon_sprite_url || 
-                                          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-                            
-                            // Try to get types from expanded Pokemon data
-                            if (pokemon.pokemon_Pokemon) {
-                                const type1 = pokemon.pokemon_Pokemon.pokemon_type1;
-                                const type2 = pokemon.pokemon_Pokemon.pokemon_type2;
-                                types = [];
-                                if (type1) types.push(type1.toLowerCase());
-                                if (type2 && type2 !== type1) types.push(type2.toLowerCase());
-                                if (types.length === 0) types = ['normal'];
-                            }
-                        }
-                        
-                        // Get HP values from Dataverse fields
-                        const currentHp = pokemon.pokemon_hp || 0;
-                        const maxHp = pokemon.pokemon_hpmax || 100;
-                        
-                        const hpPercentage = (currentHp / maxHp) * 100;
-                        const hpClass = hpPercentage > 60 ? 'hp-high' : hpPercentage > 30 ? 'hp-medium' : 'hp-low';
-                        
-                        console.log('🔍 DEBUG: Final mapped Pokemon data:', {
-                            name: pokemonName,
-                            level: pokemonLevel,
-                            id: pokemonId,
-                            sprite: pokemonSprite,
-                            hp: currentHp,
-                            maxHp: maxHp,
-                            types: types,
-                            jsonDataFound: !!pokemonJsonData
-                        });
-                        
-                        // Use unified card structure
-                        return `
-                            <div class="pokemon-card my-pokemon-card" 
-                                 data-pokemon-id="${pokemon.pokemon_pokedexid}"
-                                 onclick="battleJoin.selectPokemon('${pokemon.pokemon_pokedexid}')">
-                                <div class="pokemon-card-image">
-                                    <img src="${pokemonSprite}" 
-                                         alt="${pokemonName}" 
-                                         onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'">
-                                </div>
-                                <div class="pokemon-card-info">
-                                    <div class="pokemon-card-name">${pokemonName}</div>
-                                    <div class="pokemon-level">Level ${pokemonLevel}</div>
-                                    <div class="pokemon-card-types">
-                                        ${types.map(type => `<span class="pokemon-type-badge pokemon-type-${type}">${type}</span>`).join('')}
-                                    </div>
-                                    <div class="pokemon-hp-bar">
-                                        <div class="pokemon-hp-fill ${hpClass}" style="width: ${hpPercentage}%"></div>
-                                    </div>
-                                    <div class="pokemon-hp-text">HP: ${currentHp}/${maxHp}</div>
-                                </div>
-                                <div class="pokemon-actions">
-                                    <button class="action-btn" onclick="event.stopPropagation(); battleJoin.selectPokemon('${pokemon.pokemon_pokedexid}')">
-                                        Select for Battle
-                                    </button>
-                                </div>
+                        // Create status summary and Pokemon cards
+                        const statusSummary = `
+                            <div style="background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 16px; text-align: center; font-size: 14px; color: #666; grid-column: 1 / -1;">
+                                <strong>Your Pokemon:</strong> 
+                                <span style="color: #28a745;">✅ ${availableCount} Available</span> • 
+                                <span style="color: #e74c3c;">⚔️ ${inBattleCount} In Battle</span> • 
+                                <span style="color: #6c757d;">💀 ${faintedCount} Fainted</span>
                             </div>
                         `;
-                    }).join('');
-                    console.log('✅ renderUserPokemon: Completed successfully');
+                        
+                        const pokemonCards = this.userPokemon.map(pokemon => {
+                            console.log('🔍 DEBUG: Rendering Pokemon:', pokemon);
+                            
+                            // Handle both new and legacy data formats
+                            const pokemonName = pokemon.name || pokemon.pokemon_name || pokemon.pokemon_pokemon?.pokemon_name || 'Unknown';
+                            
+                            // Check Pokemon status
+                            const pokemonId = pokemon.pokemon_pokedexid || pokemon.id;
+                            const isInActiveBattle = activePokemonIds.includes(pokemonId);
+                            const pokemonHP = pokemon.pokemon_hp !== undefined ? pokemon.pokemon_hp : 0;
+                            const isFainted = pokemonHP <= 0;
+                            const isUnavailable = isInActiveBattle || isFainted;
+                            
+                            // Get the actual Pokemon sprite ID - try multiple sources
+                            let pokemonSpriteId = pokemon.pokemonSpriteId || pokemon.pokemon_pokemon?.pokemon_id;
+                            
+                            // If expand didn't work, try name-based lookup
+                            if (!pokemonSpriteId && pokemonName) {
+                                pokemonSpriteId = pokemonNameToId[pokemonName.toLowerCase()];
+                            }
+                            
+                            // Only proceed if we have a valid Pokemon ID
+                            if (!pokemonSpriteId) {
+                                console.error(`POKEMON-JOIN: No Pokemon ID found for ${pokemonName}`, pokemon);
+                                pokemonSpriteId = 1; // Fallback to Bulbasaur
+                            }
+                            
+                            const pokemonLevel = pokemon.level || pokemon.pokemon_level || '1';
+                            
+                            // Generate image URL from Pokemon ID
+                            const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonSpriteId}.png`;
+                            
+                            // Determine status text and color
+                            let statusText = '';
+                            let statusColor = '';
+                            
+                            if (isInActiveBattle) {
+                                statusText = '⚔️ In Battle';
+                                statusColor = '#e74c3c';
+                            } else if (isFainted) {
+                                statusText = '💀 Fainted';
+                                statusColor = '#6c757d';
+                            }
+                            
+                            return `
+                                <div class="pokemon-card ${isUnavailable ? 'unavailable' : ''}" 
+                                     data-pokemon-id="${pokemon.pokemon_pokedexid || pokemon.id}"
+                                     onclick="${isUnavailable ? 'battleJoin.showUnavailableMessage(\'' + (isFainted ? 'fainted' : 'battle') + '\')' : 'battleJoin.selectPokemon(\'' + (pokemon.pokemon_pokedexid || pokemon.id) + '\')'}"
+                                     style="${isUnavailable ? 'opacity: 0.5; filter: grayscale(50%);' : ''}">
+                                    <img src="${imageUrl}" alt="${pokemonName}" 
+                                         onerror="console.error('Failed to load Pokemon image:', '${imageUrl}'); this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png';">
+                                    <h4 style="${isUnavailable ? 'color: #999;' : ''}">${pokemonName}</h4>
+                                    <p style="${isUnavailable ? 'color: #999;' : ''}">HP: ${pokemonHP}</p>
+                                    <p style="${isUnavailable ? 'color: #999;' : ''}">Level: ${pokemonLevel}</p>
+                                    ${statusText ? `<p style="color: ${statusColor}; font-weight: bold; font-size: 12px; margin: 4px 0 0 0;">${statusText}</p>` : ''}
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        container.innerHTML = statusSummary + pokemonCards;
+                        
+                        // Check if any Pokemon are available for battle
+                        if (availableCount === 0) {
+                            const joinButton = document.getElementById('joinButton');
+                            if (joinButton) {
+                                joinButton.style.display = 'none';
+                            }
+                            
+                            // Show message about no available Pokemon
+                            const messageDiv = document.createElement('div');
+                            messageDiv.style.cssText = 'background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 16px; margin-top: 16px; text-align: center; color: #856404;';
+                            messageDiv.innerHTML = '<strong>⚠️ No Pokemon Available</strong><br>All your Pokemon are either fainted or in active battles. Heal your Pokemon or wait for battles to complete.';
+                            container.appendChild(messageDiv);
+                        }
+                        
+                        console.log('✅ renderUserPokemon: Completed successfully with status indicators');
+                    });
+                    
                 } catch (error) {
                     console.error('❌ renderUserPokemon: Error:', error);
                 }
             }
             
             selectPokemon(pokemonId) {
-                this.selectedPokemon = this.userPokemon.find(p => p.pokemon_pokedexid === pokemonId);
+                // Find the Pokemon and check if it's available
+                const pokemon = this.userPokemon.find(p => p.pokemon_pokedexid === pokemonId);
+                if (!pokemon) {
+                    console.error('Pokemon not found:', pokemonId);
+                    return;
+                }
+                
+                // Check if Pokemon is fainted or in battle (should not happen with proper UI, but safety check)
+                const pokemonHP = pokemon.pokemon_hp !== undefined ? pokemon.pokemon_hp : 0;
+                if (pokemonHP <= 0) {
+                    this.showUnavailableMessage('fainted');
+                    return;
+                }
+                
+                this.selectedPokemon = pokemon;
                 
                 // Update UI - remove selected from all cards
                 document.querySelectorAll('.pokemon-card').forEach(card => {
                     card.classList.remove('selected');
                 });
                 
-                // Add selected to clicked card
+                // Add selected to clicked card (only if it's not unavailable)
                 const selectedCard = document.querySelector(`[data-pokemon-id="${pokemonId}"]`);
-                if (selectedCard) {
+                if (selectedCard && !selectedCard.classList.contains('unavailable')) {
                     selectedCard.classList.add('selected');
                 }
                 
@@ -611,17 +1070,22 @@
                 console.log('✅ Selected Pokemon:', pokemonId);
             }
             
+            showUnavailableMessage(reason) {
+                if (reason === 'fainted') {
+                    alert('This Pokemon has fainted and cannot battle. Visit a Pokemon Center to heal your Pokemon!');
+                } else if (reason === 'battle') {
+                    alert('This Pokemon is currently in an active battle and cannot be selected.');
+                }
+            }
+            
             async joinBattle() {
                 if (!this.selectedPokemon) {
                     alert('Please select a Pokemon first!');
                     return;
                 }
                 
-                // Show loading on button
-                const joinBtn = document.getElementById('joinButton');
-                const originalText = joinBtn.textContent;
-                joinBtn.textContent = 'Joining...';
-                joinBtn.disabled = true;
+                // Show battle joining overlay
+                this.showBattleJoiningOverlay('Connecting to battle...');
                 
                 try {
                     console.log('🔄 Joining battle...', {
@@ -630,6 +1094,7 @@
                     });
                     
                     // Use the battle challenge service to join
+                    this.updateBattleJoiningStatus('Joining battle challenge...');
                     const result = await BattleChallengeService.joinChallenge(
                         this.battleId,
                         this.currentUser.id,
@@ -643,36 +1108,24 @@
                     console.log('✅ Successfully joined battle');
                     
                     // Start battle simulation
+                    this.updateBattleJoiningStatus('Simulating battle...');
                     await this.simulateBattle();
                     
-                    // Add alert with HP information before redirect to allow console inspection
-                    const battleData = await BattleChallengeService.getBattleById(this.battleId);
-                    const p1Name = battleData.pokemon_Player1?.firstname || 'Player 1';
-                    const p1Pokemon = battleData.pokemon_Player1Pokemon?.pokemon_name || 'Unknown';
-                    const p1HP = battleData.pokemon_Player1Pokemon?.pokemon_hp || '?';
-                    const p1MaxHP = battleData.pokemon_Player1Pokemon?.pokemon_hpmax || '?';
+                    this.updateBattleJoiningStatus('Battle complete! Redirecting...');
                     
-                    const p2Name = battleData.pokemon_Player2?.firstname || 'Player 2';
-                    const p2Pokemon = battleData.pokemon_Player2Pokemon?.pokemon_name || 'Unknown';
-                    const p2HP = battleData.pokemon_Player2Pokemon?.pokemon_hp || '?';
-                    const p2MaxHP = battleData.pokemon_Player2Pokemon?.pokemon_hpmax || '?';
-                    
-                    alert(`✅ Battle simulation complete!\n\nBattle Participants:\n${p1Name}'s ${p1Pokemon}: ${p1HP}/${p1MaxHP} HP\n${p2Name}'s ${p2Pokemon}: ${p2HP}/${p2MaxHP} HP\n\nCheck console for full details, then click OK to view results.`);
-                    
-                    // Redirect to battle result
-                    window.location.href = `battle-result.html?battleId=${this.battleId}`;
+                    // Small delay before redirect to show completion message
+                    setTimeout(() => {
+                        window.location.href = `battle-result.html?battleId=${this.battleId}`;
+                    }, 1000);
                     
                 } catch (error) {
                     console.error('❌ Error joining battle:', error);
                     
+                    // Hide overlay and show error
+                    this.hideBattleJoiningOverlay();
+                    
                     // Show detailed error in alert
                     alert(`❌ Battle Error: ${error.message}\n\nCheck console for full details.`);
-                    
-                    // Restore button
-                    joinBtn.textContent = originalText;
-                    joinBtn.disabled = false;
-                    
-                    alert(`Failed to join battle: ${error.message}`);
                 }
             }
             
@@ -796,6 +1249,30 @@
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('errorMessage').textContent = message;
                 document.getElementById('errorState').style.display = 'block';
+            }
+            
+            showBattleJoiningOverlay(status) {
+                const overlay = document.getElementById('battleJoiningOverlay');
+                const statusElement = document.getElementById('battleJoiningStatus');
+                
+                if (overlay && statusElement) {
+                    statusElement.textContent = status;
+                    overlay.style.display = 'flex';
+                }
+            }
+            
+            updateBattleJoiningStatus(status) {
+                const statusElement = document.getElementById('battleJoiningStatus');
+                if (statusElement) {
+                    statusElement.textContent = status;
+                }
+            }
+            
+            hideBattleJoiningOverlay() {
+                const overlay = document.getElementById('battleJoiningOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
             }
         }
         

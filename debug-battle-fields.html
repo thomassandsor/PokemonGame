@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Battle Fields</title>
+</head>
+<body>
+    <h1>Debug Battle Database Fields</h1>
+    <button onclick="testBattleFields()">Test Battle Fields</button>
+    <button onclick="getBattleMetadata()">Get Battle Metadata</button>
+    <div id="results"></div>
+
+    <script src="auth.js"></script>
+    <script src="battle-challenge-service.js"></script>
+    <script>
+        async function testBattleFields() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing Battle Fields...</h2>';
+            
+            try {
+                // Initialize auth first
+                await AuthService.initializeAuth();
+                
+                // Get the specific battle that worked
+                const battleId = '34db8361-4a72-f011-b4cb-7c1e5250e283';
+                
+                // Get authentication token
+                const authUser = AuthService.getCurrentUser();
+                if (!authUser) {
+                    results.innerHTML += '<p>❌ User not authenticated - trying to sign in...</p>';
+                    await AuthService.signIn();
+                    const authUserRetry = AuthService.getCurrentUser();
+                    if (!authUserRetry) {
+                        results.innerHTML += '<p>❌ Still not authenticated after sign in attempt</p>';
+                        return;
+                    }
+                    results.innerHTML += '<p>✅ Authentication successful</p>';
+                }
+                
+                const currentUser = AuthService.getCurrentUser();
+                results.innerHTML += `<p>🔑 Current user: ${currentUser.email}</p>`;
+                results.innerHTML += `<p>🔑 Token length: ${currentUser.token?.length || 'No token'}</p>`;
+
+                // Query the specific battle to see its current structure
+                const url = `https://pokemongame-functions-2025.azurewebsites.net/api/dataverse/pokemon_battles(${battleId})`;
+                console.log('🔍 Querying battle:', url);
+                
+                const response = await fetch(url, {
+                    headers: { 
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'X-User-Email': authUser.email
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to get battle: ${response.status} ${response.statusText}`);
+                }
+
+                const battle = await response.json();
+                console.log('🔍 Battle data:', battle);
+                
+                results.innerHTML += '<h3>Current Battle Data:</h3>';
+                results.innerHTML += '<pre>' + JSON.stringify(battle, null, 2) + '</pre>';
+                
+                // Look for winner/loser related fields
+                const winnerFields = Object.keys(battle).filter(key => 
+                    key.toLowerCase().includes('winner') || 
+                    key.toLowerCase().includes('loser') ||
+                    key.toLowerCase().includes('win') ||
+                    key.toLowerCase().includes('lose')
+                );
+                
+                results.innerHTML += '<h3>Winner/Loser Related Fields:</h3>';
+                results.innerHTML += '<pre>' + JSON.stringify(winnerFields, null, 2) + '</pre>';
+                
+                // Show all field names that contain 'pokemon'
+                const pokemonFields = Object.keys(battle).filter(key => 
+                    key.toLowerCase().includes('pokemon')
+                );
+                
+                results.innerHTML += '<h3>Pokemon Related Fields:</h3>';
+                results.innerHTML += '<pre>' + JSON.stringify(pokemonFields, null, 2) + '</pre>';
+
+            } catch (error) {
+                console.error('❌ Error testing battle fields:', error);
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function getBattleMetadata() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Getting Battle Metadata...</h2>';
+            
+            try {
+                // Initialize auth first
+                await AuthService.initializeAuth();
+                
+                // Get authentication token
+                const authUser = AuthService.getCurrentUser();
+                if (!authUser) {
+                    results.innerHTML += '<p>❌ User not authenticated</p>';
+                    return;
+                }
+
+                // Query the OData metadata for pokemon_battles entity
+                const metadataUrl = 'https://pokemongame.crm4.dynamics.com/api/data/v9.2/$metadata';
+                console.log('🔍 Querying metadata:', metadataUrl);
+                
+                const response = await fetch(metadataUrl, {
+                    headers: { 
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'X-User-Email': authUser.email
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to get metadata: ${response.status} ${response.statusText}`);
+                }
+
+                const metadata = await response.text();
+                console.log('🔍 Metadata response:', metadata);
+                
+                // Look for pokemon_battles entity definition
+                const battleEntityMatch = metadata.match(/<EntityType Name="pokemon_battle"[^>]*>[\s\S]*?<\/EntityType>/i);
+                
+                if (battleEntityMatch) {
+                    results.innerHTML += '<h3>pokemon_battle Entity Definition:</h3>';
+                    results.innerHTML += '<pre>' + battleEntityMatch[0] + '</pre>';
+                } else {
+                    results.innerHTML += '<h3>Full Metadata (truncated):</h3>';
+                    results.innerHTML += '<pre>' + metadata.substring(0, 5000) + '...</pre>';
+                }
+
+            } catch (error) {
+                console.error('❌ Error getting metadata:', error);
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-run test on page load
+        window.onload = () => {
+            setTimeout(testBattleFields, 1000);
+        };
+    </script>
+</body>
+</html>

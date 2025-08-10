@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Database Table Fields</title>
+</head>
+<body>
+    <h1>Database Table Field Inspector</h1>
+    <div id="results"></div>
+
+    <script src="auth.js"></script>
+    <script>
+        async function testTableFields() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Testing database table fields...</p>';
+
+            try {
+                // Get authentication
+                const authUser = AuthService.getCurrentUser();
+                if (!authUser) {
+                    resultsDiv.innerHTML = '<p style="color: red;">Not authenticated. Please log in first.</p>';
+                    return;
+                }
+
+                const baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+                
+                // Test 1: Get one pokemon_battles record to see all available fields
+                console.log('🔍 Testing pokemon_battles table structure...');
+                const battleResponse = await fetch(`${baseUrl}/pokemon_battles?$top=1`, {
+                    headers: { 
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'X-User-Email': authUser.email
+                    }
+                });
+
+                if (!battleResponse.ok) {
+                    throw new Error(`Battle query failed: ${battleResponse.status} ${battleResponse.statusText}`);
+                }
+
+                const battleData = await battleResponse.json();
+                console.log('📊 Battle data response:', battleData);
+
+                let output = '<h2>pokemon_battles Table Fields</h2>';
+                
+                if (battleData.value && battleData.value.length > 0) {
+                    const battleRecord = battleData.value[0];
+                    const battleFields = Object.keys(battleRecord).sort();
+                    
+                    output += '<h3>Available Fields:</h3><ul>';
+                    battleFields.forEach(field => {
+                        const value = battleRecord[field];
+                        const type = typeof value;
+                        output += `<li><strong>${field}</strong> (${type}): ${JSON.stringify(value)}</li>`;
+                    });
+                    output += '</ul>';
+
+                    // Look for winner/loser related fields
+                    const winnerFields = battleFields.filter(f => 
+                        f.toLowerCase().includes('winner') || 
+                        f.toLowerCase().includes('loser') || 
+                        f.toLowerCase().includes('loose')
+                    );
+                    
+                    if (winnerFields.length > 0) {
+                        output += '<h3>Winner/Loser Related Fields:</h3><ul>';
+                        winnerFields.forEach(field => {
+                            output += `<li><strong>${field}</strong></li>`;
+                        });
+                        output += '</ul>';
+                    } else {
+                        output += '<h3>No Winner/Loser Fields Found</h3><p>The following fields might be what we\'re looking for:</p><ul>';
+                        const possibleFields = battleFields.filter(f => 
+                            f.includes('Pokemon') || 
+                            f.includes('pokemon') ||
+                            f.includes('Player')
+                        );
+                        possibleFields.forEach(field => {
+                            output += `<li>${field}</li>`;
+                        });
+                        output += '</ul>';
+                    }
+                } else {
+                    output += '<p>No battle records found to analyze.</p>';
+                }
+
+                // Test 2: Also check pokemon_pokedex fields for stats
+                console.log('🔍 Testing pokemon_pokedex table structure...');
+                const pokedexResponse = await fetch(`${baseUrl}/pokemon_pokedexes?$top=1&$select=pokemon_wins,pokemon_losses,pokemon_battles,pokemon_pokedexid,pokemon_name`, {
+                    headers: { 
+                        'Authorization': `Bearer ${authUser.token}`,
+                        'X-User-Email': authUser.email
+                    }
+                });
+
+                if (pokedexResponse.ok) {
+                    const pokedexData = await pokedexResponse.json();
+                    output += '<h2>pokemon_pokedex Stats Fields Test</h2>';
+                    
+                    if (pokedexData.value && pokedexData.value.length > 0) {
+                        const pokedexRecord = pokedexData.value[0];
+                        output += '<h3>Stats Fields Available:</h3><ul>';
+                        Object.keys(pokedexRecord).forEach(field => {
+                            const value = pokedexRecord[field];
+                            output += `<li><strong>${field}</strong>: ${JSON.stringify(value)}</li>`;
+                        });
+                        output += '</ul>';
+                    } else {
+                        output += '<p>No pokemon_pokedex records found.</p>';
+                    }
+                } else {
+                    output += `<h2>pokemon_pokedex Stats Fields Test</h2><p style="color: orange;">Query failed: ${pokedexResponse.status}</p>`;
+                }
+
+                resultsDiv.innerHTML = output;
+
+            } catch (error) {
+                console.error('❌ Error testing table fields:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-run when page loads
+        window.addEventListener('load', () => {
+            setTimeout(testTableFields, 1000); // Wait a bit for auth to load
+        });
+    </script>
+</body>
+</html>

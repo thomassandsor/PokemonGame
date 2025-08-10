@@ -2001,7 +2001,7 @@
                                 <button class="pokemon-btn btn-outline" onclick="previousStep()" id="prev-btn">← Back</button>
                                 <div class="turn-number">Turn ${currentTurn}</div>
                                 ${isLastTurn ? 
-                                    '<a href="index.html" class="pokemon-btn btn-primary">🏠 Home</a>' :
+                                    '<button class="pokemon-btn btn-primary" onclick="battleResult.viewWinner()">� Show Winner</button>' :
                                     '<button class="pokemon-btn btn-outline" onclick="nextStep()" id="next-btn">Next →</button>'
                                 }
                             </div>

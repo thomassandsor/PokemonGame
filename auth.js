@@ -190,6 +190,63 @@ class AuthService {
     static getUserToken() {
         return this.currentUser ? this.currentUser.token : null;
     }
+
+    // Fetch user profile data from Dataverse including admin role
+    static async getUserProfileFromDataverse(email) {
+        try {
+            console.log('AUTH: Fetching user profile from Dataverse for:', email);
+            
+            if (!this.currentUser || !this.currentUser.token) {
+                throw new Error('User not authenticated');
+            }
+
+            // Use the same pattern as other services to fetch contact info
+            const baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+            const contactUrl = `${baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid,firstname,lastname,emailaddress1,pokemon_administrator`;
+            
+            const response = await fetch(contactUrl, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: {
+                    'Authorization': `Bearer ${this.currentUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': this.currentUser.email
+                }
+            });
+
+            if (!response.ok) {
+                console.error('AUTH: Failed to fetch user profile:', response.status);
+                return null;
+            }
+
+            const data = await response.json();
+            console.log('AUTH: User profile data:', data);
+
+            if (!data.value || data.value.length === 0) {
+                console.log('AUTH: No user profile found in Dataverse');
+                return null;
+            }
+
+            const profile = data.value[0];
+            console.log('AUTH: User profile loaded:', {
+                contactid: profile.contactid,
+                isAdmin: profile.pokemon_administrator
+            });
+
+            return {
+                contactid: profile.contactid,
+                firstname: profile.firstname,
+                lastname: profile.lastname,
+                email: profile.emailaddress1,
+                isAdmin: profile.pokemon_administrator === true
+            };
+
+        } catch (error) {
+            console.error('AUTH: Error fetching user profile from Dataverse:', error);
+            return null;
+        }
+    }
 }
 
 // Make it available globally

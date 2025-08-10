@@ -1,0 +1,1485 @@
+// Pokemon Battle Challenge Service - Handles battle challenges and management
+class BattleChallengeService {
+    static baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
+
+    /**
+     * Create a new battle challenge
+     */
+    static async createChallenge(playerId, pokemonId, challengeType = 'open') {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Creating challenge', { playerId, pokemonId, challengeType });
+
+            // For training battles, don't create Dataverse records - handle locally only
+            if (challengeType === 'training') {
+                console.log('🤖 CHALLENGE-SERVICE: Training battle - skipping Dataverse creation');
+                return {
+                    success: true,
+                    battleId: 'training-local-battle',
+                    message: 'Training battle ready - no database record needed'
+                };
+            }
+
+            const challengeTypeCode = challengeType === 'open' ? 1 : 2; // 1 = Open, 2 = Training
+            
+            // For Dataverse POST operations, lookup fields can use simple format or @odata.bind
+            const challengeData = {
+                "pokemon_Player1@odata.bind": `/contacts(${playerId})`,
+                "pokemon_Player1Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
+                pokemon_challengetype: challengeTypeCode,
+                statuscode: 1, // Open
+                statecode: 0,  // Active
+                createdon: new Date().toISOString()
+            };
+            
+            console.log('🔍 CHALLENGE-SERVICE: Challenge data:', challengeData);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(`${this.baseUrl}/pokemon_battles`, {
+                method: 'POST',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(challengeData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('🔍 CHALLENGE-SERVICE: POST failed with status:', response.status);
+                console.error('🔍 CHALLENGE-SERVICE: Error response:', errorText);
+                throw new Error(`Failed to create challenge: ${response.status} ${errorText}`);
+            }
+
+            // Handle different response types
+            let result;
+            if (response.status === 204) {
+                // Extract ID from Location header
+                const locationHeader = response.headers.get('Location') || response.headers.get('OData-EntityId');
+                let createdId = 'created-successfully';
+                
+                if (locationHeader) {
+                    const match = locationHeader.match(/pokemon_battles\(([^)]+)\)/);
+                    if (match) {
+                        createdId = match[1];
+                    }
+                }
+                
+                result = { pokemon_battleid: createdId };
+            } else {
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    result = { pokemon_battleid: 'created-successfully' };
+                }
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Challenge created successfully', result);
+            return { success: true, battleId: result.pokemon_battleid };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error creating challenge:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Join an existing battle challenge
+     */
+    static async joinChallenge(battleId, playerId, pokemonId) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Joining challenge', { battleId, playerId, pokemonId });
+
+            // For Dataverse PATCH operations, lookup fields need specific formatting
+            const updateData = {
+                "pokemon_Player2@odata.bind": `/contacts(${playerId})`,
+                "pokemon_Player2Pokemon@odata.bind": `/pokemon_pokedexes(${pokemonId})`,
+                statuscode: 895550002, // In Progress
+                modifiedon: new Date().toISOString()
+            };
+            
+            console.log('🔍 CHALLENGE-SERVICE: Update data:', updateData);
+            console.log('🔍 CHALLENGE-SERVICE: URL:', `${this.baseUrl}/pokemon_battles(${battleId})`);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(`${this.baseUrl}/pokemon_battles(${battleId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('🔍 CHALLENGE-SERVICE: PATCH failed with status:', response.status);
+                console.error('🔍 CHALLENGE-SERVICE: Error response:', errorText);
+                throw new Error(`Failed to join challenge: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Successfully joined challenge');
+            return { success: true };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error joining challenge:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Get open challenges
+     */
+    static async getOpenChallenges() {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Loading open challenges');
+
+            const url = `${this.baseUrl}/pokemon_battles?$filter=statuscode eq 1 and statecode eq 0&$expand=pokemon_Player1($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=createdon desc`;
+            
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(url, {
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to load challenges: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const challenges = data.value || [];
+
+            console.log('✅ CHALLENGE-SERVICE: Loaded challenges', challenges.length);
+            return challenges;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error loading challenges:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get user's battle challenges (created by user)
+     */
+    static async getUserChallenges(userId) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Loading user challenges', userId);
+
+            const url = `${this.baseUrl}/pokemon_battles?$filter=(_pokemon_player1_value eq '${userId}' or _pokemon_player2_value eq '${userId}') and statuscode ne 1&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=modifiedon desc`;
+            
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(url, {
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to load user battles: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const battles = data.value || [];
+
+            console.log('✅ CHALLENGE-SERVICE: Loaded user battles', battles.length);
+            return battles;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error loading user battles:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get battle details by ID with current Pokemon data
+     */
+    static async getBattleDetails(battleId) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Loading battle details', battleId);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            // Use token or accessToken, prefer token
+            const token = authUser.token || authUser.accessToken;
+            if (!token) {
+                throw new Error('No authentication token available');
+            }
+
+            // Get battle data with expanded Pokemon information including current HP and levels
+            const url = `${this.baseUrl}/pokemon_battles(${battleId})?$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($select=pokemon_pokedexid,pokemon_name,pokemon_level,pokemon_hp,pokemon_hpmax),pokemon_Player2Pokemon($select=pokemon_pokedexid,pokemon_name,pokemon_level,pokemon_hp,pokemon_hpmax)`;
+            
+            console.log('🌐 CHALLENGE-SERVICE: Request URL:', url);
+
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'X-User-Email': authUser.email
+            };
+
+            console.log('📤 CHALLENGE-SERVICE: Request headers:', {
+                Authorization: `Bearer ${token?.substring(0, 20)}...`,
+                'X-User-Email': authUser.email
+            });
+
+            const response = await fetch(url, {
+                headers: headers
+            });
+
+            console.log('📡 CHALLENGE-SERVICE: Response status:', response.status);
+            console.log('📡 CHALLENGE-SERVICE: Response headers:', Object.fromEntries(response.headers.entries()));
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('🔍 CHALLENGE-SERVICE: Error response body:', errorText);
+                throw new Error(`Failed to load battle details: ${response.status} ${response.statusText} - ${errorText}`);
+            }
+
+            const battle = await response.json();
+
+            console.log('✅ CHALLENGE-SERVICE: Loaded battle details with Pokemon data');
+            console.log('🔍 CHALLENGE-SERVICE: Player 1 Pokemon:', battle.pokemon_Player1Pokemon);
+            console.log('🔍 CHALLENGE-SERVICE: Player 2 Pokemon:', battle.pokemon_Player2Pokemon);
+            
+            return battle;
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error loading battle details:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get battle by ID (alias for getBattleDetails for compatibility)
+     */
+    static async getBattleById(battleId) {
+        return this.getBattleDetails(battleId);
+    }
+
+    /**
+     * Complete a battle with results
+     */
+    static async completeBattle(battleId, battleResult) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Completing battle', battleId);
+
+            // Store the full battle result for rich replay experience
+            const detailedResult = {
+                metadata: battleResult.metadata,
+                final_result: battleResult.final_result,
+                battle_turns: battleResult.battle_turns?.map(turn => ({
+                    turn_number: turn.turn_number,
+                    player1_action: {
+                        action_description: turn.player1_action?.action_description || `${turn.player1_action?.move_used || 'Unknown move'}`,
+                        move_used: turn.player1_action?.move_used,
+                        damage_dealt: turn.player1_action?.damage_dealt,
+                        critical_hit: turn.player1_action?.critical_hit,
+                        type_effectiveness: turn.player1_action?.type_effectiveness
+                    },
+                    player2_action: {
+                        action_description: turn.player2_action?.action_description || `${turn.player2_action?.move_used || 'Unknown move'}`,
+                        move_used: turn.player2_action?.move_used,
+                        damage_dealt: turn.player2_action?.damage_dealt,
+                        critical_hit: turn.player2_action?.critical_hit,
+                        type_effectiveness: turn.player2_action?.type_effectiveness
+                    },
+                    turn_result: {
+                        player1_pokemon_hp: turn.turn_result.player1_pokemon_hp,
+                        player2_pokemon_hp: turn.turn_result.player2_pokemon_hp,
+                        turn_summary: turn.turn_result.turn_summary || `Turn ${turn.turn_number} completed`,
+                        player1_pokemon_fainted: turn.turn_result.player1_pokemon_fainted,
+                        player2_pokemon_fainted: turn.turn_result.player2_pokemon_fainted,
+                        winner: turn.turn_result.winner
+                    }
+                })) || [],
+                pokemon_teams: {
+                    player1_team: [{
+                        name: battleResult.pokemon_teams?.player1_team?.[0]?.name,
+                        max_hp: battleResult.final_result?.player1_max_hp || battleResult.pokemon_teams?.player1_team?.[0]?.max_hp,
+                        final_hp: battleResult.final_result?.player1_final_hp,
+                        level: battleResult.pokemon_teams?.player1_team?.[0]?.level,
+                        types: battleResult.pokemon_teams?.player1_team?.[0]?.types,
+                        sprite_url: battleResult.pokemon_teams?.player1_team?.[0]?.sprite_url
+                    }],
+                    player2_team: [{
+                        name: battleResult.pokemon_teams?.player2_team?.[0]?.name,
+                        max_hp: battleResult.final_result?.player2_max_hp || battleResult.pokemon_teams?.player2_team?.[0]?.max_hp,
+                        final_hp: battleResult.final_result?.player2_final_hp,
+                        level: battleResult.pokemon_teams?.player2_team?.[0]?.level,
+                        types: battleResult.pokemon_teams?.player2_team?.[0]?.types,
+                        sprite_url: battleResult.pokemon_teams?.player2_team?.[0]?.sprite_url
+                    }]
+                }
+            };
+
+            const battleResultJson = JSON.stringify(detailedResult);
+            console.log('📊 Simplified battle result JSON size:', battleResultJson.length, 'characters');
+            console.log('📊 Battle result preview:', battleResultJson.substring(0, 500) + '...');
+
+            const updateData = {
+                statuscode: 895550001, // Completed
+                statecode: 0,          // Active
+                pokemon_battleresultjson: battleResultJson,
+                modifiedon: new Date().toISOString()
+            };
+
+            console.log('📤 Sending update data:', {
+                ...updateData,
+                pokemon_battleresultjson: `[JSON string of ${battleResultJson.length} chars]`
+            });
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            console.log('🔐 Auth user details:', {
+                email: authUser.email,
+                tokenLength: authUser.token?.length,
+                tokenStart: authUser.token?.substring(0, 20) + '...'
+            });
+
+            const requestUrl = `${this.baseUrl}/pokemon_battles(${battleId})`;
+            console.log('🌐 Request URL:', requestUrl);
+
+            const response = await fetch(requestUrl, {
+                method: 'PATCH', // Back to PATCH - same as joinChallenge
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to complete battle: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Battle completed successfully');
+
+            // Update winner/loser in battle table and Pokemon statistics  
+            await this.updateBattleWinnerLoser(battleId, battleResult);
+
+            return { success: true };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error completing battle:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Update battle table with winner and loser Pokemon IDs and update Pokemon stats
+     */
+    static async updateBattleWinnerLoser(battleId, battleResult) {
+        try {
+            console.log('🏆 CHALLENGE-SERVICE: Updating battle winner/loser information...');
+            console.log('🏆 Battle winner field value:', battleResult.final_result.winner);
+
+            // Check if winner field exists and is valid
+            if (!battleResult.final_result.winner || 
+                !['player1', 'player2'].includes(battleResult.final_result.winner)) {
+                console.log('⚠️ No clear winner or draw result - skipping winner/loser update');
+                return;
+            }
+
+            // Get Pokemon IDs from battle result
+            const player1PokemonId = battleResult.final_result.player1_pokemon_pokedexid;
+            const player2PokemonId = battleResult.final_result.player2_pokemon_pokedexid;
+
+            console.log('🔍 Player 1 Pokemon ID:', player1PokemonId);
+            console.log('🔍 Player 2 Pokemon ID:', player2PokemonId);
+
+            // Validate Pokemon IDs exist
+            if (!player1PokemonId || !player2PokemonId) {
+                console.error('❌ Missing Pokemon IDs in battle result');
+                throw new Error('Missing Pokemon IDs in battle result');
+            }
+
+            // Determine winner and loser Pokemon IDs
+            const winnerPokemonId = battleResult.final_result.winner === 'player1' 
+                ? player1PokemonId 
+                : player2PokemonId;
+            
+            const loserPokemonId = battleResult.final_result.winner === 'player1' 
+                ? player2PokemonId 
+                : player1PokemonId;
+
+            console.log('🏆 Winner Pokemon ID:', winnerPokemonId);
+            console.log('💔 Loser Pokemon ID:', loserPokemonId);
+
+            // Update battle table with winner and loser
+            await this.updateBattleRecord(battleId, winnerPokemonId, loserPokemonId);
+
+            // Update Pokemon statistics
+            await this.updatePokemonWinStats(winnerPokemonId);
+            await this.updatePokemonLossStats(loserPokemonId);
+
+            console.log('✅ CHALLENGE-SERVICE: Battle winner/loser information updated successfully');
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating battle winner/loser:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update battle record with winner and loser Pokemon IDs
+     */
+    static async updateBattleRecord(battleId, winnerPokemonId, loserPokemonId) {
+        try {
+            console.log('📝 CHALLENGE-SERVICE: Updating battle record with winner/loser...');
+            console.log('📝 Battle ID:', battleId);
+            console.log('📝 Winner Pokemon ID:', winnerPokemonId);
+            console.log('📝 Loser Pokemon ID:', loserPokemonId);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            // Use the correct schema names from Dataverse
+            const updateData = {
+                'pokemon_WinnerPokemon@odata.bind': `/pokemon_pokedexes(${winnerPokemonId})`,
+                'pokemon_LooserPokemon@odata.bind': `/pokemon_pokedexes(${loserPokemonId})`,
+                modifiedon: new Date().toISOString()
+            };
+
+            console.log('📝 Battle record update data:', updateData);
+            console.log('📝 Update URL:', `${this.baseUrl}/pokemon_battles(${battleId})`);
+
+            const response = await fetch(`${this.baseUrl}/pokemon_battles(${battleId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            console.log('📝 Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.log('📝 Error response body:', errorText);
+                throw new Error(`Failed to update battle record: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Battle record updated successfully');
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating battle record:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update Pokemon win statistics
+     */
+    static async updatePokemonWinStats(pokemonId) {
+        try {
+            console.log('📊 CHALLENGE-SERVICE: Updating win stats for Pokemon:', pokemonId);
+
+            // First, get current Pokemon data to read existing stats
+            const currentStats = await this.getPokemonStats(pokemonId);
+            const currentWins = currentStats.pokemon_wins || 0;
+            const currentBattles = currentStats.pokemon_battles || 0;
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const updateData = {
+                pokemon_wins: currentWins + 1,
+                pokemon_battles: currentBattles + 1,
+                modifiedon: new Date().toISOString()
+            };
+
+            console.log('📊 Win stats update:', { pokemonId, currentWins, newWins: currentWins + 1, currentBattles, newBattles: currentBattles + 1 });
+
+            const response = await fetch(`${this.baseUrl}/pokemon_pokedexes(${pokemonId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update Pokemon win stats: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Pokemon win stats updated successfully');
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating Pokemon win stats:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update Pokemon loss statistics
+     */
+    static async updatePokemonLossStats(pokemonId) {
+        try {
+            console.log('📊 CHALLENGE-SERVICE: Updating loss stats for Pokemon:', pokemonId);
+
+            // First, get current Pokemon data to read existing stats
+            const currentStats = await this.getPokemonStats(pokemonId);
+            const currentLosses = currentStats.pokemon_losses || 0;
+            const currentBattles = currentStats.pokemon_battles || 0;
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const updateData = {
+                pokemon_losses: currentLosses + 1,
+                pokemon_battles: currentBattles + 1,
+                modifiedon: new Date().toISOString()
+            };
+
+            console.log('📊 Loss stats update:', { pokemonId, currentLosses, newLosses: currentLosses + 1, currentBattles, newBattles: currentBattles + 1 });
+
+            const response = await fetch(`${this.baseUrl}/pokemon_pokedexes(${pokemonId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update Pokemon loss stats: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Pokemon loss stats updated successfully');
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating Pokemon loss stats:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get current Pokemon statistics
+     */
+    static async getPokemonStats(pokemonId) {
+        try {
+            console.log('📊 CHALLENGE-SERVICE: Getting Pokemon stats for:', pokemonId);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(`${this.baseUrl}/pokemon_pokedexes(${pokemonId})?$select=pokemon_wins,pokemon_losses,pokemon_battles`, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to get Pokemon stats: ${response.status} ${errorText}`);
+            }
+
+            const stats = await response.json();
+            console.log('📊 Current Pokemon stats:', stats);
+            return stats;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error getting Pokemon stats:', error);
+            // Return default stats if fetch fails
+            return { pokemon_wins: 0, pokemon_losses: 0, pokemon_battles: 0 };
+        }
+    }
+
+    /**
+     * Update Pokemon HP after battle
+     */
+    static async updatePokemonHP(pokemonPokedexId, newCurrentHP) {
+        try {
+            console.log(`🏥 CHALLENGE-SERVICE: Updating Pokemon HP - ID: ${pokemonPokedexId}, New HP: ${newCurrentHP}`);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const updateData = {
+                pokemon_hp: newCurrentHP, // Use pokemon_hp as the correct field name
+                modifiedon: new Date().toISOString()
+            };
+
+            const response = await fetch(`${this.baseUrl}/pokemon_pokedexes(${pokemonPokedexId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update Pokemon HP: ${response.status} ${errorText}`);
+            }
+
+            console.log(`✅ CHALLENGE-SERVICE: Pokemon HP updated successfully - ID: ${pokemonPokedexId}, HP: ${newCurrentHP}`);
+            return { success: true };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating Pokemon HP:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Update both Pokemon HP after battle completion
+     */
+    static async updateBattlePokemonHP(battleResult) {
+        try {
+            console.log('🏥 CHALLENGE-SERVICE: Updating Pokemon HP after battle...');
+            console.log('🏥 Battle result keys:', Object.keys(battleResult));
+            console.log('🏥 Looking for Pokemon HP data:', {
+                player1_final_hp: battleResult.player1_final_hp,
+                player2_final_hp: battleResult.player2_final_hp,
+                player1_pokemon_pokedexid: battleResult.player1_pokemon_pokedexid,
+                player2_pokemon_pokedexid: battleResult.player2_pokemon_pokedexid
+            });
+
+            const results = [];
+
+            // Update Player 1 Pokemon HP
+            if (battleResult.player1_final_hp !== undefined && battleResult.player1_pokemon_pokedexid) {
+                console.log(`🔄 Player 1 Pokemon HP update: ${battleResult.player1_pokemon_pokedexid} -> ${battleResult.player1_final_hp} HP`);
+                const p1Result = await this.updatePokemonHP(
+                    battleResult.player1_pokemon_pokedexid, 
+                    Math.max(0, battleResult.player1_final_hp)
+                );
+                results.push({ player: 1, pokemon_id: battleResult.player1_pokemon_pokedexid, final_hp: battleResult.player1_final_hp, ...p1Result });
+            } else {
+                console.warn('⚠️ Player 1 Pokemon HP update skipped - missing data:', {
+                    final_hp: battleResult.player1_final_hp,
+                    pokemon_id: battleResult.player1_pokemon_pokedexid
+                });
+            }
+
+            // Update Player 2 Pokemon HP
+            if (battleResult.player2_final_hp !== undefined && battleResult.player2_pokemon_pokedexid) {
+                console.log(`🔄 Player 2 Pokemon HP update: ${battleResult.player2_pokemon_pokedexid} -> ${battleResult.player2_final_hp} HP`);
+                const p2Result = await this.updatePokemonHP(
+                    battleResult.player2_pokemon_pokedexid, 
+                    Math.max(0, battleResult.player2_final_hp)
+                );
+                results.push({ player: 2, pokemon_id: battleResult.player2_pokemon_pokedexid, final_hp: battleResult.player2_final_hp, ...p2Result });
+            } else {
+                console.warn('⚠️ Player 2 Pokemon HP update skipped - missing data:', {
+                    final_hp: battleResult.player2_final_hp,
+                    pokemon_id: battleResult.player2_pokemon_pokedexid
+                });
+            }
+
+            const successCount = results.filter(r => r.success).length;
+            console.log(`✅ CHALLENGE-SERVICE: Updated HP for ${successCount}/${results.length} Pokemon`);
+            console.log('📊 HP Update Summary:', results.map(r => `Player ${r.player}: ${r.pokemon_id} -> ${r.final_hp} HP (${r.success ? 'SUCCESS' : 'FAILED'})`));
+
+            return { 
+                success: successCount === results.length, 
+                results: results,
+                updated_count: successCount
+            };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating battle Pokemon HP:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Delete/Cancel a battle challenge
+     */
+    static async cancelChallenge(battleId) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Cancelling challenge', battleId);
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(`${this.baseUrl}/pokemon_battles(${battleId})`, {
+                method: 'DELETE',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to cancel challenge: ${response.statusText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Challenge cancelled successfully');
+            return { success: true };
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error cancelling challenge:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Simulate a training battle against AI
+     */
+    static async simulateTrainingBattle(battleId, playerPokemon) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Starting training battle simulation');
+
+            // Generate AI opponent
+            const aiPokemon = BattleService.generateWildPokemon(playerPokemon.level || 5);
+            
+            // Prepare Pokemon for battle
+            const player = BattleService.preparePokemonForBattle(playerPokemon);
+            const opponent = { ...aiPokemon };
+
+            // Battle simulation
+            const battleSteps = [];
+            const battleLog = [];
+            let turnNumber = 1;
+            const maxTurns = 50; // Prevent infinite battles
+
+            battleLog.push(`🤖 A wild ${opponent.name} appears!`);
+            battleLog.push(`⚔️ Battle begins! ${player.name} vs ${opponent.name}`);
+
+            while (player.hp > 0 && opponent.hp > 0 && turnNumber <= maxTurns) {
+                console.log(`🎯 BATTLE-SERVICE: Turn ${turnNumber}`);
+
+                // Execute turn
+                const turnResult = BattleService.executeTurn(player, opponent, 0);
+                
+                // Record battle step
+                const step = {
+                    stepNumber: turnNumber,
+                    playerHP: player.hp,
+                    opponentHP: opponent.hp,
+                    playerMove: turnResult.playerMove,
+                    opponentMove: turnResult.opponentMove,
+                    playerDamage: turnResult.playerDamageDealt,
+                    opponentDamage: turnResult.opponentDamageDealt,
+                    battleLog: turnResult.battleLog
+                };
+                
+                battleSteps.push(step);
+                battleLog.push(...turnResult.battleLog);
+
+                // Check for battle end
+                if (player.hp <= 0 || opponent.hp <= 0) {
+                    break;
+                }
+
+                turnNumber++;
+            }
+
+            // Determine winner
+            let winner, experience;
+            if (player.hp > 0 && opponent.hp <= 0) {
+                winner = 'player';
+                experience = BattleService.calculateExperience(player.level, opponent.level, true);
+                battleLog.push(`🏆 ${player.name} wins the battle!`);
+            } else if (opponent.hp > 0 && player.hp <= 0) {
+                winner = 'opponent';
+                experience = BattleService.calculateExperience(player.level, opponent.level, false);
+                battleLog.push(`💀 ${player.name} was defeated!`);
+            } else {
+                winner = 'draw';
+                experience = BattleService.calculateExperience(player.level, opponent.level, false);
+                battleLog.push(`⏰ Battle ended in a draw!`);
+            }
+
+            battleLog.push(`✨ ${player.name} gained ${experience} experience!`);
+
+            // Create battle result
+            const battleResult = {
+                battleId,
+                winner,
+                battleSteps,
+                battleLog,
+                finalState: {
+                    player: { ...player },
+                    opponent: { ...opponent }
+                },
+                experience,
+                metadata: {
+                    battleType: 'training',
+                    totalTurns: turnNumber - 1,
+                    completedAt: new Date().toISOString()
+                }
+            };
+
+            console.log('✅ CHALLENGE-SERVICE: Training battle simulation completed', {
+                winner,
+                turns: turnNumber - 1,
+                experience
+            });
+
+            return battleResult;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error simulating training battle:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get caught Pokemon for a trainer
+     */
+    static async getCaughtPokemon(trainerId) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Loading caught Pokemon', trainerId);
+
+            // Get full Pokemon data including HP, level, types, and Pokemon details
+            // The key is to properly expand the pokemon_Pokemon relationship to get the master Pokemon data
+            const url = `${this.baseUrl}/pokemon_pokedexes?$filter=_pokemon_user_value eq '${trainerId}'&$expand=pokemon_Pokemon($select=pokemon_id,pokemon_name,pokemon_type1,pokemon_type2,pokemon_sprite_url)&$select=pokemon_pokedexid,pokemon_name,pokemon_level,pokemon_hp,pokemon_hpmax,pokemon_current_hp,pokemon_max_hp,pokemon_nickname,pokemon_attack,pokemon_defence,createdon,_pokemon_pokemon_value&$orderby=createdon desc`;
+            
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(url, {
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to load Pokemon: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const pokemon = data.value || [];
+
+            console.log('✅ CHALLENGE-SERVICE: Loaded caught Pokemon', pokemon.length);
+            console.log('🔍 CHALLENGE-SERVICE: Sample Pokemon data:', pokemon[0]);
+            console.log('🔍 CHALLENGE-SERVICE: Sample expanded Pokemon:', pokemon[0]?.pokemon_Pokemon);
+            
+            return pokemon;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error loading caught Pokemon:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get user's contact ID from email
+     */
+    static async getUserContactId(email) {
+        try {
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const url = `${this.baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid`;
+            const response = await fetch(url, {
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'X-User-Email': authUser.email
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data.value && data.value.length > 0 ? data.value[0].contactid : null;
+            
+        } catch (error) {
+            console.error('🎯 CHALLENGE-SERVICE: Error getting user contact ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Generate a random Pokemon opponent for training battles
+     */
+    static async generateTrainingOpponent(playerLevel) {
+        try {
+            // Use a predefined list of common Pokemon for training opponents
+            const trainingPokemonList = [
+                // Generation 1 Pokemon - common training opponents
+                { name: 'Pidgey', id: 16, baseHp: 40, baseAttack: 45, baseDefense: 40 },
+                { name: 'Rattata', id: 19, baseHp: 30, baseAttack: 56, baseDefense: 35 },
+                { name: 'Spearow', id: 21, baseHp: 40, baseAttack: 60, baseDefense: 30 },
+                { name: 'Caterpie', id: 10, baseHp: 45, baseAttack: 30, baseDefense: 35 },
+                { name: 'Weedle', id: 13, baseHp: 40, baseAttack: 35, baseDefense: 30 },
+                { name: 'Magikarp', id: 129, baseHp: 20, baseAttack: 10, baseDefense: 55 },
+                { name: 'Zubat', id: 41, baseHp: 40, baseAttack: 45, baseDefense: 35 },
+                { name: 'Geodude', id: 74, baseHp: 40, baseAttack: 80, baseDefense: 100 },
+                { name: 'Sandshrew', id: 27, baseHp: 50, baseAttack: 75, baseDefense: 85 },
+                { name: 'Mankey', id: 56, baseHp: 40, baseAttack: 80, baseDefense: 35 },
+                { name: 'Psyduck', id: 54, baseHp: 50, baseAttack: 52, baseDefense: 48 },
+                { name: 'Poliwag', id: 60, baseHp: 40, baseAttack: 50, baseDefense: 40 },
+                { name: 'Bellsprout', id: 69, baseHp: 50, baseAttack: 75, baseDefense: 35 },
+                { name: 'Tentacool', id: 72, baseHp: 40, baseAttack: 40, baseDefense: 35 },
+                { name: 'Slowpoke', id: 79, baseHp: 90, baseAttack: 65, baseDefense: 65 },
+                { name: 'Doduo', id: 84, baseHp: 35, baseAttack: 85, baseDefense: 45 },
+                { name: 'Seel', id: 86, baseHp: 65, baseAttack: 45, baseDefense: 55 },
+                { name: 'Grimer', id: 88, baseHp: 80, baseAttack: 80, baseDefense: 50 },
+                { name: 'Shellder', id: 90, baseHp: 30, baseAttack: 65, baseDefense: 100 },
+                { name: 'Gastly', id: 92, baseHp: 30, baseAttack: 35, baseDefense: 30 },
+                { name: 'Onix', id: 95, baseHp: 35, baseAttack: 45, baseDefense: 160 },
+                { name: 'Drowzee', id: 96, baseHp: 60, baseAttack: 48, baseDefense: 45 },
+                { name: 'Krabby', id: 98, baseHp: 30, baseAttack: 105, baseDefense: 90 },
+                { name: 'Voltorb', id: 100, baseHp: 40, baseAttack: 30, baseDefense: 50 },
+                { name: 'Horsea', id: 116, baseHp: 30, baseAttack: 40, baseDefense: 70 }
+            ];
+            
+            // Pick a random Pokemon from the training list
+            const randomOpponent = trainingPokemonList[Math.floor(Math.random() * trainingPokemonList.length)];
+            
+            // Generate level close to player level (±2 levels)
+            const opponentLevel = Math.max(1, playerLevel - 2 + Math.floor(Math.random() * 5));
+            
+            // Calculate stats based on level and base stats (simplified Pokemon stat calculation)
+            const levelMultiplier = opponentLevel / 10; // Simple level scaling
+            const hpStat = Math.floor(randomOpponent.baseHp * (1 + levelMultiplier));
+            const attackStat = Math.floor(randomOpponent.baseAttack * (1 + levelMultiplier * 0.8));
+            const defenseStat = Math.floor(randomOpponent.baseDefense * (1 + levelMultiplier * 0.8));
+            
+            const opponent = {
+                name: randomOpponent.name,
+                pokemonId: randomOpponent.id,
+                level: opponentLevel,
+                hp: hpStat,
+                maxHp: hpStat,
+                attack: attackStat,
+                defense: defenseStat,
+                isTrainingOpponent: true
+            };
+            
+            console.log('🎯 CHALLENGE-SERVICE: Generated training opponent:', opponent);
+            return opponent;
+            
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error generating training opponent:', error);
+            // Fallback to simple opponent if database fails
+            return {
+                name: 'Pidgey',
+                pokemonId: 16,
+                level: Math.max(1, playerLevel - 1 + Math.floor(Math.random() * 3)),
+                hp: 40,
+                maxHp: 40,
+                attack: 45,
+                defense: 40,
+                isTrainingOpponent: true
+            };
+        }
+    }
+
+    /**
+     * CLEAN Enhanced training battle simulation with minimal logging
+     */
+    static async simulateFixedTrainingBattleV2(battleId, playerPokemon) {
+        try {
+            console.log('🎯 TRAINING: Starting battle', { battleId, sessions: playerPokemon.pokemon_trainingsessions || 0 });
+
+            // Check training session limit
+            const currentSessions = playerPokemon.pokemon_trainingsessions || 0;
+            if (currentSessions >= 5) {
+                throw new Error('Pokemon has reached maximum training sessions (5/5). Your Pokemon has mastered its training!');
+            }
+            
+            const currentHP = playerPokemon.pokemon_hp || playerPokemon.hp || 50;
+            const maxHP = playerPokemon.pokemon_hpmax || playerPokemon.maxHP || 50;
+            
+            // Calculate HP loss and stat gains
+            const hpLoss = Math.floor(maxHP * (0.1 + Math.random() * 0.15));
+            const newCurrentHP = Math.max(1, currentHP - hpLoss);
+            
+            const statGains = {
+                attack: Math.floor(1 + Math.random() * 3),
+                defense: Math.floor(1 + Math.random() * 3),
+                hp: Math.floor(2 + Math.random() * 4)
+            };
+
+            const newMaxHP = maxHP + statGains.hp;
+            const newTrainingSessions = currentSessions + 1;
+
+            // SIMPLE LEVEL UP LOGIC
+            let levelUp = false;
+            let newLevel = playerPokemon.pokemon_level || 1;
+            
+            console.log(`🔍 LEVEL CHECK: ${currentSessions} → ${newTrainingSessions} sessions, current level: ${newLevel}`);
+            
+            // Level up at exactly 3 sessions and exactly 5 sessions
+            if (newTrainingSessions === 3 && currentSessions === 2) {
+                newLevel += 1;
+                levelUp = true;
+                console.log(`🎉 LEVEL UP: ${newLevel - 1} → ${newLevel} (reached 3 sessions)`);
+            } else if (newTrainingSessions === 5 && currentSessions === 4) {
+                newLevel += 1;
+                levelUp = true;
+                console.log(`🎉 LEVEL UP: ${newLevel - 1} → ${newLevel} (reached 5 sessions)`);
+            } else {
+                console.log(`📊 NO LEVEL UP: Need 2→3 sessions or 4→5 sessions for level up`);
+            }
+
+            // Calculate new stats
+            const originalAttack = playerPokemon.pokemon_attack || playerPokemon.attack || 20;
+            const originalDefense = playerPokemon.pokemon_defence || playerPokemon.defence || playerPokemon.defense || 15;
+            
+            const newAttack = originalAttack + statGains.attack;
+            const newDefense = originalDefense + statGains.defense;
+
+            // Create updated Pokemon object
+            const updatedPokemon = {
+                ...playerPokemon,
+                pokemon_attack: newAttack,
+                pokemon_defence: newDefense,
+                pokemon_hpmax: newMaxHP,
+                pokemon_hp: newCurrentHP,
+                pokemon_level: newLevel,
+                pokemon_trainingsessions: newTrainingSessions
+            };
+
+            console.log(`📊 RESULT: Level ${playerPokemon.pokemon_level || 1}→${newLevel}, Sessions ${currentSessions}→${newTrainingSessions}, Level Up: ${levelUp}`);
+
+            // Save to database
+            await this.updatePokemonStats(updatedPokemon);
+
+            // Return battle result
+            return {
+                battleId,
+                winner: 'opponent',
+                battleSteps: [],
+                battleLog: [
+                    `🥊 Training completed! (Session ${newTrainingSessions}/5)`,
+                    `💪 Stat Gains: +${statGains.attack} ATK, +${statGains.defense} DEF, +${statGains.hp} Max HP`,
+                    `😤 Training Fatigue: -${hpLoss} current HP (${newCurrentHP}/${newMaxHP})`,
+                    ...(levelUp ? [
+                        `🎉 LEVEL UP! ${playerPokemon.pokemon_level || 1} → ${newLevel}!`,
+                        `⭐ Level-up milestone reached at ${newTrainingSessions} training sessions!`
+                    ] : [
+                        `📈 Progress: ${newTrainingSessions < 3 ? `${newTrainingSessions}/3 sessions until next level` : newTrainingSessions < 5 ? `${newTrainingSessions}/5 sessions until next level` : 'Training mastered!'}`
+                    ])
+                ],
+                finalState: {
+                    player: { hp: newCurrentHP, maxHp: newMaxHP }
+                },
+                experience: 20,
+                statGains,
+                hpLoss,
+                newTrainingSessions,
+                levelUp,
+                newLevel,
+                updatedPokemon,
+                metadata: { battleType: 'training', isEnhanced: true }
+            };
+
+        } catch (error) {
+            console.error('❌ TRAINING ERROR:', error);
+            throw error;
+        }
+    }
+        try {
+            console.log('🎯 NEW TRAINING V2: Starting training battle with NO HP restrictions [COMPLETELY NEW FUNCTION]', { battleId, playerPokemon });
+
+            // Check training session limit (restore the 5 session cap)
+            const currentSessions = playerPokemon.pokemon_trainingsessions || 0;
+            if (currentSessions >= 5) {
+                throw new Error('Pokemon has reached maximum training sessions (5/5). Your Pokemon has mastered its training!');
+            }
+            
+            console.log('✅ V2: NO HP RESTRICTIONS - Pokemon can train at any HP level!');
+            
+            const currentHP = playerPokemon.pokemon_hp || playerPokemon.hp || 50;
+            const maxHP = playerPokemon.pokemon_hpmax || playerPokemon.maxHP || 50;
+            
+            // Get current values
+            const originalCurrentHP = currentHP;
+            const originalMaxHP = maxHP;
+            
+            console.log('🎯 FIXED TRAINING: Starting HP:', {
+                current: originalCurrentHP,
+                max: originalMaxHP
+            });
+
+            // Calculate HP loss (10-25% of max HP)
+            const hpLossPercent = 0.1 + Math.random() * 0.15;
+            const hpLoss = Math.floor(originalMaxHP * hpLossPercent);
+            const newCurrentHP = Math.max(1, originalCurrentHP - hpLoss);
+            
+            console.log('🎯 FIXED TRAINING: HP Loss Calculation:', {
+                percent: (hpLossPercent * 100).toFixed(1) + '%',
+                loss: hpLoss,
+                math: `${originalCurrentHP} - ${hpLoss} = ${newCurrentHP}`
+            });
+
+            // Calculate stat gains
+            const statGains = {
+                attack: Math.floor(1 + Math.random() * 3),
+                defense: Math.floor(1 + Math.random() * 3),
+                hp: Math.floor(2 + Math.random() * 4)
+            };
+
+            const newMaxHP = originalMaxHP + statGains.hp;
+            const newTrainingSessions = currentSessions + 1;
+
+            // Level up check - ENHANCED logic for milestone-based leveling
+            let levelUp = false;
+            let newLevel = playerPokemon.pokemon_level || 1; // Default to level 1, not 5!
+            
+            console.log('🎯 LEVEL UP CHECK ULTRA DETAILED:', {
+                currentSessions,
+                newTrainingSessions,
+                currentLevel: newLevel,
+                'typeof currentSessions': typeof currentSessions,
+                'typeof newTrainingSessions': typeof newTrainingSessions,
+                'currentSessions === 2': currentSessions === 2,
+                'currentSessions === 4': currentSessions === 4,
+                'newTrainingSessions === 3': newTrainingSessions === 3,
+                'newTrainingSessions === 5': newTrainingSessions === 5,
+                'currentSessions < 3': currentSessions < 3,
+                'currentSessions < 5': currentSessions < 5,
+                'condition for 3': newTrainingSessions === 3 && currentSessions < 3,
+                'condition for 5': newTrainingSessions === 5 && currentSessions < 5,
+                'Will level up for 3?': newTrainingSessions === 3 && currentSessions < 3,
+                'Will level up for 5?': newTrainingSessions === 5 && currentSessions < 5
+            });
+            
+            // Level up when REACHING 3 training sessions (from 2 to 3)
+            if (newTrainingSessions === 3 && currentSessions === 2) {
+                newLevel += 1;
+                levelUp = true;
+                console.log('🎉 LEVEL UP: 2→3 training sessions (Level 1→2)!');
+            } 
+            // Level up when REACHING 5 training sessions (from 4 to 5)
+            else if (newTrainingSessions === 5 && currentSessions === 4) {
+                newLevel += 1;
+                levelUp = true;
+                console.log('🎉 LEVEL UP: 4→5 training sessions (Level 2→3)!');
+            }
+            
+            // COMPREHENSIVE DEBUG: Check all possible scenarios
+            console.log('🔍 LEVEL UP ANALYSIS:', {
+                scenario: `${currentSessions}→${newTrainingSessions} sessions`,
+                expectedLevel: currentSessions < 3 ? 1 : currentSessions < 5 ? 2 : 3,
+                actualCurrentLevel: newLevel,
+                shouldLevelUpNow: (newTrainingSessions === 3 && currentSessions === 2) || (newTrainingSessions === 5 && currentSessions === 4),
+                levelUpTriggered: levelUp,
+                reason: levelUp ? 'Level up triggered' : `No level up: sessions ${currentSessions}→${newTrainingSessions}, need 2→3 or 4→5`
+            });
+            
+            // ADDITIONAL DEBUG: Check if no level-up occurred when it should have
+            if (!levelUp && (newTrainingSessions === 3 || newTrainingSessions === 5)) {
+                console.log('⚠️ NO LEVEL UP DETECTED - DEEP INVESTIGATION:', {
+                    newTrainingSessions,
+                    currentSessions,
+                    'Exact condition 2→3': newTrainingSessions === 3 && currentSessions === 2,
+                    'Exact condition 4→5': newTrainingSessions === 5 && currentSessions === 4,
+                    'Why no level up at 3?': newTrainingSessions === 3 ? `Current sessions is ${currentSessions}, expected 2` : 'Not session 3',
+                    'Why no level up at 5?': newTrainingSessions === 5 ? `Current sessions is ${currentSessions}, expected 4` : 'Not session 5',
+                    possibleIssue: currentSessions === 4 && newTrainingSessions === 5 ? 'THIS SHOULD LEVEL UP! Bug detected!' : 'Expected behavior'
+                });
+            }
+
+            console.log('🎯 LEVEL UP RESULT DETAILED:', {
+                levelUp,
+                oldLevel: playerPokemon.pokemon_level || 1,
+                newLevel,
+                'Level increased': newLevel > (playerPokemon.pokemon_level || 1)
+            });
+
+            // Debug current Pokemon stat values WITH ALL POSSIBLE FIELD NAMES
+            console.log('🔍 FIXED TRAINING: RAW Pokemon object ALL FIELDS:');
+            console.log(playerPokemon);
+            console.log('🔍 FIXED TRAINING: Defense field analysis:', {
+                pokemon_defence: playerPokemon.pokemon_defence,
+                defence: playerPokemon.defence,
+                pokemon_attack: playerPokemon.pokemon_attack,
+                attack: playerPokemon.attack,
+                pokemon_hp: playerPokemon.pokemon_hp,
+                hp: playerPokemon.hp,
+                pokemon_hpmax: playerPokemon.pokemon_hpmax,
+                hpmax: playerPokemon.hpmax,
+                maxHP: playerPokemon.maxHP
+            });
+
+            console.log('🔍 FIXED TRAINING: Stat gains:', statGains);
+
+            // Calculate new stats with detailed logging - TRY ALL POSSIBLE DEFENSE FIELD NAMES
+            const originalAttack = playerPokemon.pokemon_attack || playerPokemon.attack || 20;
+            
+            // Try to find the actual defense value from ANY possible field
+            let originalDefense = 15; // fallback
+            if (playerPokemon.pokemon_defence !== undefined) {
+                originalDefense = playerPokemon.pokemon_defence;
+                console.log('🔍 DEFENSE SOURCE: Using pokemon_defence =', originalDefense);
+            } else if (playerPokemon.pokemon_Defence !== undefined) {
+                originalDefense = playerPokemon.pokemon_Defence;
+                console.log('🔍 DEFENSE SOURCE: Using pokemon_Defence =', originalDefense);
+            } else if (playerPokemon.defence !== undefined) {
+                originalDefense = playerPokemon.defence;
+                console.log('🔍 DEFENSE SOURCE: Using defence =', originalDefense);
+            } else if (playerPokemon.defense !== undefined) {
+                originalDefense = playerPokemon.defense;
+                console.log('🔍 DEFENSE SOURCE: Using defense =', originalDefense);
+            } else {
+                console.log('🔍 DEFENSE SOURCE: Using fallback =', originalDefense);
+            } if (playerPokemon.defense !== undefined) {
+                originalDefense = playerPokemon.defense;
+                console.log('🔍 DEFENSE SOURCE: Using defense =', originalDefense);
+            } else {
+                console.log('🔍 DEFENSE SOURCE: Using fallback =', originalDefense);
+            }
+
+            const newAttack = originalAttack + statGains.attack;
+            const newDefense = originalDefense + statGains.defense;
+
+            console.log('🔍 FIXED TRAINING: Stat calculations DETAILED:', {
+                attack: `${originalAttack} + ${statGains.attack} = ${newAttack}`,
+                defense: `${originalDefense} + ${statGains.defense} = ${newDefense}`,
+                hp: `${originalMaxHP} + ${statGains.hp} = ${newMaxHP}`,
+                defenseMath: `SHOULD BE: ${originalDefense} + ${statGains.defense} = ${newDefense}`
+            });
+
+            // CRITICAL FIX: Use CORRECT database field name pokemon_defence (with 'c', lowercase 'd')
+            const updatedPokemon = {
+                ...playerPokemon,
+                pokemon_attack: newAttack,
+                pokemon_defence: newDefense,  // EXACT FIELD: pokemon_defence (with 'c', lowercase 'd')
+                pokemon_hpmax: newMaxHP,
+                pokemon_hp: newCurrentHP,
+                pokemon_level: newLevel,
+                pokemon_trainingsessions: newTrainingSessions
+            };
+
+            // Remove any incorrect field names that might have been inherited
+            delete updatedPokemon.pokemon_Defence; // Remove incorrect uppercase D version
+            delete updatedPokemon.pokemon_defense; // Remove American spelling version
+
+            console.log('🔍 FIXED TRAINING: Final updated Pokemon BEFORE database save:', {
+                original_defense: originalDefense,
+                calculated_defense: newDefense,
+                pokemon_defence_field: updatedPokemon.pokemon_defence,
+                defense_math_check: `${originalDefense} + ${statGains.defense} = ${newDefense}`,
+                full_updated_pokemon: updatedPokemon
+            });
+
+            console.log('🔍 FIXED TRAINING: Final updated Pokemon before database save:', {
+                pokemon_attack: updatedPokemon.pokemon_attack,
+                pokemon_defence: updatedPokemon.pokemon_defence,
+                pokemon_hp: updatedPokemon.pokemon_hp,
+                pokemon_hpmax: updatedPokemon.pokemon_hpmax,
+                pokemon_level: updatedPokemon.pokemon_level,
+                pokemon_trainingsessions: updatedPokemon.pokemon_trainingsessions
+            });
+
+            console.log('🎯 FIXED TRAINING: Final Result:', {
+                hp: `${originalCurrentHP} -> ${newCurrentHP}`,
+                maxHp: `${originalMaxHP} -> ${newMaxHP}`,
+                level: `${playerPokemon.pokemon_level || 1} -> ${newLevel}`,
+                sessions: `${currentSessions} -> ${newTrainingSessions}`
+            });
+
+            // Save to database
+            await this.updatePokemonStats(updatedPokemon);
+
+            // Return battle result
+            return {
+                battleId,
+                winner: 'opponent',
+                battleSteps: [],
+                battleLog: [
+                    `🥊 Training completed! (Session ${newTrainingSessions}/5)`,
+                    `💪 Stat Gains: +${statGains.attack} ATK, +${statGains.defense} DEF, +${statGains.hp} Max HP`,
+                    `😤 Training Fatigue: -${hpLoss} current HP (${newCurrentHP}/${newMaxHP})`,
+                    ...(levelUp ? [
+                        `🎉 LEVEL UP! ${playerPokemon.pokemon_level || 1} → ${newLevel}!`,
+                        `⭐ Level-up milestone reached at ${newTrainingSessions} training sessions!`
+                    ] : [
+                        `📈 Progress: ${newTrainingSessions < 3 ? `${newTrainingSessions}/3 sessions until next level` : newTrainingSessions < 5 ? `${newTrainingSessions}/5 sessions until next level` : 'Training mastered!'}`
+                    ])
+                ],
+                finalState: {
+                    player: { hp: newCurrentHP, maxHp: newMaxHP }
+                },
+                experience: 20,
+                statGains,
+                hpLoss,
+                newTrainingSessions,
+                levelUp,
+                newLevel,
+                updatedPokemon,
+                metadata: { battleType: 'training', isEnhanced: true }
+            };
+
+        } catch (error) {
+            console.error('❌ NEW TRAINING V2: Error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * LEGACY ALIAS: Redirect old function calls to new V2 function
+     */
+    static async simulateFixedTrainingBattle(battleId, playerPokemon) {
+        console.log('🔄 LEGACY REDIRECT: Calling new V2 function to avoid cache issues');
+        return this.simulateFixedTrainingBattleV2(battleId, playerPokemon);
+    }
+
+
+
+    /**
+     * Update Pokemon stats in the database after training
+     */
+    static async updatePokemonStats(pokemon) {
+        try {
+            console.log('🎯 CHALLENGE-SERVICE: Updating Pokemon stats after training', pokemon);
+
+            const pokemonId = pokemon.pokemon_pokedexid || pokemon.pokemon_pokemonid || pokemon.id;
+            if (!pokemonId) {
+                throw new Error('Pokemon ID not found for stat update');
+            }
+
+            // Prepare update data for Dataverse - EXPLICITLY avoid incorrect field names
+            const updateData = {
+                pokemon_attack: pokemon.pokemon_attack,
+                pokemon_defence: pokemon.pokemon_defence || pokemon.pokemon_Defence || pokemon.defence || pokemon.defense || 15,  // Use correct field, fallback to any defense value
+                pokemon_hpmax: pokemon.pokemon_hpmax,
+                pokemon_hp: pokemon.pokemon_hp,
+                pokemon_level: pokemon.pokemon_level,
+                pokemon_trainingsessions: pokemon.pokemon_trainingsessions,
+                modifiedon: new Date().toISOString()
+            };
+
+            // CRITICAL: Double-check that we're not accidentally including wrong field names
+            if ('pokemon_Defence' in updateData) {
+                console.error('❌ CRITICAL ERROR: Found pokemon_Defence in updateData!');
+                delete updateData.pokemon_Defence;
+            }
+            if ('pokemon_defense' in updateData) {
+                console.error('❌ CRITICAL ERROR: Found pokemon_defense in updateData!');
+                delete updateData.pokemon_defense;
+            }
+
+            // Debug: Check for any incorrect field names in the pokemon object
+            console.log('🔍 CHALLENGE-SERVICE: Checking Pokemon object for field names:');
+            console.log('🔍 pokemon_defence (correct):', pokemon.pokemon_defence);
+            console.log('🔍 pokemon_Defence (incorrect):', pokemon.pokemon_Defence);
+            console.log('🔍 pokemon_defense (incorrect):', pokemon.pokemon_defense);
+            console.log('🔍 All keys containing "defence" or "defense":', Object.keys(pokemon).filter(key => key.toLowerCase().includes('defence') || key.toLowerCase().includes('defense')));
+
+            console.log('🔍 CHALLENGE-SERVICE: Pokemon stat update data:', updateData);
+            console.log('🔍 CHALLENGE-SERVICE: Final update JSON:', JSON.stringify(updateData, null, 2));
+            console.log('🔍 CHALLENGE-SERVICE: Checking for bad field names in JSON:', JSON.stringify(updateData).includes('pokemon_Defence') ? '❌ FOUND pokemon_Defence!' : '✅ No pokemon_Defence found');
+
+            // Get authentication token
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await fetch(`${this.baseUrl}/pokemon_pokedexes(${pokemonId})`, {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: { 
+                    'Authorization': `Bearer ${authUser.token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('🔍 CHALLENGE-SERVICE: Stat update failed with status:', response.status);
+                console.error('🔍 CHALLENGE-SERVICE: Error response:', errorText);
+                throw new Error(`Failed to update Pokemon stats: ${response.status} ${errorText}`);
+            }
+
+            console.log('✅ CHALLENGE-SERVICE: Pokemon stats updated successfully');
+            return true;
+
+        } catch (error) {
+            console.error('❌ CHALLENGE-SERVICE: Error updating Pokemon stats:', error);
+            throw error;
+        }
+    }
+}
