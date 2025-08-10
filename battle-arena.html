@@ -15,39 +15,39 @@
             padding: 0;
         }
 
-        /* Clean navigation buttons - more compact */
+        /* Clean navigation buttons - larger and more mobile-friendly */
         .arena-nav {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             margin-bottom: 20px;
             background: #f8f9fa;
-            border-radius: 10px;
-            padding: 6px;
-            max-width: 320px;
+            border-radius: 12px;
+            padding: 8px;
+            max-width: 400px;
             margin: 0 auto 20px auto;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .arena-nav-btn {
             flex: 1;
-            padding: 12px 6px;
+            padding: 16px 8px;
             border: none;
-            border-radius: 7px;
+            border-radius: 8px;
             background: transparent;
             color: #666;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
-            min-height: 44px; /* Touch-friendly */
+            min-height: 56px; /* Larger touch-friendly size */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            line-height: 1.1;
+            gap: 3px;
+            line-height: 1.2;
         }
         
         .arena-nav-btn.active {
@@ -110,6 +110,12 @@
             background: #f8f9fa;
         }
 
+        .arena-battles-table tbody tr[style*="cursor: pointer"]:hover {
+            background: #e3f2fd;
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+
         .arena-battles-table tbody tr:last-child td {
             border-bottom: none;
         }
@@ -158,6 +164,9 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .status.won {
@@ -173,6 +182,20 @@
         .status.pending {
             background: #fff8e1;
             color: #f57c00;
+        }
+
+        /* Mobile responsive - more compact table */
+        @media (max-width: 768px) {
+            .arena-battles-table th,
+            .arena-battles-table td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+            
+            .arena-action-btn {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
         }
 
         /* Pokemon selection styling */
@@ -205,6 +228,20 @@
         .pokemon-card.selected {
             border-color: #10b981;
             background: #f0fdf4;
+        }
+
+        .pokemon-card.unavailable {
+            border-color: #e0e0e0;
+            background: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .pokemon-card.unavailable:hover {
+            border-color: #e0e0e0;
+            transform: none;
+            box-shadow: none;
+            background: #f8f9fa;
         }
 
         .pokemon-card img {
@@ -437,6 +474,64 @@
             animation: none;
         }
 
+        /* Home navigation button */
+        .home-nav-btn {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        .home-nav-btn:hover {
+            background: #f8f9fa;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .home-nav-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .pokeball-icon {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.2s;
+        }
+
+        .home-nav-btn:hover .pokeball-icon {
+            transform: rotate(10deg);
+        }
+
+        /* Header layout adjustment */
+        .pokemon-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-spacer {
+            width: 48px; /* Match home button width for balanced layout */
+        }
+
+        .pokemon-title {
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+
         /* Empty states */
         .arena-empty {
             color: #666;
@@ -483,20 +578,20 @@
             color: #666;
         }
 
-        /* Mobile responsive - keep buttons side by side */
+        /* Mobile responsive - larger buttons for better touch experience */
         @media (max-width: 768px) {
             .arena-nav {
-                gap: 4px;
-                max-width: 300px;
-                margin: 0 auto 18px auto;
-                padding: 4px;
+                gap: 6px;
+                max-width: 360px;
+                margin: 0 auto 20px auto;
+                padding: 6px;
             }
             
             .arena-nav-btn {
-                padding: 8px 4px;
-                font-size: 11px;
-                min-height: 48px; /* Touch-friendly size */
-                gap: 1px;
+                padding: 18px 6px;
+                font-size: 13px;
+                min-height: 64px; /* Even larger on mobile */
+                gap: 2px;
             }
             
             .challenge-types {
@@ -515,6 +610,17 @@
             
             .arena-battles-table {
                 min-width: 500px;
+            }
+            
+            .arena-battles-table th,
+            .arena-battles-table td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+            
+            .arena-action-btn {
+                padding: 4px 8px;
+                font-size: 11px;
             }
         }
 
@@ -545,6 +651,186 @@
         .notification-info {
             background: linear-gradient(135deg, #007bff, #0056b3);
         }
+
+        /* Training Battle Results Modal */
+        .training-results-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .training-results-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .training-results-header h3 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .training-results-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .training-results-body {
+            padding: 32px 24px;
+        }
+
+        .battle-participants {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .participant {
+            text-align: center;
+            flex: 1;
+        }
+
+        .participant-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 12px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            border: 3px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .participant.player .participant-avatar {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .participant.ai .participant-avatar {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .participant h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .participant p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .vs-indicator {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-gains {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-gains h4 {
+            margin: 0 0 16px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .stat-gain-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stat-gain-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stat-change {
+            font-weight: 600;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        .training-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 24px;
+            color: #856404;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .training-results-footer {
+            padding: 0 24px 24px 24px;
+        }
+
+        .continue-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
     </style>
 </head>
 <body class="pokemon-game-body">
@@ -552,14 +838,11 @@
         <!-- Clean Header -->
         <header class="pokemon-header">
             <div class="pokemon-header-content">
-                <div class="arena-logo">⚔️</div>
-                <h1 class="pokemon-title">Battle Arena</h1>
-                <div class="trainer-info">
-                    <div class="trainer-name" id="trainerName">Welcome, Trainer!</div>
-                    <div class="pokemon-stats">
-                        <span>Ready to Battle!</span>
-                    </div>
-                </div>
+                <button class="home-nav-btn" onclick="window.location.href='index.html'" title="Go Home">
+                    <img src="assets/pokeball.svg" alt="Home" class="pokeball-icon">
+                </button>
+                <h1 class="pokemon-title">⚔️ Battle Arena</h1>
+                <div class="header-spacer"></div>
             </div>
         </header>
 
@@ -611,12 +894,11 @@
                                 <th>Pokemon</th>
                                 <th>Level</th>
                                 <th>HP</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="challengesTableBody">
                             <tr>
-                                <td colspan="5" class="arena-empty">Loading challenges...</td>
+                                <td colspan="4" class="arena-empty">Loading challenges...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -660,15 +942,13 @@
                     <table class="arena-battles-table">
                         <thead>
                             <tr>
-                                <th>Opponent</th>
-                                <th>Your Pokemon</th>
+                                <th>Battle Details</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
                             <tr>
-                                <td colspan="4" class="arena-empty">Loading battle history...</td>
+                                <td colspan="2" class="arena-empty">Loading battle history...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -710,11 +990,54 @@
                 </div>
             </div>
         </div>
+
+        <!-- Training Battle Results Modal -->
+        <div id="trainingResultsModal" class="modal-overlay" style="display: none;">
+            <div class="training-results-modal">
+                <div class="training-results-header">
+                    <h3>🏆 Training Complete!</h3>
+                    <p>Your Pokemon has grown stronger</p>
+                </div>
+                <div class="training-results-body">
+                    <div class="battle-participants">
+                        <div class="participant player">
+                            <div class="participant-avatar" id="playerPokemonAvatar">🔹</div>
+                            <h4 id="playerPokemonName">Your Pokemon</h4>
+                            <p>Level <span id="playerPokemonLevel">1</span></p>
+                        </div>
+                        <div class="vs-indicator">VS</div>
+                        <div class="participant ai">
+                            <div class="participant-avatar" id="aiPokemonAvatar">🤖</div>
+                            <h4 id="aiPokemonName">AI Opponent</h4>
+                            <p>Level <span id="aiPokemonLevel">1</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-gains">
+                        <h4>💪 Stat Improvements</h4>
+                        <div id="statGainsList">
+                            <!-- Stat gains will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="training-note">
+                        <strong>Training Session Complete!</strong><br>
+                        Your Pokemon battled against an AI opponent and gained valuable experience.
+                    </div>
+                </div>
+                <div class="training-results-footer">
+                    <button class="continue-btn" onclick="closeTrainingResults()">
+                        Continue Training
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
     <script src="auth.js"></script>
     <script src="portal-settings-service.js"></script>
+    <script src="battle-service.js"></script>
     <script src="battle-challenge-service.js"></script>
     <script src="pokemon-service.js"></script>
     <script>
@@ -744,8 +1067,6 @@
                     // Set up event listeners
                     this.setupEventListeners();
                     
-                    // Update trainer name
-                    this.updateTrainerName();
                 } catch (error) {
                     console.error('Failed to initialize Battle Arena:', error);
                     this.showError('Failed to initialize battle arena. Please refresh the page.');
@@ -814,9 +1135,23 @@
                     // Load user's Pokemon using the new service pattern
                     console.log('BATTLE-ARENA: Loading user Pokemon...');
                     const allUserPokemon = await PokemonService.getCaughtPokemon(user.email);
-                    this.userPokemon = allUserPokemon.filter(p => !p.hp || p.hp > 0); // Only healthy Pokemon
                     
-                    console.log('BATTLE-ARENA: Loaded', this.userPokemon.length, 'healthy Pokemon');
+                    // Keep ALL Pokemon for display, but we'll mark unavailable ones in the modal
+                    this.userPokemon = allUserPokemon;
+                    
+                    console.log('BATTLE-ARENA: Loaded', this.userPokemon.length, 'total Pokemon');
+                    
+                    // Debug: Log training sessions for each Pokemon
+                    this.userPokemon.forEach((pokemon, index) => {
+                        console.log(`🎯 BATTLE-ARENA: Pokemon ${index + 1}:`, {
+                            fullObject: pokemon,
+                            name: pokemon.pokemon_name || pokemon.name,
+                            trainingSessions: pokemon.pokemon_trainingsessions,
+                            level: pokemon.pokemon_level || pokemon.level,
+                            hp: pokemon.pokemon_hp || pokemon.hp,
+                            maxHp: pokemon.pokemon_hpmax || pokemon.maxHP
+                        });
+                    });
                     
                 } catch (error) {
                     console.error('BATTLE-ARENA: Failed to load user data:', error);
@@ -824,11 +1159,57 @@
                 }
             }
 
-            updateTrainerName() {
-                const trainerNameEl = document.getElementById('trainerName');
-                const user = AuthService.getCurrentUser();
-                if (user && trainerNameEl) {
-                    trainerNameEl.textContent = `Welcome, ${user.name || user.email}!`;
+            async getActiveBattlePokemon() {
+                if (!this.userId) return [];
+                
+                try {
+                    console.log('BATTLE-ARENA: Checking for Pokemon in active battles...');
+                    
+                    const authUser = AuthService.getCurrentUser();
+                    if (!authUser || !authUser.token) {
+                        return [];
+                    }
+
+                    // Get active battles where user is player 1 or player 2
+                    // statuscode 1 = Open, 895550002 = In Progress (active battles)
+                    const url = `${BattleChallengeService.baseUrl}/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.userId}' or _pokemon_player2_value eq '${this.userId}') and (statuscode eq 1 or statuscode eq 895550002) and statecode eq 0&$select=_pokemon_player1pokemon_value,_pokemon_player2pokemon_value`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        credentials: 'omit',
+                        headers: {
+                            'Authorization': `Bearer ${authUser.token}`,
+                            'Content-Type': 'application/json',
+                            'X-User-Email': authUser.email
+                        }
+                    });
+
+                    if (!response.ok) {
+                        console.error('BATTLE-ARENA: Failed to get active battles:', response.status);
+                        return [];
+                    }
+
+                    const data = await response.json();
+                    const activeBattles = data.value || [];
+                    
+                    // Extract Pokemon IDs that are in active battles
+                    const activePokemonIds = new Set();
+                    activeBattles.forEach(battle => {
+                        if (battle._pokemon_player1pokemon_value) {
+                            activePokemonIds.add(battle._pokemon_player1pokemon_value);
+                        }
+                        if (battle._pokemon_player2pokemon_value) {
+                            activePokemonIds.add(battle._pokemon_player2pokemon_value);
+                        }
+                    });
+                    
+                    console.log('BATTLE-ARENA: Found', activePokemonIds.size, 'Pokemon in active battles:', Array.from(activePokemonIds));
+                    return Array.from(activePokemonIds);
+                    
+                } catch (error) {
+                    console.error('BATTLE-ARENA: Error checking active battles:', error);
+                    return [];
                 }
             }
 
@@ -917,35 +1298,89 @@
                 try {
                     console.log('BATTLE-ARENA: Loading user battles for:', this.userId);
                     
-                    // Get authenticated user
+                    // Get authenticated user with enhanced error checking
                     const authUser = AuthService.getCurrentUser();
-                    if (!authUser || !authUser.token) {
-                        throw new Error('Authentication required');
+                    console.log('BATTLE-ARENA: Auth user check:', { 
+                        hasUser: !!authUser, 
+                        hasToken: !!(authUser?.token),
+                        hasAccessToken: !!(authUser?.accessToken),
+                        email: authUser?.email 
+                    });
+                    
+                    if (!authUser) {
+                        throw new Error('User not authenticated');
+                    }
+                    
+                    // Try both token fields to ensure compatibility
+                    const token = authUser.token || authUser.accessToken;
+                    if (!token) {
+                        throw new Error('No authentication token found');
                     }
 
-                    // Load user's battles with proper authentication
-                    const url = `${BattleChallengeService.baseUrl}/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.userId}' or _pokemon_player2_value eq '${this.userId}') and statuscode ne 1&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id)),pokemon_Player2Pokemon($expand=pokemon_Pokemon($select=pokemon_name,pokemon_id))&$orderby=modifiedon desc`;
+                    // Load ALL user battles first, then filter client-side if needed
+                    // Remove the restrictive challengetype filter to see all battles
+                    const url = `${BattleChallengeService.baseUrl}/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.userId}' or _pokemon_player2_value eq '${this.userId}')&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($select=pokemon_name),pokemon_Player2Pokemon($select=pokemon_name),pokemon_WinnerPokemon($select=pokemon_name),pokemon_LooserPokemon($select=pokemon_name)&$orderby=createdon desc&$top=50`;
+                    
+                    console.log('BATTLE-ARENA: Making request to:', url);
+                    console.log('BATTLE-ARENA: Using token:', token.substring(0, 20) + '...');
                     
                     const response = await fetch(url, {
                         method: 'GET',
                         mode: 'cors',
                         credentials: 'omit',
                         headers: {
-                            'Authorization': `Bearer ${authUser.token}`,
+                            'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
                             'X-User-Email': authUser.email
                         }
                     });
 
                     if (!response.ok) {
+                        console.error('BATTLE-ARENA: User battles request failed:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            url: url
+                        });
+                        
+                        // If 401, try to refresh authentication
+                        if (response.status === 401) {
+                            console.log('BATTLE-ARENA: 401 error, attempting to refresh authentication...');
+                            try {
+                                const refreshedUser = await AuthService.checkAuth();
+                                if (refreshedUser && refreshedUser.token) {
+                                    console.log('BATTLE-ARENA: Authentication refreshed, retrying request...');
+                                    
+                                    // Retry the request with refreshed token
+                                    const retryResponse = await fetch(url, {
+                                        method: 'GET',
+                                        mode: 'cors',
+                                        credentials: 'omit',
+                                        headers: {
+                                            'Authorization': `Bearer ${refreshedUser.token}`,
+                                            'Content-Type': 'application/json',
+                                            'X-User-Email': refreshedUser.email
+                                        }
+                                    });
+                                    
+                                    if (retryResponse.ok) {
+                                        const retryData = await retryResponse.json();
+                                        const allBattles = retryData.value || [];
+                                        this.processBattleHistory(allBattles);
+                                        return; // Success on retry
+                                    }
+                                }
+                            } catch (refreshError) {
+                                console.error('BATTLE-ARENA: Authentication refresh failed:', refreshError);
+                            }
+                        }
+                        
                         throw new Error(`Failed to load user battles: ${response.status} ${response.statusText}`);
                     }
 
                     const data = await response.json();
-                    this.userBattles = data.value || [];
+                    const allBattles = data.value || [];
                     
-                    console.log('BATTLE-ARENA: Loaded', this.userBattles.length, 'user battles');
-                    this.renderBattleHistory();
+                    this.processBattleHistory(allBattles);
                 } catch (error) {
                     console.error('BATTLE-ARENA: Failed to load battle history:', error);
                     this.showError(`Failed to load battle history: ${error.message}`);
@@ -954,33 +1389,68 @@
                 }
             }
 
+            processBattleHistory(allBattles) {
+                // Client-side filtering: Include all PvP battles (completed + open)
+                // Keep battles where:
+                // 1. challengetype is 1 (PvP) or null/undefined (assume PvP)
+                // 2. OR statuscode is 1 (Open) - regardless of challengetype (for open battles waiting for opponents)
+                this.userBattles = allBattles.filter(battle => {
+                    const challengeType = battle.pokemon_challengetype;
+                    const isOpen = battle.statuscode === 1; // Open status
+                    const isPvP = challengeType === 1 || challengeType === null || challengeType === undefined;
+                    
+                    // Include if it's PvP OR if it's an open battle (could be waiting for opponent)
+                    return isPvP || isOpen;
+                });
+                
+                console.log('BATTLE-ARENA: Loaded', allBattles.length, 'total battles, filtered to', this.userBattles.length, 'PvP/Open battles');
+                console.log('BATTLE-ARENA: All battles details:', allBattles.map(b => ({
+                    id: b.pokemon_battleid, 
+                    type: b.pokemon_challengetype, 
+                    status: b.statuscode,
+                    isOpen: b.statuscode === 1,
+                    player1: b._pokemon_player1_value === this.userId ? 'ME' : 'OTHER',
+                    player2: b._pokemon_player2_value
+                })));
+                console.log('BATTLE-ARENA: Filtered battles:', this.userBattles.map(b => ({
+                    id: b.pokemon_battleid,
+                    type: b.pokemon_challengetype,
+                    status: b.statuscode
+                })));
+                this.renderBattleHistory();
+            }
+
             renderChallenges() {
                 const tbody = document.getElementById('challengesTableBody');
                 tbody.innerHTML = '';
 
                 if (this.battles.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="arena-empty">No open challenges found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="arena-empty">No open challenges found.</td></tr>';
                     return;
                 }
 
                 this.battles.forEach(battle => {
                     const row = document.createElement('tr');
+                    row.style.cursor = 'pointer';
+                    row.onclick = () => this.joinBattle(battle.pokemon_battleid);
+                    
                     const trainerName = battle.pokemon_Player1?.firstname || 'Unknown';
                     const pokemonName = battle.pokemon_Player1Pokemon?.pokemon_name || 'Unknown';
                     const pokemonLevel = battle.pokemon_Player1Pokemon?.pokemon_level || battle.pokemon_Player1Pokemon?.level || '1';
-                    const pokemonHP = battle.pokemon_Player1Pokemon?.pokemon_hp || '?';
-                    const pokemonMaxHP = battle.pokemon_Player1Pokemon?.pokemon_hpmax || '?';
+                    
+                    // Handle HP values properly - show actual values, not fallbacks
+                    const pokemonHP = battle.pokemon_Player1Pokemon?.pokemon_hp !== undefined ? 
+                        battle.pokemon_Player1Pokemon.pokemon_hp : 
+                        (battle.pokemon_Player1Pokemon?.hp !== undefined ? battle.pokemon_Player1Pokemon.hp : '?');
+                    const pokemonMaxHP = battle.pokemon_Player1Pokemon?.pokemon_hpmax !== undefined ? 
+                        battle.pokemon_Player1Pokemon.pokemon_hpmax : 
+                        (battle.pokemon_Player1Pokemon?.maxHP !== undefined ? battle.pokemon_Player1Pokemon.maxHP : '?');
 
                     row.innerHTML = `
                         <td>${trainerName}</td>
                         <td>${pokemonName}</td>
                         <td>Lv. ${pokemonLevel}</td>
                         <td>${pokemonHP}/${pokemonMaxHP} HP</td>
-                        <td>
-                            <button class="arena-action-btn" onclick="battleArena.joinBattle('${battle.pokemon_battleid}')">
-                                Join Battle
-                            </button>
-                        </td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -991,44 +1461,179 @@
                 tbody.innerHTML = '';
 
                 if (this.userBattles.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="arena-empty">No battle history found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="2" class="arena-empty">No PvP battle history found. Create an open challenge to battle other players!</td></tr>';
                     return;
                 }
 
                 this.userBattles.forEach(battle => {
                     const row = document.createElement('tr');
-                    const opponent = battle.pokemon_Player2?.firstname || 'AI';
-                    const myPokemon = battle.pokemon_Player1Pokemon?.pokemon_Pokemon?.pokemon_name || 'Unknown';
-                    const result = this.getBattleResult(battle);
+                    
+                    // Determine if user is player 1 or player 2
+                    const isPlayer1 = battle._pokemon_player1_value === this.userId;
+                    const opponent = isPlayer1 ? 
+                        (battle.pokemon_Player2?.firstname || 'Waiting for opponent') : 
+                        (battle.pokemon_Player1?.firstname || 'Unknown');
+                    
+                    const myPokemon = isPlayer1 ? 
+                        (battle.pokemon_Player1Pokemon?.pokemon_name || 'Unknown') :
+                        (battle.pokemon_Player2Pokemon?.pokemon_name || 'Unknown');
+                    
+                    // Simplified status logic - only Open, Won, Lost
+                    let statusDisplay = '';
+                    let isClickable = false;
+                    
+                    if (battle.statuscode === 1) {
+                        // Open battle waiting for opponent - not clickable for the creator
+                        statusDisplay = '<span class="status pending">Open</span>';
+                        isClickable = false;
+                    } else if (battle.pokemon_battleresultjson || battle.pokemon_battleresult || battle.pokemon_WinnerPokemon || battle.pokemon_LooserPokemon) {
+                        // Completed battle - determine win/loss using multiple methods
+                        const result = this.getBattleResultForUser(battle, isPlayer1);
+                        if (result === 'won') {
+                            statusDisplay = '<span class="status won">Won</span>';
+                        } else if (result === 'lost') {
+                            statusDisplay = '<span class="status lost">Lost</span>';
+                        } else {
+                            // If we can't determine result, treat as lost for simplicity
+                            statusDisplay = '<span class="status lost">Lost</span>';
+                        }
+                        isClickable = true;
+                    } else {
+                        // No result data - assume lost
+                        statusDisplay = '<span class="status lost">Lost</span>';
+                        isClickable = true;
+                    }
 
+                    // Make completed battles clickable
+                    if (isClickable) {
+                        row.style.cursor = 'pointer';
+                        row.onclick = () => this.viewBattleResult(battle.pokemon_battleid);
+                    }
+
+                    // Compact row with opponent and Pokemon on same line
                     row.innerHTML = `
-                        <td>${opponent}</td>
-                        <td>${myPokemon}</td>
-                        <td><span class="status ${result.toLowerCase()}">${result}</span></td>
                         <td>
-                            ${(battle.pokemon_battleresultjson || battle.pokemon_battleresult) ? 
-                                `<button class="arena-action-btn" onclick="battleArena.viewBattleResult('${battle.pokemon_battleid}')">View Result</button>` : 
-                                'Pending'
-                            }
+                            <div style="font-weight: 600; color: #333;">${opponent}</div>
+                            <div style="font-size: 12px; color: #666;">vs ${myPokemon}</div>
                         </td>
+                        <td>${statusDisplay}</td>
                     `;
                     tbody.appendChild(row);
                 });
             }
 
+            getBattleResultForUser(battle, isPlayer1) {
+                // Determine battle result from the perspective of the current user
+                try {
+                    console.log('BATTLE-ARENA: Analyzing battle result for:', {
+                        battleId: battle.pokemon_battleid,
+                        isPlayer1: isPlayer1,
+                        hasResultJSON: !!battle.pokemon_battleresultjson,
+                        hasResult: !!battle.pokemon_battleresult,
+                        hasWinnerPokemon: !!battle.pokemon_WinnerPokemon,
+                        hasLooserPokemon: !!battle.pokemon_LooserPokemon,
+                        statuscode: battle.statuscode
+                    });
+                    
+                    // Method 1: Check new winner/loser Pokemon fields first
+                    if (battle.pokemon_WinnerPokemon || battle.pokemon_LooserPokemon) {
+                        const myPokemon = isPlayer1 ? 
+                            (battle.pokemon_Player1Pokemon?.pokemon_name || battle._pokemon_player1pokemon_value) :
+                            (battle.pokemon_Player2Pokemon?.pokemon_name || battle._pokemon_player2pokemon_value);
+                        
+                        const winnerPokemonName = battle.pokemon_WinnerPokemon?.pokemon_name;
+                        const looserPokemonName = battle.pokemon_LooserPokemon?.pokemon_name;
+                        
+                        console.log('BATTLE-ARENA: Winner/Loser check:', {
+                            myPokemon: myPokemon,
+                            winnerPokemon: winnerPokemonName,
+                            looserPokemon: looserPokemonName
+                        });
+                        
+                        // Check if my Pokemon is the winner
+                        if (winnerPokemonName && myPokemon && winnerPokemonName.toLowerCase() === myPokemon.toLowerCase()) {
+                            return 'won';
+                        }
+                        
+                        // Check if my Pokemon is the loser
+                        if (looserPokemonName && myPokemon && looserPokemonName.toLowerCase() === myPokemon.toLowerCase()) {
+                            return 'lost';
+                        }
+                        
+                        // If we have winner/loser data but can't match, still indicate completion
+                        if (winnerPokemonName || looserPokemonName) {
+                            console.log('BATTLE-ARENA: Has winner/loser data but could not match to user Pokemon');
+                            // Default assumption based on which field is populated
+                            return winnerPokemonName ? 'lost' : 'won'; 
+                        }
+                    }
+                    
+                    // Method 2: Try to parse battle result JSON 
+                    let battleResultData = null;
+                    if (battle.pokemon_battleresultjson) {
+                        try {
+                            battleResultData = JSON.parse(battle.pokemon_battleresultjson);
+                            console.log('BATTLE-ARENA: Parsed battle result JSON:', battleResultData);
+                        } catch (e) {
+                            console.warn('BATTLE-ARENA: Failed to parse battle result JSON:', e);
+                        }
+                    }
+                    
+                    // If we have battle result data, determine winner
+                    if (battleResultData && battleResultData.winner) {
+                        const winner = battleResultData.winner.toLowerCase();
+                        console.log('BATTLE-ARENA: Battle winner from JSON:', winner, 'User is player1:', isPlayer1);
+                        
+                        if (winner === 'player1' || winner === 'player') {
+                            return isPlayer1 ? 'won' : 'lost';
+                        } else if (winner === 'player2' || winner === 'opponent') {
+                            return isPlayer1 ? 'lost' : 'won';
+                        }
+                    }
+                    
+                    // Method 3: Try simple text result field
+                    if (battle.pokemon_battleresult) {
+                        const result = battle.pokemon_battleresult.toLowerCase();
+                        console.log('BATTLE-ARENA: Battle result text:', result);
+                        
+                        if (result.includes('player1') || (result.includes('player') && !result.includes('player2'))) {
+                            return isPlayer1 ? 'won' : 'lost';
+                        } else if (result.includes('player2') || result.includes('opponent')) {
+                            return isPlayer1 ? 'lost' : 'won';
+                        } else if (result.includes('win') || result.includes('victory')) {
+                            // If it just says "win" or "victory", assume it's from player 1 perspective
+                            return isPlayer1 ? 'won' : 'lost';
+                        } else if (result.includes('loss') || result.includes('defeat')) {
+                            // If it just says "loss" or "defeat", assume it's from player 1 perspective
+                            return isPlayer1 ? 'lost' : 'won';
+                        }
+                    }
+                    
+                    // Check if battle is completed but no clear result
+                    if (battle.statuscode !== 1 && battle.statuscode !== 895550002) {
+                        console.log('BATTLE-ARENA: Battle completed but no clear winner data');
+                        return 'completed';
+                    }
+                    
+                    console.log('BATTLE-ARENA: Could not determine battle result');
+                    return 'unknown';
+                    
+                } catch (error) {
+                    console.error('BATTLE-ARENA: Error determining battle result:', error);
+                    return 'error';
+                }
+            }
+
             getBattleResult(battle) {
-                // Determine battle result based on battle data
+                // Legacy method - kept for compatibility
                 if (!battle.pokemon_battleresultjson && !battle.pokemon_battleresult) {
                     return 'Pending';
                 }
-                
-                // This would need to be implemented based on your battle result data structure
-                // For now, return a placeholder
                 return 'Completed';
             }
 
             // Two-step challenge creation (like React version)
-            startCreateChallenge(challengeType) {
+            async startCreateChallenge(challengeType) {
                 console.log('BATTLE-ARENA: Starting create challenge flow:', challengeType);
                 this.selectedChallengeType = challengeType;
                 
@@ -1036,14 +1641,14 @@
                 const modalTitle = document.getElementById('modalTitle');
                 modalTitle.textContent = `Select a Pokemon for ${challengeType === 'training' ? 'Training Battle' : 'Open Challenge'}`;
                 
-                // Render Pokemon in modal
-                this.renderPokemonInModal();
-                
-                // Show modal
+                // Show modal first
                 document.getElementById('pokemonSelectModal').style.display = 'flex';
+                
+                // Render Pokemon in modal (async to check availability)
+                await this.renderPokemonInModal();
             }
 
-            renderPokemonInModal() {
+            async renderPokemonInModal() {
                 const selector = document.getElementById('pokemonSelectorModal');
                 
                 if (this.userPokemon.length === 0) {
@@ -1057,43 +1662,245 @@
                     return;
                 }
 
+                // Show loading while checking active battles
+                selector.innerHTML = `
+                    <div class="pokemon-loading">
+                        <img src="assets/pokeball.svg" alt="Loading..." class="pokemon-spinner" style="width: 48px; height: 48px;">
+                        <p>Checking Pokemon availability...</p>
+                    </div>
+                `;
+
+                // Get Pokemon that are currently in active battles
+                const activePokemonIds = await this.getActiveBattlePokemon();
+                
                 selector.innerHTML = '';
+                
+                // Add status summary at the top
+                const statusSummary = document.createElement('div');
+                statusSummary.style.cssText = 'background: #f8f9fa; border-radius: 8px; padding: 12px; margin-bottom: 16px; text-align: center; font-size: 14px; color: #666;';
+                
+                // Count Pokemon by status
+                const availableCount = this.userPokemon.filter(p => {
+                    const pokemonId = p.pokemon_pokemonid || p.contactId || p.id;
+                    const isInBattle = activePokemonIds.includes(pokemonId);
+                    const hp = p.hp !== undefined ? p.hp : (p.pokemon_hp !== undefined ? p.pokemon_hp : 0);
+                    const isFainted = hp <= 0;
+                    return !isInBattle && !isFainted;
+                }).length;
+                
+                const inBattleCount = this.userPokemon.filter(p => {
+                    const pokemonId = p.pokemon_pokemonid || p.contactId || p.id;
+                    return activePokemonIds.includes(pokemonId);
+                }).length;
+                
+                const faintedCount = this.userPokemon.filter(p => {
+                    const hp = p.hp !== undefined ? p.hp : (p.pokemon_hp !== undefined ? p.pokemon_hp : (p.currentHP !== undefined ? p.currentHP : 0));
+                    return hp <= 0;
+                }).length;
+                
+                statusSummary.innerHTML = `
+                    <strong>Pokemon Status:</strong> 
+                    <span style="color: #28a745;">✅ ${availableCount} Available</span> • 
+                    <span style="color: #e74c3c;">⚔️ ${inBattleCount} In Battle</span> • 
+                    <span style="color: #6c757d;">💀 ${faintedCount} Fainted</span>
+                `;
+                
+                selector.appendChild(statusSummary);
+                
+                // Pokemon name to ID mapping for sprites (comprehensive list for Gen 1)
+                const pokemonNameToId = {
+                    'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3,
+                    'charmander': 4, 'charmeleon': 5, 'charizard': 6,
+                    'squirtle': 7, 'wartortle': 8, 'blastoise': 9,
+                    'caterpie': 10, 'metapod': 11, 'butterfree': 12,
+                    'weedle': 13, 'kakuna': 14, 'beedrill': 15,
+                    'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
+                    'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
+                    'ekans': 23, 'arbok': 24, 'pikachu': 25, 'raichu': 26,
+                    'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
+                    'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34,
+                    'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
+                    'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
+                    'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
+                    'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
+                    'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
+                    'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
+                    'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
+                    'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
+                    'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
+                    'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
+                    'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
+                    'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
+                    'farfetchd': 83, 'doduo': 84, 'dodrio': 85, 'seel': 86,
+                    'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
+                    'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94,
+                    'onix': 95, 'drowzee': 96, 'hypno': 97, 'krabby': 98,
+                    'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
+                    'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106,
+                    'hitmonchan': 107, 'lickitung': 108, 'koffing': 109, 'weezing': 110,
+                    'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
+                    'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118,
+                    'seaking': 119, 'staryu': 120, 'starmie': 121, 'mr. mime': 122,
+                    'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
+                    'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130,
+                    'lapras': 131, 'ditto': 132, 'eevee': 133, 'vaporeon': 134,
+                    'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
+                    'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142,
+                    'snorlax': 143, 'articuno': 144, 'zapdos': 145, 'moltres': 146,
+                    'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
+                    'mew': 151
+                };
+                
                 this.userPokemon.forEach(pokemon => {
                     const card = document.createElement('div');
-                    card.className = 'pokemon-card';
-                    card.onclick = () => this.selectPokemonInModal(pokemon);
+                    
+                    // Check Pokemon status
+                    const pokemonId = pokemon.pokemon_pokemonid || pokemon.contactId || pokemon.id;
+                    const isInActiveBattle = activePokemonIds.includes(pokemonId);
+                    
+                    // Check if Pokemon is fainted - get both current HP and max HP
+                    const pokemonHP = pokemon.hp !== undefined ? pokemon.hp : 
+                                     (pokemon.currentHP !== undefined ? pokemon.currentHP : 0);
+                    const pokemonMaxHP = pokemon.maxHP !== undefined ? pokemon.maxHP : 
+                                        (pokemon.maxHp !== undefined ? pokemon.maxHp : pokemonHP);
+                    const isFainted = pokemonHP <= 0;
+                    
+                    // Determine availability and status
+                    const isUnavailable = isInActiveBattle || isFainted;
+                    let statusText = '';
+                    let statusColor = '';
+                    
+                    if (isInActiveBattle) {
+                        statusText = '⚔️ In Battle';
+                        statusColor = '#e74c3c';
+                    } else if (isFainted) {
+                        statusText = '💀 Fainted';
+                        statusColor = '#6c757d';
+                    }
+                    
+                    card.className = isUnavailable ? 'pokemon-card unavailable' : 'pokemon-card';
+                    
+                    if (!isUnavailable) {
+                        card.onclick = () => this.selectPokemonInModal(pokemon);
+                    }
                     
                     // Handle both new and legacy data formats
-                    const pokemonName = pokemon.name || pokemon.pokemon_Pokemon?.pokemon_name || 'Unknown';
-                    const pokemonId = pokemon.pokedexid || pokemon.pokedexId || pokemon.pokemon_pokedexid || '1';
-                    const pokemonHP = pokemon.hp || pokemon.currentHP || pokemon.maxHP || pokemon.pokemon_hp || '???';
+                    const pokemonName = pokemon.name || pokemon.pokemon_pokemon?.pokemon_name || 'Unknown';
+                    
+                    // Get the actual Pokemon sprite ID - try multiple sources
+                    let pokemonSpriteId = pokemon.pokemonSpriteId || pokemon.pokemon_pokemon?.pokemon_id;
+                    
+                    // If expand didn't work, try name-based lookup
+                    if (!pokemonSpriteId && pokemonName) {
+                        pokemonSpriteId = pokemonNameToId[pokemonName.toLowerCase()];
+                    }
+                    
+                    // Only proceed if we have a valid Pokemon ID
+                    if (!pokemonSpriteId) {
+                        console.error(`POKEMON-MODAL: No Pokemon ID found for ${pokemonName}`, pokemon);
+                        return; // Skip this Pokemon if we can't determine its ID
+                    }
+                    
+                    // Get HP and level values properly
+                    const pokemonLevel = pokemon.level !== undefined ? pokemon.level : 
+                                        (pokemon.pokemon_level !== undefined ? pokemon.pokemon_level : '?');
                     
                     // Generate image URL from Pokemon ID
-                    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
+                    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonSpriteId}.png`;
+                    
+                    console.log(`🔍 BATTLE-ARENA: Pokemon ${pokemonName} ALL FIELDS:`, Object.keys(pokemon));
+                    console.log(`🔍 BATTLE-ARENA: Pokemon ${pokemonName} FULL OBJECT:`, pokemon);
+                    
+                    // Get training session info - ONLY use pokemon_trainingsessions field
+                    const trainingSessions = pokemon.pokemon_trainingsessions || 0;
+                    const maxSessions = 5;
+                    const canTrain = trainingSessions < maxSessions;
+                    
+                    console.log(`🎯 BATTLE-ARENA: Pokemon ${pokemonName} training sessions:`, {
+                        pokemon_trainingsessions: pokemon.pokemon_trainingsessions,
+                        trainingSessions: trainingSessions,
+                        training_sessions: pokemon.training_sessions,
+                        rawValue: pokemon.pokemon_trainingsessions,
+                        allFields: Object.keys(pokemon),
+                        fullPokemonObject: pokemon
+                    });
+                    
+                    // Training session indicator - show for all challenge types
+                    let trainingIndicator = '';
+                    if (this.selectedChallengeType === 'training') {
+                        // For training battles, show if can train or reached max
+                        if (canTrain) {
+                            trainingIndicator = `<p style="color: #28a745; font-weight: bold; font-size: 11px; margin: 2px 0;">⚡ Training: ${trainingSessions}/${maxSessions}</p>`;
+                        } else {
+                            trainingIndicator = `<p style="color: #ffc107; font-weight: bold; font-size: 11px; margin: 2px 0;">🔒 Max</p>`;
+                        }
+                    } else {
+                        // For open challenges, just show training progress as info
+                        trainingIndicator = `<p style="color: #6c757d; font-weight: normal; font-size: 11px; margin: 2px 0;">📚 Training: ${trainingSessions}/${maxSessions}</p>`;
+                    }
                     
                     card.innerHTML = `
                         <img src="${imageUrl}" alt="${pokemonName}" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="pokemon-placeholder" style="display:none; width:60px; height:60px; background:#f0f0f0; border-radius:8px; align-items:center; justify-content:center; color:#666; font-size:24px;">?</div>
-                        <h4>${pokemonName}</h4>
-                        <p>HP: ${pokemonHP}</p>
-                        <p>Level: ${pokemon.level || '1'}</p>
+                             onerror="console.error('Failed to load Pokemon image:', '${imageUrl}'); this.style.display='none';"
+                             ${isUnavailable ? 'style="opacity: 0.5; filter: grayscale(50%);"' : ''}>
+                        <h4 ${isUnavailable ? 'style="color: #999;"' : ''}>${pokemonName}</h4>
+                        <p ${isUnavailable ? 'style="color: #999;"' : ''}>HP: ${pokemonHP}/${pokemonMaxHP}</p>
+                        <p ${isUnavailable ? 'style="color: #999;"' : ''}>Level: ${pokemonLevel}</p>
+                        ${trainingIndicator}
+                        ${statusText ? `<p style="color: ${statusColor}; font-weight: bold; font-size: 12px; margin: 4px 0 0 0;">${statusText}</p>` : ''}
                     `;
                     
                     selector.appendChild(card);
                 });
                 
-                console.log('BATTLE-ARENA: Rendered', this.userPokemon.length, 'Pokemon in modal');
+                // Count available vs unavailable Pokemon
+                const finalAvailableCount = this.userPokemon.filter(p => {
+                    const pokemonId = p.pokemon_pokemonid || p.contactId || p.id;
+                    const isInBattle = activePokemonIds.includes(pokemonId);
+                    const hp = p.hp !== undefined ? p.hp : (p.pokemon_hp !== undefined ? p.pokemon_hp : 0);
+                    const isFainted = hp <= 0;
+                    return !isInBattle && !isFainted;
+                }).length;
+                
+                console.log('BATTLE-ARENA: Rendered', this.userPokemon.length, 'Pokemon in modal (', finalAvailableCount, 'available,', (this.userPokemon.length - finalAvailableCount), 'unavailable)');
             }
 
             selectPokemonInModal(pokemon) {
+                console.log('🎯 BATTLE-ARENA: Selecting Pokemon:', pokemon);
+                
+                // Check if Pokemon is available (not in active battle and not fainted)
+                const card = event.target.closest('.pokemon-card');
+                if (card.classList.contains('unavailable')) {
+                    console.log('BATTLE-ARENA: Cannot select Pokemon - unavailable');
+                    
+                    // Determine specific reason for unavailability
+                    const pokemonHP = pokemon.hp !== undefined ? pokemon.hp : 
+                                     (pokemon.pokemon_hp !== undefined ? pokemon.pokemon_hp : 0);
+                    
+                    if (pokemonHP <= 0) {
+                        this.showNotification('This Pokemon has fainted and cannot battle. Visit a Pokemon Center to heal!', 'error');
+                    } else {
+                        this.showNotification('This Pokemon is currently in an active battle and cannot be selected.', 'error');
+                    }
+                    return;
+                }
+                
+                // Additional check for training battles - check training session limit
+                if (this.selectedChallengeType === 'training') {
+                    const trainingSessions = pokemon.pokemon_trainingsessions || 0;
+                    if (trainingSessions >= 5) {
+                        this.showNotification('This Pokemon has reached the maximum training sessions (5/5). Choose a different Pokemon for training.', 'warning');
+                        return;
+                    }
+                }
+                
                 // Remove previous selection
                 document.querySelectorAll('#pokemonSelectorModal .pokemon-card').forEach(card => {
                     card.classList.remove('selected');
                 });
                 
                 // Add selection to clicked card
-                event.target.closest('.pokemon-card').classList.add('selected');
+                card.classList.add('selected');
                 
                 this.selectedPokemon = pokemon;
                 
@@ -1123,11 +1930,6 @@
                     const button = document.getElementById('confirmChallengeBtn');
                     button.disabled = true;
                     button.textContent = 'Creating...';
-
-                    const authUser = AuthService.getCurrentUser();
-                    if (!authUser || !authUser.token) {
-                        throw new Error('Authentication required');
-                    }
                     
                     // Get Pokemon ID - handle different data formats
                     const pokemonId = this.selectedPokemon.pokemon_pokemonid || 
@@ -1142,37 +1944,34 @@
                         throw new Error('User ID not found');
                     }
 
-                    // Create battle record in pokemon_battles table
-                    const battleData = {
-                        'pokemon_challengetype': this.selectedChallengeType === 'training' ? 2 : 1, // 2 = training, 1 = pvp
-                        'statuscode': 1, // Open/Active status
-                        'statecode': 0, // Active state
-                        'pokemon_Player1@odata.bind': `/contacts(${this.userId})`,
-                        'pokemon_Player1Pokemon@odata.bind': `/pokemon_pokedexes(${pokemonId})`
-                    };
-
-                    console.log('BATTLE-ARENA: Creating battle with data:', battleData);
-
-                    const url = `${BattleChallengeService.baseUrl}/pokemon_battles`;
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        mode: 'cors',
-                        credentials: 'omit',
-                        headers: {
-                            'Authorization': `Bearer ${authUser.token}`,
-                            'Content-Type': 'application/json',
-                            'X-User-Email': authUser.email
-                        },
-                        body: JSON.stringify(battleData)
+                    console.log('BATTLE-ARENA: Creating challenge using BattleChallengeService:', {
+                        playerId: this.userId,
+                        pokemonId: pokemonId,
+                        challengeType: this.selectedChallengeType
                     });
 
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Battle creation failed: ${response.status} - ${errorText}`);
+                    // For training, skip battle creation and directly train Pokemon
+                    if (this.selectedChallengeType === 'training') {
+                        console.log('BATTLE-ARENA: Starting training session (no battle record)');
+                        const trainingResult = await BattleChallengeService.trainPokemon(this.selectedPokemon);
+                        this.showTrainingResults(trainingResult);
+                        this.closePokemonModal();
+                        return; // Skip battle creation flow
                     }
 
-                    const result = await response.json();
+                    // For PvP battles, create actual battle record
+                    const result = await BattleChallengeService.createChallenge(
+                        this.userId,
+                        pokemonId,
+                        this.selectedChallengeType
+                    );
+
+                    if (!result.success) {
+                        throw new Error(result.error || 'Failed to create challenge');
+                    }
+
                     console.log('BATTLE-ARENA: Battle created successfully:', result);
+                    this.showNotification('Challenge created successfully!', 'success');
                     
                     this.closePokemonModal();
                     
@@ -1182,9 +1981,6 @@
                     
                     // Switch to challenges view to show the new challenge
                     this.switchView('challenges');
-                    
-                    // Show success message
-                    this.showNotification('Challenge created successfully!', 'success');
 
                 } catch (error) {
                     console.error('BATTLE-ARENA: Challenge creation error:', error);
@@ -1195,6 +1991,8 @@
                     button.textContent = 'Confirm Challenge';
                 }
             }
+
+
 
             async joinBattle(battleId) {
                 if (!this.userId) {
@@ -1260,6 +2058,228 @@
                     }
                 }, 5000);
             }
+
+            showTrainingResults(battleResult) {
+                if (!battleResult) return;
+                
+                console.log('🎭 BATTLE-ARENA: Showing training results:', battleResult);
+                console.log('🔍 HP DEBUG: Battle result HP data:', {
+                    hpLoss: battleResult.hpLoss,
+                    finalPlayerState: battleResult.finalState?.player,
+                    finalPlayerHP: battleResult.finalState?.player?.hp,
+                    originalHP: battleResult.finalState?.player?.originalHp
+                });
+                
+                const modal = document.getElementById('trainingResultsModal');
+                
+                // Update player Pokemon info
+                const playerPokemon = this.selectedPokemon;
+                console.log('🎭 BATTLE-ARENA: Selected Pokemon object:', playerPokemon);
+                const playerPokemonName = playerPokemon.pokemon_name || playerPokemon.name || 'Your Pokemon';
+                const playerPokemonLevel = playerPokemon.pokemon_level || playerPokemon.level || '1';
+                
+                document.getElementById('playerPokemonName').textContent = playerPokemon.pokemon_nickname || playerPokemonName;
+                document.getElementById('playerPokemonLevel').textContent = playerPokemonLevel;
+                
+                // Set player Pokemon avatar (use first letter of name)
+                const playerAvatar = document.getElementById('playerPokemonAvatar');
+                const playerName = playerPokemonName;
+                console.log('🖼️ BATTLE-ARENA: Setting player Pokemon image for:', playerName);
+                const playerPokemonId = this.getPokemonIdFromName(playerName);
+                console.log('🖼️ BATTLE-ARENA: Player Pokemon ID found:', playerPokemonId);
+                if (playerPokemonId) {
+                    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${playerPokemonId}.png`;
+                    console.log('🖼️ BATTLE-ARENA: Loading player image from:', imageUrl);
+                    playerAvatar.innerHTML = `<img src="${imageUrl}" alt="${playerName}" style="width: 60px; height: 60px; object-fit: contain;" onerror="console.error('Failed to load player Pokemon image:', this.src); this.style.display='none'; this.parentElement.textContent='${playerName.charAt(0).toUpperCase()}';">`;
+                } else {
+                    console.log('🖼️ BATTLE-ARENA: No Pokemon ID found, using text fallback');
+                    playerAvatar.textContent = playerName.charAt(0).toUpperCase();
+                }
+                
+                // Update AI opponent info (from battle result)
+                const opponentData = battleResult.finalState?.opponent || { name: 'Training Bot', level: 1 };
+                document.getElementById('aiPokemonName').textContent = opponentData.name || 'Training Bot';
+                document.getElementById('aiPokemonLevel').textContent = opponentData.level || '1';
+                
+                // Set AI opponent avatar
+                const aiAvatar = document.getElementById('aiPokemonAvatar');
+                const opponentPokemonId = opponentData.pokemonId || this.getPokemonIdFromName(opponentData.name);
+                if (opponentPokemonId) {
+                    aiAvatar.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${opponentPokemonId}.png" alt="${opponentData.name}" style="width: 60px; height: 60px; object-fit: contain;">`;
+                } else {
+                    aiAvatar.textContent = '🤖';
+                }
+                
+                // Update stat gains
+                const statGainsList = document.getElementById('statGainsList');
+                statGainsList.innerHTML = '';
+                
+                if (battleResult.statGains) {
+                    const gains = battleResult.statGains;
+                    
+                    // Attack gain
+                    if (gains.attack > 0) {
+                        const attackItem = document.createElement('div');
+                        attackItem.className = 'stat-gain-item';
+                        attackItem.innerHTML = `
+                            <span class="stat-name">⚔️ Attack</span>
+                            <span class="stat-change">+${gains.attack}</span>
+                        `;
+                        statGainsList.appendChild(attackItem);
+                    }
+                    
+                    // Defense gain
+                    if (gains.defense > 0) {
+                        const defenseItem = document.createElement('div');
+                        defenseItem.className = 'stat-gain-item';
+                        defenseItem.innerHTML = `
+                            <span class="stat-name">🛡️ Defense</span>
+                            <span class="stat-change">+${gains.defense}</span>
+                        `;
+                        statGainsList.appendChild(defenseItem);
+                    }
+                    
+                    // HP gain
+                    if (gains.hp > 0) {
+                        const hpItem = document.createElement('div');
+                        hpItem.className = 'stat-gain-item';
+                        hpItem.innerHTML = `
+                            <span class="stat-name">❤️ Max HP</span>
+                            <span class="stat-change">+${gains.hp}</span>
+                        `;
+                        statGainsList.appendChild(hpItem);
+                    }
+                    
+                    // HP loss from training - calculate correct current HP
+                    if (battleResult.hpLoss > 0) {
+                        const finalPlayerState = battleResult.finalState?.player || {};
+                        // Use the correctly calculated current HP from the battle result
+                        const currentHp = finalPlayerState.hp || 0;
+                        const hpLossItem = document.createElement('div');
+                        hpLossItem.className = 'stat-gain-item';
+                        hpLossItem.innerHTML = `
+                            <span class="stat-name">💔 Current HP</span>
+                            <span class="stat-change negative">-${battleResult.hpLoss} (now ${currentHp})</span>
+                        `;
+                        statGainsList.appendChild(hpLossItem);
+                    }
+                    
+                    // Training sessions
+                    if (battleResult.newTrainingSessions !== undefined) {
+                        const sessionsItem = document.createElement('div');
+                        sessionsItem.className = 'stat-gain-item';
+                        sessionsItem.innerHTML = `
+                            <span class="stat-name">📚 Training Sessions</span>
+                            <span class="stat-change">${battleResult.newTrainingSessions}/5</span>
+                        `;
+                        statGainsList.appendChild(sessionsItem);
+                    }
+                    
+                    // Level up notification
+                    if (battleResult.levelUp && battleResult.newLevel) {
+                        const levelUpItem = document.createElement('div');
+                        levelUpItem.className = 'stat-gain-item';
+                        levelUpItem.style.backgroundColor = '#fff3cd';
+                        levelUpItem.style.borderRadius = '6px';
+                        levelUpItem.style.padding = '8px';
+                        levelUpItem.innerHTML = `
+                            <span class="stat-name">🌟 Level Up!</span>
+                            <span class="stat-change" style="color: #856404; font-weight: bold;">Level ${battleResult.newLevel}</span>
+                        `;
+                        statGainsList.appendChild(levelUpItem);
+                    }
+                }
+                
+                // Show the modal
+                modal.style.display = 'flex';
+                
+                // Update the user Pokemon data with the new stats to ensure UI reflects changes
+                if (battleResult.updatedPokemon && this.selectedPokemon) {
+                    const pokemonIndex = this.userPokemon.findIndex(p => {
+                        const pokemonId = p.pokemon_pokemonid || p.contactId || p.id;
+                        const selectedId = this.selectedPokemon.pokemon_pokemonid || this.selectedPokemon.contactId || this.selectedPokemon.id;
+                        return pokemonId === selectedId;
+                    });
+                    
+                    if (pokemonIndex !== -1) {
+                        // Update the Pokemon in our local array
+                        this.userPokemon[pokemonIndex] = {
+                            ...this.userPokemon[pokemonIndex],
+                            ...battleResult.updatedPokemon
+                        };
+                        console.log('🔄 BATTLE-ARENA: Updated local Pokemon data with training results');
+                    }
+                }
+                
+                // Close the Pokemon selection modal
+                this.closePokemonModal();
+            }
+
+            closeTrainingResults() {
+                document.getElementById('trainingResultsModal').style.display = 'none';
+                
+                // Force refresh user data to show updated stats and training sessions
+                this.loadUserData().then(() => {
+                    console.log('🔄 BATTLE-ARENA: User data refreshed after training');
+                    // Re-render Pokemon modal if it's open to show updated stats
+                    const pokemonModal = document.getElementById('pokemonSelectModal');
+                    if (pokemonModal.style.display === 'flex') {
+                        console.log('🔄 BATTLE-ARENA: Re-rendering Pokemon modal with fresh data');
+                        this.renderPokemonInModal();
+                    }
+                });
+                
+                // Show success notification
+                this.showNotification('Training complete! Your Pokemon has grown stronger!', 'success');
+            }
+
+            getPokemonIdFromName(pokemonName) {
+                // Pokemon name to ID mapping for sprites (comprehensive list for Gen 1)
+                const pokemonNameToId = {
+                    'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3, 'charmander': 4, 'charmeleon': 5, 'charizard': 6,
+                    'squirtle': 7, 'wartortle': 8, 'blastoise': 9, 'caterpie': 10, 'metapod': 11, 'butterfree': 12,
+                    'weedle': 13, 'kakuna': 14, 'beedrill': 15, 'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
+                    'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22, 'ekans': 23, 'arbok': 24,
+                    'pikachu': 25, 'raichu': 26, 'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
+                    'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34, 'clefairy': 35, 'clefable': 36,
+                    'vulpix': 37, 'ninetales': 38, 'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
+                    'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46, 'parasect': 47, 'venonat': 48,
+                    'venomoth': 49, 'diglett': 50, 'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
+                    'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58, 'arcanine': 59, 'poliwag': 60,
+                    'poliwhirl': 61, 'poliwrath': 62, 'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
+                    'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70, 'victreebel': 71, 'tentacool': 72,
+                    'tentacruel': 73, 'geodude': 74, 'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
+                    'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82, 'farfetch\'d': 83, 'doduo': 84,
+                    'dodrio': 85, 'seel': 86, 'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
+                    'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94, 'onix': 95, 'drowzee': 96,
+                    'hypno': 97, 'krabby': 98, 'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
+                    'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106, 'hitmonchan': 107, 'lickitung': 108,
+                    'koffing': 109, 'weezing': 110, 'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
+                    'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118, 'seaking': 119, 'staryu': 120,
+                    'starmie': 121, 'mr. mime': 122, 'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
+                    'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130, 'lapras': 131, 'ditto': 132,
+                    'eevee': 133, 'vaporeon': 134, 'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
+                    'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142, 'snorlax': 143, 'articuno': 144,
+                    'zapdos': 145, 'moltres': 146, 'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
+                    'mew': 151
+                };
+                
+                if (!pokemonName) {
+                    console.log('🖼️ BATTLE-ARENA: No Pokemon name provided');
+                    return null;
+                }
+                
+                const lowerName = pokemonName.toLowerCase().trim();
+                const pokemonId = pokemonNameToId[lowerName];
+                
+                console.log('🖼️ BATTLE-ARENA: Looking up Pokemon:', {
+                    originalName: pokemonName,
+                    lowerName: lowerName,
+                    foundId: pokemonId
+                });
+                
+                return pokemonId || null;
+            }
         }
 
         // Global functions for onclick handlers
@@ -1285,6 +2305,10 @@
 
         function confirmCreateChallenge() {
             window.battleArena.confirmCreateChallenge();
+        }
+
+        function closeTrainingResults() {
+            window.battleArena.closeTrainingResults();
         }
 
         // Initialize when page loads

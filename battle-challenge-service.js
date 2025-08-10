@@ -709,4 +709,230 @@ class BattleChallengeService {
             throw error;
         }
     }
+
+    /**
+     * CLEAN Training simulation - NO BATTLE RECORDS - Just stat updates
+     */
+    static async simulateFixedTrainingBattle(battleId, playerPokemon) {
+        try {
+            console.log('🎯 TRAINING: Starting training session (no battle record)', { sessions: playerPokemon.pokemon_trainingsessions || 0 });
+
+            // Check training session limit
+            const currentSessions = playerPokemon.pokemon_trainingsessions || 0;
+            if (currentSessions >= 5) {
+                throw new Error('Pokemon has reached maximum training sessions (5/5). Your Pokemon has mastered its training!');
+            }
+            
+            const currentHP = playerPokemon.pokemon_hp || playerPokemon.hp || 50;
+            const maxHP = playerPokemon.pokemon_hpmax || playerPokemon.maxHP || 50;
+            
+            // Calculate HP loss and stat gains
+            const hpLoss = Math.floor(maxHP * (0.1 + Math.random() * 0.15));
+            const newCurrentHP = Math.max(1, currentHP - hpLoss);
+            
+            const statGains = {
+                attack: Math.floor(1 + Math.random() * 3),
+                defense: Math.floor(1 + Math.random() * 3),
+                hp: Math.floor(2 + Math.random() * 4)
+            };
+
+            const newMaxHP = maxHP + statGains.hp;
+            const newTrainingSessions = currentSessions + 1;
+
+            // LEVEL UP LOGIC - NO FALLBACKS, USE EXACT DATABASE VALUES
+            let levelUp = false;
+            let newLevel = playerPokemon.pokemon_level || playerPokemon.level; // Check both field names
+            
+            console.log(`🔍 LEVEL CHECK: ${currentSessions} → ${newTrainingSessions} sessions, current level: ${newLevel}`);
+            console.log(`🔍 POKEMON DATA:`, {
+                name: playerPokemon.pokemon_name || playerPokemon.name,
+                id: playerPokemon.pokemon_pokedexid || playerPokemon.id,
+                level_pokemon_level: playerPokemon.pokemon_level,
+                level_level: playerPokemon.level,
+                final_level: newLevel,
+                sessions: playerPokemon.pokemon_trainingsessions
+            });
+            
+            // DEBUG: Log the actual Pokemon level value and type
+            console.log(`🔍 RAW LEVEL DATA:`, {
+                pokemon_level_field: playerPokemon.pokemon_level,
+                level_field: playerPokemon.level,
+                level_type: typeof newLevel,
+                exact_value: newLevel
+            });
+            
+            // Level up at session milestones: 3 sessions and 5 sessions
+            if (newTrainingSessions === 3 && currentSessions === 2) {
+                newLevel += 1; // INCREMENT current level
+                levelUp = true;
+                console.log(`🎉 LEVEL UP: Level ${playerPokemon.pokemon_level || playerPokemon.level} → ${newLevel} (reached 3 sessions)`);
+            } else if (newTrainingSessions === 5 && currentSessions === 4) {
+                newLevel += 1; // INCREMENT current level
+                levelUp = true;
+                console.log(`🎉 LEVEL UP: Level ${playerPokemon.pokemon_level || playerPokemon.level} → ${newLevel} (reached 5 sessions)`);
+            } else {
+                console.log(`📊 NO LEVEL UP: Current milestone - need 2→3 sessions or 4→5 sessions for level up`);
+            }
+
+            // Calculate new stats
+            const originalAttack = playerPokemon.pokemon_attack || playerPokemon.attack || 20;
+            const originalDefense = playerPokemon.pokemon_defence || playerPokemon.defence || playerPokemon.defense || 15;
+            
+            const newAttack = originalAttack + statGains.attack;
+            const newDefense = originalDefense + statGains.defense;
+
+            // Create updated Pokemon object with CORRECT FIELD NAMES
+            const updatedPokemon = {
+                ...playerPokemon,
+                pokemon_attack: newAttack,
+                pokemon_defence: newDefense,  // CORRECT: pokemon_defence with 'c'
+                pokemon_hpmax: newMaxHP,
+                pokemon_hp: newCurrentHP,
+                pokemon_level: newLevel,
+                pokemon_trainingsessions: newTrainingSessions
+            };
+
+            console.log(`📊 RESULT: Level ${playerPokemon.pokemon_level || 1}→${newLevel}, Sessions ${currentSessions}→${newTrainingSessions}, Level Up: ${levelUp}`);
+            
+            console.log('🔍 TRAINING: Before database update - Pokemon data:', {
+                pokemonId: playerPokemon.pokemon_pokedexid || playerPokemon.id,
+                originalLevel: playerPokemon.pokemon_level,
+                newLevel: newLevel,
+                originalSessions: currentSessions,
+                newSessions: newTrainingSessions,
+                levelUpOccurred: levelUp
+            });
+
+            // Debug Pokemon object structure
+            console.log('🔍 TRAINING: Pokemon object keys:', Object.keys(playerPokemon));
+            console.log('🔍 TRAINING: Pokemon ID fields:', {
+                pokemon_pokedexid: playerPokemon.pokemon_pokedexid,
+                pokemon_id: playerPokemon.pokemon_id,
+                id: playerPokemon.id
+            });
+
+            // Save to database
+            await this.updatePokemonStats(updatedPokemon);
+
+            // Return training result (NO BATTLE DATA)
+            return {
+                battleId: 'training-session', // Dummy ID for compatibility
+                winner: 'training',
+                battleSteps: [],
+                battleLog: [
+                    `🥊 Training completed! (Session ${newTrainingSessions}/5)`,
+                    `💪 Stat Gains: +${statGains.attack} ATK, +${statGains.defense} DEF, +${statGains.hp} Max HP`,
+                    `😤 Training Fatigue: -${hpLoss} current HP (${newCurrentHP}/${newMaxHP})`,
+                    ...(levelUp ? [
+                        `🎉 LEVEL UP! ${playerPokemon.pokemon_level || 1} → ${newLevel}!`,
+                        `⭐ Level-up milestone reached at ${newTrainingSessions} training sessions!`
+                    ] : [
+                        `📈 Progress: ${newTrainingSessions < 3 ? `${newTrainingSessions}/3 sessions until next level` : newTrainingSessions < 5 ? `${newTrainingSessions}/5 sessions until next level` : 'Training mastered!'}`
+                    ])
+                ],
+                finalState: {
+                    player: { hp: newCurrentHP, maxHp: newMaxHP },
+                    opponent: { 
+                        name: 'Training Bot', 
+                        level: newLevel, 
+                        pokemonId: 25, // Pikachu for training
+                        hp: 1,
+                        maxHp: 50
+                    }
+                },
+                experience: 20,
+                statGains,
+                hpLoss,
+                newTrainingSessions,
+                levelUp,
+                newLevel,
+                updatedPokemon,
+                metadata: { battleType: 'training', isTrainingOnly: true }
+            };
+
+        } catch (error) {
+            console.error('❌ TRAINING ERROR:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Pure training function - no battle records, just Pokemon stat updates
+     */
+    static async trainPokemon(playerPokemon) {
+        // Alias for simulateFixedTrainingBattle but without requiring battleId
+        return this.simulateFixedTrainingBattle('training-session', playerPokemon);
+    }
+
+    /**
+     * Update Pokemon stats in the database
+     */
+    static async updatePokemonStats(pokemon) {
+        try {
+            const authUser = AuthService.getCurrentUser();
+            if (!authUser?.token && !authUser?.accessToken) {
+                throw new Error('Authentication required');
+            }
+
+            // Use token or accessToken, prefer token for consistency with other methods
+            const token = authUser.token || authUser.accessToken;
+            
+            // Find the correct Pokemon ID field
+            const pokemonId = pokemon.pokemon_pokedexid || pokemon.pokemon_id || pokemon.id;
+            
+            if (!pokemonId) {
+                console.error('❌ TRAINING: No Pokemon ID found', pokemon);
+                throw new Error('Pokemon ID is required for database update');
+            }
+            
+            const url = `${this.baseUrl}/pokemon_pokedexes(${pokemonId})`;
+
+            const updateData = {
+                pokemon_attack: pokemon.pokemon_attack,
+                pokemon_defence: pokemon.pokemon_defence,  // CORRECT: pokemon_defence with 'c'
+                pokemon_hp: pokemon.pokemon_hp,
+                pokemon_hpmax: pokemon.pokemon_hpmax,
+                pokemon_level: pokemon.pokemon_level,
+                pokemon_trainingsessions: pokemon.pokemon_trainingsessions
+            };
+
+            console.log('🔄 TRAINING: Database update details:', { 
+                pokemonId, 
+                url,
+                originalPokemon: {
+                    level: pokemon.pokemon_level,
+                    sessions: pokemon.pokemon_trainingsessions,
+                    attack: pokemon.pokemon_attack,
+                    defence: pokemon.pokemon_defence
+                },
+                updateData 
+            });
+
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'X-User-Email': authUser.email,
+                    'OData-MaxVersion': '4.0',
+                    'OData-Version': '4.0',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ TRAINING: Database update failed', { status: response.status, error: errorText, url, updateData });
+                throw new Error(`Failed to update Pokemon stats: ${response.status} - ${errorText}`);
+            }
+
+            console.log('✅ TRAINING: Pokemon stats updated successfully');
+            return true;
+
+        } catch (error) {
+            console.error('❌ TRAINING: Error updating Pokemon stats:', error);
+            throw error;
+        }
+    }
 }
