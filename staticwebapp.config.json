@@ -29,13 +29,63 @@
       "statusCode": 200
     },
     {
-      "route": "/redirect.html",
-      "serve": "/redirect.html",
+      "route": "/choose.html", 
+      "serve": "/choose.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/game-unified.html",
+      "serve": "/game-unified.html", 
+      "statusCode": 200
+    },
+    {
+      "route": "/login.html",
+      "serve": "/login.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/login-simple.html",
+      "serve": "/login-simple.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/mobile-safe.html",
+      "serve": "/mobile-safe.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/battle-arena.html",
+      "serve": "/battle-arena.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/battle-join.html",
+      "serve": "/battle-join.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/battle-result.html", 
+      "serve": "/battle-result.html",
       "statusCode": 200
     },
     {
       "route": "/catch-pokemon.html",
       "serve": "/catch-pokemon.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/pokemon-unified.html",
+      "serve": "/pokemon-unified.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/my-pokemon.html",
+      "serve": "/my-pokemon.html",
+      "statusCode": 200
+    },
+    {
+      "route": "/redirect.html",
+      "serve": "/redirect.html",
       "statusCode": 200
     },
     {
@@ -68,7 +118,7 @@
     },
     {
       "route": "/*",
-      "serve": "/index.html",
+      "serve": "/choose.html",
       "statusCode": 200
     }
   ],
