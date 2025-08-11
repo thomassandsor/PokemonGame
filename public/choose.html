@@ -133,7 +133,7 @@
             </div>
 
             <div class="option">
-                <h3>💻 Desktop Experience (React)</h3>
+                <h3>💻 Desktop Experience</h3>
                 <p><strong>Best for:</strong> Computers, fast connections, full features</p>
                 <ul style="text-align: left; margin: 15px 0;">
                     <li>🎨 Rich animations & UI</li>
@@ -183,7 +183,7 @@
             else if (userAgent.includes('Firefox')) browser = 'Firefox';
             else if (userAgent.includes('Edge')) browser = 'Edge';
 
-            const recommended = isMobile ? 'Mobile-Optimized (HTML)' : 'Desktop Experience (React)';
+            const recommended = isMobile ? 'Mobile-Optimized (HTML)' : 'Desktop Experience';
 
             document.getElementById('deviceInfo').innerHTML = `
                 📱 Device: ${device} | 🌐 Browser: ${browser}<br>
@@ -226,7 +226,7 @@
         // Log for debugging
         console.log('🎮 Pokemon Game - Choose Your Experience');
         console.log('📱 Mobile users will be auto-redirected to optimized version');
-        console.log('💻 Desktop users get the full React experience');
+        console.log('💻 Desktop users get the full Pokemon Game experience');
     </script>
 </body>
 </html>

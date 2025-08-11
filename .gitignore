@@ -9,15 +9,7 @@ local.settings.json
 .env.local
 .env.production.local
 
-# Legacy React files (moved to legacy-react folder)
-/legacy-react/build
-/legacy-react/node_modules
-
-# Duplicate HTML development folder (files moved to root)
-/html-version/
-
-# dependencies
-/node_modules
+# Dependencies (Azure Functions API only)
 /api/node_modules
 /.pnp
 .pnp.js
@@ -25,8 +17,8 @@ local.settings.json
 # testing
 /coverage
 
-# production
-/build
+# production (Azure Functions only)
+/api/build
 
 # misc
 .DS_Store
@@ -34,9 +26,9 @@ local.settings.json
 .env.test.local
 .env
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Logs
+logs
+*.log
 
 # IDE
 .vscode/
