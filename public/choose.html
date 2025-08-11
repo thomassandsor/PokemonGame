@@ -116,6 +116,16 @@
             <h3>🤖 Smart Auto-Detection</h3>
             <p>We'll automatically choose the best version for your device!</p>
             <a href="/" class="button primary">Auto-Detect Best Version</a>
+            
+            <!-- Quick Login Option -->
+            <div id="quickLoginOption" style="display: none; margin-top: 20px; padding: 15px; background: rgba(40, 167, 69, 0.3); border-radius: 10px;">
+                <p style="margin: 0 0 10px 0;">🚀 <strong>Welcome back!</strong></p>
+                <button id="quickLoginBtn" class="button" style="background: #28a745; margin: 5px;">
+                    Continue as <span id="lastUserName">User</span>
+                </button>
+                <br>
+                <a href="/login-simple.html" style="color: #ffd700; font-size: 14px;">More login options</a>
+            </div>
         </div>
 
         <div class="options">
@@ -220,6 +230,28 @@
 
         // Initialize
         detectDevice();
+        checkQuickLogin();
+
+        // Quick login functionality
+        function checkQuickLogin() {
+            const lastUser = localStorage.getItem('pokemonGame_lastUser');
+            const rememberMe = localStorage.getItem('pokemonGame_rememberMe');
+            
+            if (lastUser && rememberMe === 'true') {
+                try {
+                    const userData = JSON.parse(lastUser);
+                    document.getElementById('lastUserName').textContent = userData.name || userData.email.split('@')[0];
+                    document.getElementById('quickLoginOption').style.display = 'block';
+                    
+                    document.getElementById('quickLoginBtn').onclick = function() {
+                        // Redirect to simple login for quick authentication
+                        window.location.href = '/login-simple.html';
+                    };
+                } catch (error) {
+                    console.error('Error with stored user data:', error);
+                }
+            }
+        }
 
         // Log for debugging
         console.log('🎮 Pokemon Game - Choose Your Experience');

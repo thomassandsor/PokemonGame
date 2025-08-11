@@ -34,6 +34,8 @@ namespace PokemonGame.Api.OAuth
             // Check if request is coming from localhost (for development)
             var query = HttpUtility.ParseQueryString(req.Url.Query);
             var devMode = query["dev"] == "true";
+            var rememberMe = query["remember"] == "true";
+            var loginHint = query["login_hint"];
             
             // Build Microsoft OAuth URL
             var state = devMode ? "localhost" : Guid.NewGuid().ToString(); // Use "localhost" as state for dev mode
@@ -43,6 +45,18 @@ namespace PokemonGame.Api.OAuth
                 "&response_type=code" +
                 "&scope=openid%20profile%20email%20User.Read" +
                 $"&state={state}";
+            
+            // Add login hint if provided (helps skip account selection)
+            if (!string.IsNullOrEmpty(loginHint))
+            {
+                microsoftAuthUrl += $"&login_hint={HttpUtility.UrlEncode(loginHint)}";
+            }
+            
+            // Add prompt=none for returning users if remember me is set
+            if (rememberMe && !string.IsNullOrEmpty(loginHint))
+            {
+                microsoftAuthUrl += "&prompt=none";
+            }
 
             var response = req.CreateResponse(HttpStatusCode.Redirect);
             response.Headers.Add("Location", microsoftAuthUrl);

@@ -33,14 +33,29 @@ class AuthService {
     }
 
     // Set authenticated user and store in session
-    static setAuthenticatedUser(user) {
-        console.log('AUTH: Setting authenticated user:', user);
+    static setAuthenticatedUser(user, rememberMe = false) {
+        console.log('AUTH: Setting authenticated user:', user, 'Remember me:', rememberMe);
         this.currentUser = user;
         this.isAuthenticatedFlag = true;
         
-        // Store in sessionStorage for persistence
+        // Store in sessionStorage for current session
         sessionStorage.setItem('pokemonGame_user', JSON.stringify(user));
         sessionStorage.setItem('pokemonGame_authenticated', 'true');
+        
+        // If remember me is enabled, also store in localStorage for persistence
+        if (rememberMe) {
+            localStorage.setItem('pokemonGame_lastUser', JSON.stringify({
+                email: user.email,
+                name: user.name,
+                provider: user.provider || 'microsoft'
+            }));
+            localStorage.setItem('pokemonGame_rememberMe', 'true');
+            
+            // Store token for extended sessions (if available)
+            if (user.token) {
+                localStorage.setItem('pokemonGame_token', user.token);
+            }
+        }
         
         console.log('AUTH: User authentication complete');
     }
@@ -163,6 +178,9 @@ class AuthService {
         // Clear local storage too (just in case)
         localStorage.removeItem('pokemonGame_user');
         localStorage.removeItem('pokemonGame_authenticated');
+        localStorage.removeItem('pokemonGame_lastUser');
+        localStorage.removeItem('pokemonGame_rememberMe');
+        localStorage.removeItem('pokemonGame_token');
         
         // Clear any other Pokemon-related storage
         Object.keys(sessionStorage).forEach(key => {

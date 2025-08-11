@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Game - Quick Login</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            max-width: 350px;
+            width: 100%;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #ffd700;
+        }
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 15px 0;
+            background: #0078d4;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .login-btn:hover {
+            background: #106ebe;
+            transform: translateY(-2px);
+        }
+        .guest-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .guest-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .quick-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin: 20px 0;
+            line-height: 1.4;
+        }
+        .divider {
+            margin: 25px 0;
+            position: relative;
+            text-align: center;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .divider span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0 15px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🎮 Pokemon Game</h1>
+        
+        <!-- Quick Login for Returning Users -->
+        <div id="quickLoginSection" style="display: none;">
+            <p style="color: #90ee90; font-weight: bold;">Welcome back!</p>
+            <button id="quickLoginBtn" class="login-btn">
+                ⚡ Continue as <span id="lastUserName">User</span>
+            </button>
+            <p style="font-size: 12px; margin-top: 10px;">
+                <a href="#" id="useNewAccountLink" style="color: #ffd700;">Use different account</a>
+            </p>
+            <div class="divider"><span>or</span></div>
+        </div>
+        
+        <div id="mainLoginSection">
+            <div class="quick-info">
+                One-click login for seminar participants
+            </div>
+            
+            <a href="https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin?remember=true" class="login-btn">
+                🏢 Login with Microsoft
+            </a>
+            
+            <div class="divider"><span>or</span></div>
+            
+            <a href="/game.html" class="login-btn guest-btn">
+                🕹️ Play as Guest
+            </a>
+            
+            <div class="quick-info">
+                Guest mode: Preview only, progress not saved
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for quick login
+        function checkQuickLogin() {
+            const lastUser = localStorage.getItem('pokemonGame_lastUser');
+            const rememberMe = localStorage.getItem('pokemonGame_rememberMe');
+            
+            if (lastUser && rememberMe === 'true') {
+                try {
+                    const userData = JSON.parse(lastUser);
+                    document.getElementById('lastUserName').textContent = userData.name || userData.email.split('@')[0];
+                    document.getElementById('quickLoginSection').style.display = 'block';
+                    
+                    // Quick login handler
+                    document.getElementById('quickLoginBtn').onclick = function() {
+                        const storedToken = localStorage.getItem('pokemonGame_token');
+                        if (storedToken) {
+                            // Try token validation
+                            validateToken(storedToken, userData);
+                        } else {
+                            // Redirect with login hint
+                            const hint = encodeURIComponent(userData.email);
+                            window.location.href = `https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin?remember=true&login_hint=${hint}`;
+                        }
+                    };
+                    
+                    // Different account handler
+                    document.getElementById('useNewAccountLink').onclick = function(e) {
+                        e.preventDefault();
+                        document.getElementById('quickLoginSection').style.display = 'none';
+                    };
+                    
+                } catch (error) {
+                    console.error('Error with stored user data:', error);
+                    localStorage.removeItem('pokemonGame_lastUser');
+                    localStorage.removeItem('pokemonGame_rememberMe');
+                }
+            }
+        }
+        
+        async function validateToken(token, userData) {
+            try {
+                const response = await fetch('https://pokemongame-functions-2025.azurewebsites.net/api/whoami', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    // Restore session
+                    sessionStorage.setItem('pokemonGame_user', JSON.stringify(userData));
+                    sessionStorage.setItem('pokemonGame_authenticated', 'true');
+                    window.location.href = '/game.html';
+                } else {
+                    // Token expired, try OAuth with hint
+                    localStorage.removeItem('pokemonGame_token');
+                    const hint = encodeURIComponent(userData.email);
+                    window.location.href = `https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin?remember=true&login_hint=${hint}`;
+                }
+            } catch (error) {
+                console.error('Token validation failed:', error);
+                const hint = encodeURIComponent(userData.email);
+                window.location.href = `https://pokemongame-functions-2025.azurewebsites.net/api/microsoftlogin?remember=true&login_hint=${hint}`;
+            }
+        }
+        
+        checkQuickLogin();
+    </script>
+</body>
+</html>
