@@ -202,7 +202,7 @@ class AuthService {
 
             // Use the same pattern as other services to fetch contact info
             const baseUrl = 'https://pokemongame-functions-2025.azurewebsites.net/api/dataverse';
-            const contactUrl = `${baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid,firstname,lastname,emailaddress1,pokemon_administrator`;
+            const contactUrl = `${baseUrl}/contacts?$filter=emailaddress1 eq '${email}'&$select=contactid,firstname,lastname,emailaddress1,pokemon_administrator,pokemon_pokeballs,pokemon_berries`;
             
             const response = await fetch(contactUrl, {
                 method: 'GET',
@@ -231,7 +231,9 @@ class AuthService {
             const profile = data.value[0];
             console.log('AUTH: User profile loaded:', {
                 contactid: profile.contactid,
-                isAdmin: profile.pokemon_administrator
+                isAdmin: profile.pokemon_administrator,
+                pokeballs: profile.pokemon_pokeballs,
+                berries: profile.pokemon_berries
             });
 
             return {
@@ -239,7 +241,9 @@ class AuthService {
                 firstname: profile.firstname,
                 lastname: profile.lastname,
                 email: profile.emailaddress1,
-                isAdmin: profile.pokemon_administrator === true
+                isAdmin: profile.pokemon_administrator === true,
+                pokeballs: profile.pokemon_pokeballs || 0,
+                berries: profile.pokemon_berries || 0
             };
 
         } catch (error) {

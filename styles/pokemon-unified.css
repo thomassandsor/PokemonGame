@@ -6,65 +6,7 @@
     margin-bottom: 15px;
 }
 
-/* Home Button Styles - Absolutely positioned to left side */
-.pokemon-home-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    width: 40px;
-    height: 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-}
 
-.pokemon-home-btn:hover {
-    background: rgba(255, 255, 255, 1);
-    border-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.pokeball-icon {
-    width: 20px;
-    height: 20px;
-    transition: all 0.3s ease;
-}
-
-.pokemon-home-btn:hover .pokeball-icon {
-    transform: rotate(15deg);
-}
-
-/* Header Content Layout - Simple centered title */
-.pokemon-header-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-md);
-}
-
-/* Override design system title styles for unified page */
-.pokemon-header .pokemon-title {
-    margin: 0;
-    margin-bottom: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    text-transform: none;
-    letter-spacing: normal;
-    text-transform: none;
-}
 
 /* View Toggle - Full width side by side */
 .view-toggle {
@@ -337,16 +279,15 @@
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-    .pokemon-home-btn {
-        width: 36px;
-        height: 36px;
+    .home-nav-btn {
+        width: 40px;
+        height: 40px;
         padding: 6px;
-        margin-right: 12px;
     }
     
     .pokeball-icon {
-        width: 18px;
-        height: 18px;
+        width: 24px;
+        height: 24px;
     }
     
     .pokemon-section {
@@ -365,16 +306,15 @@
 }
 
 @media (max-width: 480px) {
-    .pokemon-home-btn {
-        width: 32px;
-        height: 32px;
+    .home-nav-btn {
+        width: 36px;
+        height: 36px;
         padding: 4px;
-        margin-right: 10px;
     }
     
     .pokeball-icon {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
     }
     
     .pokemon-section {
@@ -391,7 +331,6 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .pokemon-header-content {
-        flex-direction: column;
         align-items: center;
         text-align: center;
     }

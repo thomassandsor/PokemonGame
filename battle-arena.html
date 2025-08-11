@@ -77,46 +77,33 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            /* Add mobile overflow handling */
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .arena-battles-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
             background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            table-layout: fixed; /* Ensures consistent column widths */
-            min-width: 300px; /* Minimum width to prevent over-compression */
         }
 
         .arena-battles-table thead {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-bottom: 2px solid #dee2e6;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .arena-battles-table th {
-            color: #495057;
+            color: #333;
             font-weight: 600;
             padding: 16px;
-            text-align: left; /* Changed from center to left */
+            text-align: left;
             font-size: 14px;
             border: none;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
         }
 
         .arena-battles-table td {
             padding: 16px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #f0f0f0;
             color: #333;
             font-size: 14px;
-            vertical-align: middle;
-            background: #ffffff;
         }
 
         .arena-battles-table tbody tr:hover {
@@ -129,184 +116,8 @@
             transition: all 0.2s ease;
         }
 
-        /* Alternating row colors for better visual separation */
-        .arena-battles-table tbody tr:nth-child(even) td {
-            background: #f8f9fa;
-        }
-
-        .arena-battles-table tbody tr:nth-child(odd) td {
-            background: #ffffff;
-        }
-
-        .arena-battles-table tbody tr:hover td {
-            background: #e3f2fd !important;
-            box-shadow: inset 0 0 0 1px #90caf9;
-        }
-
         .arena-battles-table tbody tr:last-child td {
             border-bottom: none;
-        }
-
-        /* Enhanced button styling for battle actions */
-        .arena-battles-table button {
-            transition: all 0.2s ease;
-            font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .arena-battles-table button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        /* Mobile responsive table optimizations */
-        @media (max-width: 768px) {
-            .arena-battles-table th,
-            .arena-battles-table td {
-                padding: 6px 4px;
-                font-size: 11px;
-                text-align: left; /* Force left alignment on mobile */
-            }
-            
-            /* Much more aggressive space distribution for mobile */
-            .arena-battles-table th:first-child,
-            .arena-battles-table td:first-child {
-                width: 30%;
-            }
-            
-            .arena-battles-table th:nth-child(2),
-            .arena-battles-table td:nth-child(2) {
-                width: 50%;
-                text-align: center; /* Keep VS section centered */
-            }
-            
-            .arena-battles-table th:last-child,
-            .arena-battles-table td:last-child {
-                width: 20%;
-                text-align: left; /* Left align status */
-            }
-            
-            /* Compact Pokemon images */
-            .arena-battles-table img {
-                width: 32px !important;
-                height: 32px !important;
-            }
-            
-            /* Smaller font sizes for mobile */
-            .arena-battles-table td div {
-                font-size: 10px !important;
-            }
-            
-            /* Compact VS text */
-            .arena-battles-table td:nth-child(2) div {
-                font-size: 14px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .arena-battles-table th,
-            .arena-battles-table td {
-                padding: 4px 2px;
-                font-size: 10px;
-                text-align: left;
-            }
-            
-            /* Ultra compact distribution for small phones */
-            .arena-battles-table th:first-child,
-            .arena-battles-table td:first-child {
-                width: 28%;
-            }
-            
-            .arena-battles-table th:nth-child(2),
-            .arena-battles-table td:nth-child(2) {
-                width: 52%;
-                text-align: center;
-            }
-            
-            .arena-battles-table th:last-child,
-            .arena-battles-table td:last-child {
-                width: 20%;
-                text-align: left;
-            }
-            
-            /* Extra small Pokemon images */
-            .arena-battles-table img {
-                width: 24px !important;
-                height: 24px !important;
-            }
-            
-            /* Tiny buttons for mobile */
-            .arena-battles-table button {
-                padding: 2px 4px !important;
-                font-size: 8px !important;
-                border-radius: 2px !important;
-            }
-            
-            /* Ultra compact text */
-            .arena-battles-table td div {
-                font-size: 9px !important;
-                margin-bottom: 0 !important;
-                line-height: 1.2 !important;
-            }
-            
-            /* Keep VS readable */
-            .arena-battles-table td:nth-child(2) div {
-                font-size: 12px !important;
-            }
-        }
-
-        /* Ultra small screens - iPhone SE, etc */
-        @media (max-width: 360px) {
-            .arena-table-section {
-                margin: 0 -8px; /* Extend to screen edges */
-                border-radius: 0;
-            }
-            
-            .arena-battles-table {
-                font-size: 9px;
-                border-radius: 0;
-            }
-            
-            .arena-battles-table th,
-            .arena-battles-table td {
-                padding: 3px 1px;
-                text-align: left;
-            }
-            
-            /* Maximum compression for tiny screens */
-            .arena-battles-table th:first-child,
-            .arena-battles-table td:first-child {
-                width: 25%;
-            }
-            
-            .arena-battles-table th:nth-child(2),
-            .arena-battles-table td:nth-child(2) {
-                width: 55%;
-                text-align: center;
-            }
-            
-            .arena-battles-table th:last-child,
-            .arena-battles-table td:last-child {
-                width: 20%;
-                text-align: left;
-            }
-            
-            /* Micro images */
-            .arena-battles-table img {
-                width: 20px !important;
-                height: 20px !important;
-            }
-            
-            /* Micro buttons */
-            .arena-battles-table button {
-                padding: 1px 3px !important;
-                font-size: 7px !important;
-            }
-            
-            /* Micro text */
-            .arena-battles-table td div {
-                font-size: 8px !important;
-            }
         }
 
         /* Clean type badges */
@@ -1079,10 +890,10 @@
                     <table class="arena-battles-table">
                         <thead>
                             <tr>
-                                <th>Challenger Pokemon</th>
-                                <th></th>
-                                <th>Your Pokemon</th>
-                                <th></th>
+                                <th>Trainer</th>
+                                <th>Pokemon</th>
+                                <th>Level</th>
+                                <th>HP</th>
                             </tr>
                         </thead>
                         <tbody id="challengesTableBody">
@@ -1131,14 +942,13 @@
                     <table class="arena-battles-table">
                         <thead>
                             <tr>
-                                <th>Your Pokemon</th>
-                                <th>Battle Matchup</th>
+                                <th>Battle Details</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
                             <tr>
-                                <td colspan="3" class="arena-empty">Loading battle history...</td>
+                                <td colspan="2" class="arena-empty">Loading battle history...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1488,126 +1298,68 @@
                 try {
                     console.log('BATTLE-ARENA: Loading user battles for:', this.userId);
                     
-                    // Get authenticated user with enhanced error checking
+                    // Get authenticated user
                     const authUser = AuthService.getCurrentUser();
-                    console.log('BATTLE-ARENA: Auth user check:', { 
-                        hasUser: !!authUser, 
-                        hasToken: !!(authUser?.token),
-                        hasAccessToken: !!(authUser?.accessToken),
-                        email: authUser?.email 
-                    });
-                    
-                    if (!authUser) {
-                        throw new Error('User not authenticated');
-                    }
-                    
-                    // Try both token fields to ensure compatibility
-                    const token = authUser.token || authUser.accessToken;
-                    if (!token) {
-                        throw new Error('No authentication token found');
+                    if (!authUser || !authUser.token) {
+                        throw new Error('Authentication required');
                     }
 
                     // Load ALL user battles first, then filter client-side if needed
                     // Remove the restrictive challengetype filter to see all battles
                     const url = `${BattleChallengeService.baseUrl}/pokemon_battles?$filter=(_pokemon_player1_value eq '${this.userId}' or _pokemon_player2_value eq '${this.userId}')&$expand=pokemon_Player1($select=firstname),pokemon_Player2($select=firstname),pokemon_Player1Pokemon($select=pokemon_name),pokemon_Player2Pokemon($select=pokemon_name),pokemon_WinnerPokemon($select=pokemon_name),pokemon_LooserPokemon($select=pokemon_name)&$orderby=createdon desc&$top=50`;
                     
-                    console.log('BATTLE-ARENA: Making request to:', url);
-                    console.log('BATTLE-ARENA: Using token:', token.substring(0, 20) + '...');
-                    
                     const response = await fetch(url, {
                         method: 'GET',
                         mode: 'cors',
                         credentials: 'omit',
                         headers: {
-                            'Authorization': `Bearer ${token}`,
+                            'Authorization': `Bearer ${authUser.token}`,
                             'Content-Type': 'application/json',
                             'X-User-Email': authUser.email
                         }
                     });
 
                     if (!response.ok) {
-                        console.error('BATTLE-ARENA: User battles request failed:', {
-                            status: response.status,
-                            statusText: response.statusText,
-                            url: url
-                        });
-                        
-                        // If 401, try to refresh authentication
-                        if (response.status === 401) {
-                            console.log('BATTLE-ARENA: 401 error, attempting to refresh authentication...');
-                            try {
-                                const refreshedUser = await AuthService.checkAuth();
-                                if (refreshedUser && refreshedUser.token) {
-                                    console.log('BATTLE-ARENA: Authentication refreshed, retrying request...');
-                                    
-                                    // Retry the request with refreshed token
-                                    const retryResponse = await fetch(url, {
-                                        method: 'GET',
-                                        mode: 'cors',
-                                        credentials: 'omit',
-                                        headers: {
-                                            'Authorization': `Bearer ${refreshedUser.token}`,
-                                            'Content-Type': 'application/json',
-                                            'X-User-Email': refreshedUser.email
-                                        }
-                                    });
-                                    
-                                    if (retryResponse.ok) {
-                                        const retryData = await retryResponse.json();
-                                        const allBattles = retryData.value || [];
-                                        this.processBattleHistory(allBattles);
-                                        return; // Success on retry
-                                    }
-                                }
-                            } catch (refreshError) {
-                                console.error('BATTLE-ARENA: Authentication refresh failed:', refreshError);
-                            }
-                        }
-                        
                         throw new Error(`Failed to load user battles: ${response.status} ${response.statusText}`);
                     }
 
                     const data = await response.json();
                     const allBattles = data.value || [];
                     
-                    this.processBattleHistory(allBattles);
+                    // Client-side filtering: Include all PvP battles (completed + open)
+                    // Keep battles where:
+                    // 1. challengetype is 1 (PvP) or null/undefined (assume PvP)
+                    // 2. OR statuscode is 1 (Open) - regardless of challengetype (for open battles waiting for opponents)
+                    this.userBattles = allBattles.filter(battle => {
+                        const challengeType = battle.pokemon_challengetype;
+                        const isOpen = battle.statuscode === 1; // Open status
+                        const isPvP = challengeType === 1 || challengeType === null || challengeType === undefined;
+                        
+                        // Include if it's PvP OR if it's an open battle (could be waiting for opponent)
+                        return isPvP || isOpen;
+                    });
+                    
+                    console.log('BATTLE-ARENA: Loaded', allBattles.length, 'total battles, filtered to', this.userBattles.length, 'PvP/Open battles');
+                    console.log('BATTLE-ARENA: All battles details:', allBattles.map(b => ({
+                        id: b.pokemon_battleid, 
+                        type: b.pokemon_challengetype, 
+                        status: b.statuscode,
+                        isOpen: b.statuscode === 1,
+                        player1: b._pokemon_player1_value === this.userId ? 'ME' : 'OTHER',
+                        player2: b._pokemon_player2_value
+                    })));
+                    console.log('BATTLE-ARENA: Filtered battles:', this.userBattles.map(b => ({
+                        id: b.pokemon_battleid,
+                        type: b.pokemon_challengetype,
+                        status: b.statuscode
+                    })));
+                    this.renderBattleHistory();
                 } catch (error) {
                     console.error('BATTLE-ARENA: Failed to load battle history:', error);
                     this.showError(`Failed to load battle history: ${error.message}`);
                 } finally {
                     this.showLoading(false);
                 }
-            }
-
-            processBattleHistory(allBattles) {
-                // Client-side filtering: Include all PvP battles (completed + open)
-                // Keep battles where:
-                // 1. challengetype is 1 (PvP) or null/undefined (assume PvP)
-                // 2. OR statuscode is 1 (Open) - regardless of challengetype (for open battles waiting for opponents)
-                this.userBattles = allBattles.filter(battle => {
-                    const challengeType = battle.pokemon_challengetype;
-                    const isOpen = battle.statuscode === 1; // Open status
-                    const isPvP = challengeType === 1 || challengeType === null || challengeType === undefined;
-                    
-                    // Include if it's PvP OR if it's an open battle (could be waiting for opponent)
-                    return isPvP || isOpen;
-                });
-                
-                console.log('BATTLE-ARENA: Loaded', allBattles.length, 'total battles, filtered to', this.userBattles.length, 'PvP/Open battles');
-                console.log('BATTLE-ARENA: All battles details:', allBattles.map(b => ({
-                    id: b.pokemon_battleid, 
-                    type: b.pokemon_challengetype, 
-                    status: b.statuscode,
-                    isOpen: b.statuscode === 1,
-                    player1: b._pokemon_player1_value === this.userId ? 'ME' : 'OTHER',
-                    player2: b._pokemon_player2_value
-                })));
-                console.log('BATTLE-ARENA: Filtered battles:', this.userBattles.map(b => ({
-                    id: b.pokemon_battleid,
-                    type: b.pokemon_challengetype,
-                    status: b.statuscode
-                })));
-                this.renderBattleHistory();
             }
 
             renderChallenges() {
@@ -1619,70 +1371,9 @@
                     return;
                 }
 
-                // Pokemon name to ID mapping for sprites
-                const pokemonNameToId = {
-                    'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3,
-                    'charmander': 4, 'charmeleon': 5, 'charizard': 6,
-                    'squirtle': 7, 'wartortle': 8, 'blastoise': 9,
-                    'caterpie': 10, 'metapod': 11, 'butterfree': 12,
-                    'weedle': 13, 'kakuna': 14, 'beedrill': 15,
-                    'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
-                    'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
-                    'ekans': 23, 'arbok': 24, 'pikachu': 25, 'raichu': 26,
-                    'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
-                    'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34,
-                    'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
-                    'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
-                    'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
-                    'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
-                    'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
-                    'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
-                    'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
-                    'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
-                    'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
-                    'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
-                    'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
-                    'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
-                    'farfetchd': 83, 'doduo': 84, 'dodrio': 85, 'seel': 86,
-                    'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
-                    'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94,
-                    'onix': 95, 'drowzee': 96, 'hypno': 97, 'krabby': 98,
-                    'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
-                    'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106,
-                    'hitmonchan': 107, 'lickitung': 108, 'koffing': 109, 'weezing': 110,
-                    'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
-                    'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118,
-                    'seaking': 119, 'staryu': 120, 'starmie': 121, 'mr. mime': 122,
-                    'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
-                    'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130,
-                    'lapras': 131, 'ditto': 132, 'eevee': 133, 'vaporeon': 134,
-                    'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
-                    'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142,
-                    'snorlax': 143, 'articuno': 144, 'zapdos': 145, 'moltres': 146,
-                    'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
-                    'mew': 151
-                };
-
                 this.battles.forEach(battle => {
                     const row = document.createElement('tr');
-                    row.style.height = '70px'; // Increased height for better spacing
                     row.style.cursor = 'pointer';
-                    row.style.borderBottom = '2px solid #e9ecef'; // Clear separator between battles
-                    row.style.backgroundColor = '#ffffff'; // White background
-                    row.style.transition = 'all 0.2s ease'; // Smooth hover transition
-                    
-                    // Enhanced hover effect for better visual feedback
-                    row.onmouseenter = () => {
-                        row.style.backgroundColor = '#f8f9fa';
-                        row.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                        row.style.transform = 'translateY(-1px)';
-                    };
-                    row.onmouseleave = () => {
-                        row.style.backgroundColor = '#ffffff';
-                        row.style.boxShadow = 'none';
-                        row.style.transform = 'translateY(0)';
-                    };
-                    
                     row.onclick = () => this.joinBattle(battle.pokemon_battleid);
                     
                     const trainerName = battle.pokemon_Player1?.firstname || 'Unknown';
@@ -1697,38 +1388,11 @@
                         battle.pokemon_Player1Pokemon.pokemon_hpmax : 
                         (battle.pokemon_Player1Pokemon?.maxHP !== undefined ? battle.pokemon_Player1Pokemon.maxHP : '?');
 
-                    // Get Pokemon sprite
-                    const pokemonId = pokemonNameToId[pokemonName.toLowerCase()] || 1;
-                    const pokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-
                     row.innerHTML = `
-                        <td style="vertical-align: middle;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="${pokemonImageUrl}" alt="${pokemonName}" 
-                                     style="width: 40px; height: 40px; object-fit: contain;" 
-                                     onerror="this.style.display='none';">
-                                <div>
-                                    <div style="font-weight: 600; color: #333; font-size: 14px; margin-bottom: 2px;">${trainerName}</div>
-                                    <div style="font-weight: 500; color: #555; font-size: 13px; margin-bottom: 2px;">${pokemonName}</div>
-                                    <div style="font-size: 12px; color: #666;">Lv. ${pokemonLevel} • ${pokemonHP}/${pokemonMaxHP} HP</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="vertical-align: middle; text-align: center;">
-                            <div style="font-size: 24px; color: #999;">VS</div>
-                        </td>
-                        <td style="vertical-align: middle; text-align: center;">
-                            <div style="font-size: 32px; color: #ccc;">❓</div>
-                            <div style="font-size: 12px; color: #999; margin-top: 4px;">You</div>
-                            <div style="margin-top: 8px; display: flex; justify-content: center;">
-                                <button onclick="event.stopPropagation(); window.location.href='battle-join.html?id=${battle.pokemon_battleid}'" 
-                                        style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;">
-                                    Join Battle
-                                </button>
-                            </div>
-                        </td>
-                        <td style="vertical-align: middle; text-align: center;">
-                        </td>
+                        <td>${trainerName}</td>
+                        <td>${pokemonName}</td>
+                        <td>Lv. ${pokemonLevel}</td>
+                        <td>${pokemonHP}/${pokemonMaxHP} HP</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -1739,57 +1403,12 @@
                 tbody.innerHTML = '';
 
                 if (this.userBattles.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="arena-empty">No PvP battle history found. Create an open challenge to battle other players!</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="2" class="arena-empty">No PvP battle history found. Create an open challenge to battle other players!</td></tr>';
                     return;
                 }
 
-                // Pokemon name to ID mapping for sprites
-                const pokemonNameToId = {
-                    'bulbasaur': 1, 'ivysaur': 2, 'venusaur': 3,
-                    'charmander': 4, 'charmeleon': 5, 'charizard': 6,
-                    'squirtle': 7, 'wartortle': 8, 'blastoise': 9,
-                    'caterpie': 10, 'metapod': 11, 'butterfree': 12,
-                    'weedle': 13, 'kakuna': 14, 'beedrill': 15,
-                    'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
-                    'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
-                    'ekans': 23, 'arbok': 24, 'pikachu': 25, 'raichu': 26,
-                    'sandshrew': 27, 'sandslash': 28, 'nidoran♀': 29, 'nidorina': 30,
-                    'nidoqueen': 31, 'nidoran♂': 32, 'nidorino': 33, 'nidoking': 34,
-                    'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
-                    'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
-                    'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
-                    'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
-                    'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
-                    'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
-                    'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
-                    'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
-                    'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
-                    'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
-                    'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
-                    'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
-                    'farfetchd': 83, 'doduo': 84, 'dodrio': 85, 'seel': 86,
-                    'dewgong': 87, 'grimer': 88, 'muk': 89, 'shellder': 90,
-                    'cloyster': 91, 'gastly': 92, 'haunter': 93, 'gengar': 94,
-                    'onix': 95, 'drowzee': 96, 'hypno': 97, 'krabby': 98,
-                    'kingler': 99, 'voltorb': 100, 'electrode': 101, 'exeggcute': 102,
-                    'exeggutor': 103, 'cubone': 104, 'marowak': 105, 'hitmonlee': 106,
-                    'hitmonchan': 107, 'lickitung': 108, 'koffing': 109, 'weezing': 110,
-                    'rhyhorn': 111, 'rhydon': 112, 'chansey': 113, 'tangela': 114,
-                    'kangaskhan': 115, 'horsea': 116, 'seadra': 117, 'goldeen': 118,
-                    'seaking': 119, 'staryu': 120, 'starmie': 121, 'mr. mime': 122,
-                    'scyther': 123, 'jynx': 124, 'electabuzz': 125, 'magmar': 126,
-                    'pinsir': 127, 'tauros': 128, 'magikarp': 129, 'gyarados': 130,
-                    'lapras': 131, 'ditto': 132, 'eevee': 133, 'vaporeon': 134,
-                    'jolteon': 135, 'flareon': 136, 'porygon': 137, 'omanyte': 138,
-                    'omastar': 139, 'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142,
-                    'snorlax': 143, 'articuno': 144, 'zapdos': 145, 'moltres': 146,
-                    'dratini': 147, 'dragonair': 148, 'dragonite': 149, 'mewtwo': 150,
-                    'mew': 151
-                };
-
                 this.userBattles.forEach(battle => {
                     const row = document.createElement('tr');
-                    row.style.height = '80px'; // Increased height for Pokemon images and stats
                     
                     // Determine if user is player 1 or player 2
                     const isPlayer1 = battle._pokemon_player1_value === this.userId;
@@ -1801,66 +1420,30 @@
                         (battle.pokemon_Player1Pokemon?.pokemon_name || 'Unknown') :
                         (battle.pokemon_Player2Pokemon?.pokemon_name || 'Unknown');
                     
-                    const opponentPokemon = isPlayer1 ? 
-                        (battle.pokemon_Player2Pokemon?.pokemon_name || '???') :
-                        (battle.pokemon_Player1Pokemon?.pokemon_name || 'Unknown');
-                    
-                    // Get Pokemon sprites
-                    const myPokemonId = pokemonNameToId[myPokemon.toLowerCase()] || 1;
-                    const opponentPokemonId = pokemonNameToId[opponentPokemon.toLowerCase()] || 1;
-                    const myPokemonImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${myPokemonId}.png`;
-                    const opponentPokemonImageUrl = opponentPokemon === '???' ? 
-                        '' : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${opponentPokemonId}.png`;
-                    
                     // Simplified status logic - only Open, Won, Lost
                     let statusDisplay = '';
-                    let statusColor = '';
                     let isClickable = false;
-                    let battleStats = '';
                     
                     if (battle.statuscode === 1) {
                         // Open battle waiting for opponent - not clickable for the creator
-                        statusDisplay = 'OPEN';
-                        statusColor = '#ffc107';
+                        statusDisplay = '<span class="status pending">Open</span>';
                         isClickable = false;
-                        battleStats = 'Waiting for opponent to join';
                     } else if (battle.pokemon_battleresultjson || battle.pokemon_battleresult || battle.pokemon_WinnerPokemon || battle.pokemon_LooserPokemon) {
                         // Completed battle - determine win/loss using multiple methods
                         const result = this.getBattleResultForUser(battle, isPlayer1);
                         if (result === 'won') {
-                            statusDisplay = 'WON';
-                            statusColor = '#28a745';
+                            statusDisplay = '<span class="status won">Won</span>';
                         } else if (result === 'lost') {
-                            statusDisplay = 'LOST';
-                            statusColor = '#dc3545';
+                            statusDisplay = '<span class="status lost">Lost</span>';
                         } else {
                             // If we can't determine result, treat as lost for simplicity
-                            statusDisplay = 'LOST';
-                            statusColor = '#dc3545';
+                            statusDisplay = '<span class="status lost">Lost</span>';
                         }
                         isClickable = true;
-                        
-                        // Try to extract battle stats
-                        try {
-                            if (battle.pokemon_battleresultjson) {
-                                const battleData = JSON.parse(battle.pokemon_battleresultjson);
-                                if (battleData.rounds) {
-                                    battleStats = `${battleData.rounds} rounds`;
-                                } else {
-                                    battleStats = 'Battle completed';
-                                }
-                            } else {
-                                battleStats = 'Battle completed';
-                            }
-                        } catch (e) {
-                            battleStats = 'Battle completed';
-                        }
                     } else {
                         // No result data - assume lost
-                        statusDisplay = 'LOST';
-                        statusColor = '#dc3545';
+                        statusDisplay = '<span class="status lost">Lost</span>';
                         isClickable = true;
-                        battleStats = 'Battle completed';
                     }
 
                     // Make completed battles clickable
@@ -1869,47 +1452,13 @@
                         row.onclick = () => this.viewBattleResult(battle.pokemon_battleid);
                     }
 
-                    // Enhanced row with Pokemon images and battle info
+                    // Compact row with opponent and Pokemon on same line
                     row.innerHTML = `
-                        <td style="vertical-align: middle;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="${myPokemonImageUrl}" alt="${myPokemon}" 
-                                     style="width: 48px; height: 48px; object-fit: contain;" 
-                                     onerror="this.style.display='none';">
-                                <div>
-                                    <div style="font-weight: 600; color: #333; font-size: 14px; margin-bottom: 2px;">You</div>
-                                    <div style="font-weight: 500; color: #555; font-size: 13px;">${myPokemon}</div>
-                                </div>
-                            </div>
+                        <td>
+                            <div style="font-weight: 600; color: #333;">${opponent}</div>
+                            <div style="font-size: 12px; color: #666;">vs ${myPokemon}</div>
                         </td>
-                        <td style="vertical-align: middle; text-align: center;">
-                            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <div style="font-size: 20px; color: #999;">VS</div>
-                                ${opponentPokemon === '???' ? 
-                                    '<div style="font-size: 24px; color: #ccc;">❓</div>' : 
-                                    `<img src="${opponentPokemonImageUrl}" alt="${opponentPokemon}" 
-                                          style="width: 48px; height: 48px; object-fit: contain;" 
-                                          onerror="this.style.display='none';">`
-                                }
-                            </div>
-                            <div style="font-size: 11px; color: #666; margin-top: 4px;">
-                                ${opponentPokemon === '???' ? '' : 
-                                    `<div style="font-weight: 600; color: #333; margin-bottom: 1px;">${opponent}</div>
-                                     <div>${opponentPokemon}</div>`
-                                }
-                            </div>
-                        </td>
-                        <td style="vertical-align: middle; text-align: left;">
-                            <div style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 4px;">
-                                <div style="font-weight: 600; color: ${statusColor}; font-size: 14px;">${statusDisplay}</div>
-                                ${isClickable ? 
-                                    `<button onclick="event.stopPropagation(); window.location.href='battle-result.html?id=${battle.pokemon_battleid}'" 
-                                             style="background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: 500;">
-                                        View
-                                    </button>` : ''
-                                }
-                            </div>
-                        </td>
+                        <td>${statusDisplay}</td>
                     `;
                     tbody.appendChild(row);
                 });

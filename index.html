@@ -18,6 +18,19 @@
         <div id="userInfo" class="pokemon-section hidden">
             <h2 class="pokemon-subtitle">Welcome back, <span id="userName"></span>!</h2>
             <p class="pokemon-text-small">Trainer ID: <span id="userEmail"></span></p>
+
+            <!-- Trainer Stats -->
+            <div class="pokemon-grid-condensed">
+                <div class="pokemon-stat-card">
+                    <div class="stat-value" id="pokeballs">--</div>
+                    <div class="stat-label">Pokeballs</div>
+                </div>
+                 <div class="pokemon-stat-card">
+                    <div class="stat-value" id="berries">--</div>
+                    <div class="stat-label">Berries</div>
+                </div>
+            </div>
+
             <div class="pokemon-flex-center mt-lg">
                 <button onclick="logout()" class="pokemon-btn pokemon-btn-sm">Logout</button>
             </div>
@@ -154,6 +167,11 @@
             }
         }
 
+        function updateDashboardStats(profile) {
+            document.getElementById('pokeballs').textContent = profile.pokeballs;
+            document.getElementById('berries').textContent = profile.berries;
+        }
+
         async function loadUserProfileAndShowNavigation(email) {
             try {
                 console.log('INDEX: Loading user profile to check admin privileges...');
@@ -164,6 +182,9 @@
                 if (profile) {
                     console.log('INDEX: User profile loaded, isAdmin:', profile.isAdmin);
                     
+                    // Update dashboard stats
+                    updateDashboardStats(profile);
+
                     // Show navigation with conditional admin panel
                     showNavigation(profile.isAdmin);
                 } else {
