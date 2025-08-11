@@ -29,28 +29,8 @@
       "statusCode": 200
     },
     {
-      "route": "/choose.html", 
-      "serve": "/choose.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/game-unified.html",
-      "serve": "/game-unified.html", 
-      "statusCode": 200
-    },
-    {
       "route": "/login.html",
       "serve": "/login.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/login-simple.html",
-      "serve": "/login-simple.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/mobile-safe.html",
-      "serve": "/mobile-safe.html",
       "statusCode": 200
     },
     {
@@ -76,16 +56,6 @@
     {
       "route": "/pokemon-unified.html",
       "serve": "/pokemon-unified.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/my-pokemon.html",
-      "serve": "/my-pokemon.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/redirect.html",
-      "serve": "/redirect.html",
       "statusCode": 200
     },
     {
@@ -118,7 +88,7 @@
     },
     {
       "route": "/*",
-      "serve": "/choose.html",
+      "serve": "/index.html",
       "statusCode": 200
     }
   ],
